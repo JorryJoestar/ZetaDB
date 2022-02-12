@@ -32,6 +32,10 @@ const (
 	DDL_VIEW_DROP        DDLEnum = 7
 	DDL_INDEX_CREATE     DDLEnum = 8
 	DDL_INDEX_DROP       DDLEnum = 9
+	DDL_TRIGGER_CREATE   DDLEnum = 10
+	DDL_TRIGGER_DROP     DDLEnum = 11
+	DDL_PSM_CREATE       DDLEnum = 12
+	DDL_PSM_DROP         DDLEnum = 13
 )
 
 //data definition language
@@ -40,6 +44,11 @@ const (
 type DDLNode struct {
 	DdlType DDLEnum
 	Table   *TableNode
+	Assert  *AssertNode
+	View    *ViewNode
+	Index   *IndexNode
+	Trigger *TableNode
+	PSM     *PSMNode
 }
 
 //table
@@ -54,8 +63,37 @@ type TableNode struct {
 	ConstraintListValid bool
 
 	//alter table add
-	
+	Domain     *DomainNode
+	Constraint *ConstraintNode
+}
 
+//assert
+type AssertNode struct {
+	AssertName string
+	Condition  *ConditionNode
+}
+
+//view
+type ViewNode struct {
+	ViewName               string
+	Query                  QueryNode
+	AttributeNameList      []string
+	AttributeNameListValid bool
+}
+
+//index
+type IndexNode struct {
+	IndexName         string
+	TableName         string
+	AttributeNameList []string
+}
+
+//trigger
+type TriggerNode struct {
+}
+
+//PSM (function, procedure)
+type PSMNode struct {
 }
 
 //---------------------------------------- DQL ----------------------------------------
@@ -63,6 +101,11 @@ type TableNode struct {
 //data query language
 //SELECT
 type DQLNode struct {
+	Query *QueryNode
+}
+
+//query
+type QueryNode struct {
 }
 
 //---------------------------------------- DCL ----------------------------------------
@@ -95,7 +138,7 @@ type DMLNode struct {
 	Type DMLEnum
 }
 
-//---------------------------------------- common ----------------------------------------
+//---------------------------------------- public ----------------------------------------
 
 //domain
 type DomainEnum uint8
@@ -111,11 +154,11 @@ const (
 	DOMAIN_SHORTINT        DomainEnum = 7
 	DOMAIN_FLOAT           DomainEnum = 8
 	DOMAIN_REAL            DomainEnum = 9
-	DOMAIN_DOUBLEPRECISION DomainEnum = 0
-	DOMAIN_DECIMAL         DomainEnum = 1 //DECIMAL(n,d)
-	DOMAIN_NUMERIC         DomainEnum = 2 //NUMERIC(n,d)
-	DOMAIN_DATE            DomainEnum = 3
-	DOMAIN_TIME            DomainEnum = 4
+	DOMAIN_DOUBLEPRECISION DomainEnum = 10
+	DOMAIN_DECIMAL         DomainEnum = 11 //DECIMAL(n,d)
+	DOMAIN_NUMERIC         DomainEnum = 12 //NUMERIC(n,d)
+	DOMAIN_DATE            DomainEnum = 13
+	DOMAIN_TIME            DomainEnum = 14
 )
 
 type DomainNode struct {
@@ -124,11 +167,10 @@ type DomainNode struct {
 	D    int
 }
 
-//(TableName.)AttributeName
-type AttriNameOptTableNameNode struct {
-	TableNameValid bool
-	AttributeName  string
-	TableName      string
+//TableName.AttributeName
+type AttriNameWithTableNameNode struct {
+	AttributeName string
+	TableName     string
 }
 
 //constraint
@@ -151,4 +193,27 @@ type ElementaryValueNode struct {
 	FloatValue   float64
 	StringValue  string
 	BooleanValue bool
+}
+
+//condition
+type ConditionEnum uint8
+
+const (
+	CONDITION_PREDICATE ConditionEnum = 0
+	CONDITION_AND       ConditionEnum = 1
+	CONDITION_OR        ConditionEnum = 2
+)
+
+type ConditionNode struct {
+	Type       ConditionEnum
+	Predicate  *PredicateNode
+	ConditionL *ConditionNode
+	ConditionR *ConditionNode
+}
+
+type PredicateEnum uint8
+
+const ()
+
+type PredicateNode struct {
 }
