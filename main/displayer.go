@@ -1,5 +1,8 @@
 package main
 
-func displayInfo(s string) {
+type Displayer struct {
+}
+
+func (displayer Displayer) displayInfo(s string) {
 	//TODO
 }
