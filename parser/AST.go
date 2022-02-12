@@ -316,15 +316,37 @@ type ConditionNode struct {
 }
 
 //predicate
-type PredicateEnum uint8
+type CompareMarkEnum uint8
 
-const ()
+const (
+	COMPAREMARK_EQUAL        CompareMarkEnum = 1 // =
+	COMPAREMARK_NOTEQUAL     CompareMarkEnum = 2 // <>
+	COMPAREMARK_LESS         CompareMarkEnum = 3 // <
+	COMPAREMARK_GREATER      CompareMarkEnum = 4 // >
+	COMPAREMARK_LESSEQUAL    CompareMarkEnum = 5 // <=
+	COMPAREMARK_GREATEREQUAL CompareMarkEnum = 6 // >=
+)
 
 type PredicateNode struct {
+	
 }
 
 //expression
-type ExpressionNode struct{}
+type ExpressionOperatorEnum uint8
+
+const (
+	EXPRESSION_OPERATOR_PLUS          ExpressionOperatorEnum = 1
+	EXPRESSION_OPERATOR_MINUS         ExpressionOperatorEnum = 2
+	EXPRESSION_OPERATOR_DIVISION      ExpressionOperatorEnum = 3
+	EXPRESSION_OPERATOR_MULTIPLY      ExpressionOperatorEnum = 4
+	EXPRESSION_OPERATOR_CONCATENATION ExpressionOperatorEnum = 5
+)
+
+type ExpressionNode struct {
+	Type        ExpressionOperatorEnum
+	ExpressionL *ExpressionNode
+	ExpressionR *ExpressionNode
+}
 
 type ExpressionEntryEnum uint8
 
@@ -358,5 +380,5 @@ const (
 type AggregationNode struct {
 	Type                   AggregationEnum
 	DistinctValid          bool
-	AttriNameWithTableName *AttriNameWithTableNameNode
+	AttriNameWithTableName *AttriNameWithTableNameNode //invalid when AGGREGATION_COUNT_ALL
 }
