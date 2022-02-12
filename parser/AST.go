@@ -100,12 +100,115 @@ type PSMNode struct {
 
 //data query language
 //SELECT
+
+type DQLEnum uint8
+
+const (
+	DQL_SINGLE_QUERY DQLEnum = 0 //use only QueryL
+	DQL_UNION        DQLEnum = 1
+	DQL_DIFFERENCE   DQLEnum = 2
+	DQL_INTERSECTION DQLEnum = 3
+)
+
 type DQLNode struct {
-	Query *QueryNode
+	Type   DQLEnum
+	QueryL *QueryNode
+	QueryR *QueryNode
 }
+
+type JoinEnum uint8
+
+const (
+	CROSS_JOIN               JoinEnum = 1
+	JOIN_ON                  JoinEnum = 2
+	NATURAL_JOIN             JoinEnum = 3
+	NATURAL_FULL_OUTER_JOIN  JoinEnum = 4
+	NATURAL_LEFT_OUTER_JOIN  JoinEnum = 5
+	NATURAL_RIGHT_OUTER_JOIN JoinEnum = 6
+	FULL_OUTER_JOIN_ON       JoinEnum = 7
+	LEFT_OUTER_JOIN_ON       JoinEnum = 8
+	RIGHT_OUTER_JOIN_ON      JoinEnum = 9
+)
 
 //query
 type QueryNode struct {
+	//select
+	StarValid     bool
+	DistinctValid bool
+	SelectList    []*SelectListEntry
+
+	//from
+	FromListValid  bool //true then FromList valid, false then Join valid
+	FromList       []*FromListEntry
+	JoinType       JoinEnum
+	JoinTableNameL string
+	JoinTableNameR string
+	OnList         []*OnListEntry
+
+	//where
+	WhereValid     bool
+	WhereCondition *ConditionNode
+
+	//group by
+	GroupByValid bool
+	GroupByList  []*AttriNameWithTableNameNode
+
+	//having
+	HavingValid     bool
+	HavingCondition *ConditionNode
+
+	//order by
+	OrderByValid bool
+	OrderByList  []*OrderByListEntry
+
+	//limit
+	LimitValid bool
+	InitialPos uint32
+	OffsetPos  uint32
+}
+
+type SelectListEntry struct {
+}
+
+type FromListEntryEnum uint8
+
+const (
+	FROM_LIST_ENTRY_SUBQUERY FromListEntryEnum = 1
+	FROM_LIST_ENTRY_TABLE    FromListEntryEnum = 2
+)
+
+type FromListEntry struct {
+	Type       FromListEntryEnum
+	TableName  string
+	Subquery   *QueryNode
+	AliasValid bool
+	Alias      string
+}
+
+type OnListEntry struct {
+	AttriNameWithTableNameL *AttriNameWithTableNameNode
+	AttriNameWithTableNameR *AttriNameWithTableNameNode
+}
+
+type OrderByListEntryEnum uint8
+
+const (
+	ORDER_BY_LIST_ENTRY_EXPRESSION OrderByListEntryEnum = 1
+	ORDER_BY_LIST_ENTRY_ATTRIBUTE  OrderByListEntryEnum = 2
+)
+
+type OrderTrendEnum uint8
+
+const (
+	ORDER_BY_LIST_ENTRY_ASC  OrderTrendEnum = 1
+	ORDER_BY_LIST_ENTRY_DESC OrderTrendEnum = 2
+)
+
+type OrderByListEntry struct {
+	Type                   OrderByListEntryEnum
+	Trend                  OrderTrendEnum
+	Expression             *ExpressionNode
+	AttriNameWithTableName *AttriNameWithTableNameNode
 }
 
 //---------------------------------------- DCL ----------------------------------------
@@ -167,10 +270,11 @@ type DomainNode struct {
 	D    int
 }
 
-//TableName.AttributeName
+//(TableName.)AttributeName
 type AttriNameWithTableNameNode struct {
-	AttributeName string
-	TableName     string
+	TableNameValid bool
+	AttributeName  string
+	TableName      string
 }
 
 //constraint
@@ -189,10 +293,10 @@ const (
 
 type ElementaryValueNode struct {
 	Type         ElementaryValueEnum
-	IntValue     int
-	FloatValue   float64
-	StringValue  string
-	BooleanValue bool
+	IntValue     int     //ELEMENTARY_VALUE_INT
+	FloatValue   float64 //ELEMENTARY_VALUE_FLOAT
+	StringValue  string  //ELEMENTARY_VALUE_STRING
+	BooleanValue bool    //ELEMENTARY_VALUE_BOOLEAN
 }
 
 //condition
@@ -206,14 +310,53 @@ const (
 
 type ConditionNode struct {
 	Type       ConditionEnum
-	Predicate  *PredicateNode
+	Predicate  *PredicateNode //CONDITION_PREDICATE
 	ConditionL *ConditionNode
 	ConditionR *ConditionNode
 }
 
+//predicate
 type PredicateEnum uint8
 
 const ()
 
 type PredicateNode struct {
+}
+
+//expression
+type ExpressionNode struct{}
+
+type ExpressionEntryEnum uint8
+
+const (
+	EXPRESSION_ENTRY_ELEMENTARY_VALUE ExpressionEntryEnum = 1
+	EXPRESSION_ENTRY_ATTRIBUTE_NAME   ExpressionEntryEnum = 2
+	EXPRESSION_ENTRY_AGGREGATION      ExpressionEntryEnum = 3
+	EXPRESSION_ENTRY_EXPRESSION       ExpressionEntryEnum = 4
+)
+
+type ExpressionEntryNode struct {
+	Type                   ExpressionEntryEnum
+	ElementaryValue        *ElementaryValueNode        //EXPRESSION_ENTRY_ELEMENTARY_VALUE
+	AttriNameWithTableName *AttriNameWithTableNameNode //EXPRESSION_ENTRY_ATTRIBUTE_NAME
+	Aggregation            *AggregationNode            //EXPRESSION_ENTRY_AGGREGATION
+	Expression             *ExpressionNode             //EXPRESSION_ENTRY_EXPRESSION
+}
+
+//aggregation
+type AggregationEnum uint8
+
+const (
+	AGGREGATION_SUM       AggregationEnum = 1
+	AGGREGATION_AVG       AggregationEnum = 2
+	AGGREGATION_MIN       AggregationEnum = 3
+	AGGREGATION_MAX       AggregationEnum = 4
+	AGGREGATION_COUNT     AggregationEnum = 5
+	AGGREGATION_COUNT_ALL AggregationEnum = 6
+)
+
+type AggregationNode struct {
+	Type                   AggregationEnum
+	DistinctValid          bool
+	AttriNameWithTableName *AttriNameWithTableNameNode
 }
