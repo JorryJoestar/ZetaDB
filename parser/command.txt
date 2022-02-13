@@ -1,2 +1,2 @@
-flex --prefix=yy --header-file=parse/calc.lex.h -o parse/calc.lex.c parse/calc.l
-go tool yacc -o parse/calc.y.go -p "calc" parse/calc.y
+flex --prefix=yy --header-file=parser/calc.lexer.h -o parser/calc.lexer.c parser/patterns.l
+go tool yacc -o parser/calc.y.go -p "calc" parser/grammar.y
