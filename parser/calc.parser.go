@@ -52,21 +52,70 @@ const (
 
 type Node struct {
 	Type NodeEnum
+
+	/* ast */
+	Ast *ASTNode
+	Ddl *DDLNode
+	Dql *DQLNode
+	Dcl *DCLNode
+	Dml *DMLNode
+
+	/* ddl */
+	Table   *TableNode
+	Assert  *AssertNode
+	View    *ViewNode
+	Index   *IndexNode
+	Trigger *TriggerNode
+	Psm     *PsmNode
+
+	/* dql */
+	Query            *QueryNode
+	SelectListEntry  *SelectListEntryNode
+	FromListEntry    *FromListEntryNode
+	OnListEntry      *OnListEntryNode
+	OrderByListEntry *OrderByListEntryNode
+
+	/* dml */
+	Update          *UpdateNode
+	UpdateListEntry *UpdateListEntryNode
+	Insert          *InsertNode
+	DeleteNode      *DeleteNode
+
+	/* public */
+	Domain                   *DomainNode
+	AttriNameOptionTableName *AttriNameOptionTableNameNode
+	Constraint               *ConstraintNode
+	ElementaryValue          *ElementaryValueNode
+	Condition                *ConditionNode
+	Predicate                *PredicateNode
+	Expression               *ExpressionNode
+	ExpressionEntry          *ExpressionEntryNode
+	Aggregation              *AggregationNode
 }
 
-//line parser/grammar.y:54
+//line parser/grammar.y:92
 type calcSymType struct {
-	yys    int
-	NodePt *Node
+	yys     int
+	NodePt  *Node
+	Int     int
+	Float   float64
+	String  string
+	Boolean bool
 }
 
-const LPAREN = 57346
+const INTVALUE = 57346
+const FLOATVALUE = 57347
+const STRINGVALUE = 57348
+const BOOLVALUE = 57349
 
 var calcToknames = [...]string{
 	"$end",
 	"error",
 	"$unk",
-	"LPAREN",
+	"INTVALUE",
+	"FLOATVALUE",
+	"STRINGVALUE",
+	"BOOLVALUE",
 }
 
 var calcStatenames = [...]string{}
@@ -75,7 +124,7 @@ const calcEofCode = 1
 const calcErrCode = 2
 const calcInitialStackSize = 16
 
-//line parser/grammar.y:74
+//line parser/grammar.y:297
 
 //line yacctab:1
 var calcExca = [...]int{
@@ -86,34 +135,34 @@ var calcExca = [...]int{
 
 const calcPrivate = 57344
 
-const calcLast = 2
+const calcLast = 6
 
 var calcAct = [...]int{
-	2, 1,
+	3, 4, 5, 6, 2, 1,
 }
 
 var calcPact = [...]int{
-	-4, -1000, -1000,
+	-4, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 
 var calcPgo = [...]int{
-	0, 1,
+	0, 5, 4,
 }
 
 var calcR1 = [...]int{
-	0, 1,
+	0, 1, 2, 2, 2, 2,
 }
 
 var calcR2 = [...]int{
-	0, 1,
+	0, 1, 1, 1, 1, 1,
 }
 
 var calcChk = [...]int{
-	-1000, -1, 4,
+	-1000, -1, -2, 4, 5, 6, 7,
 }
 
 var calcDef = [...]int{
-	0, -2, 1,
+	0, -2, 1, 2, 3, 4, 5,
 }
 
 var calcTok1 = [...]int{
@@ -121,7 +170,7 @@ var calcTok1 = [...]int{
 }
 
 var calcTok2 = [...]int{
-	2, 3, 4,
+	2, 3, 4, 5, 6, 7,
 }
 
 var calcTok3 = [...]int{
@@ -467,15 +516,57 @@ calcdefault:
 
 	case 1:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:64
+//line parser/grammar.y:126
 		{
-			fmt.Println("success")
+			fmt.Println("k")
+			fmt.Println(calcDollar[1].NodePt.ElementaryValue.IntValue)
+
 			GetInstance().AST = &ASTNode{
 				Type: AST_DQL,
 				Ddl:  nil,
 				Dml:  nil,
 				Dcl:  nil,
 				Dql:  nil}
+		}
+	case 2:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:266
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
+			calcVAL.NodePt.ElementaryValue = &ElementaryValueNode{}
+			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_INT
+			calcVAL.NodePt.ElementaryValue.IntValue = calcDollar[1].Int
+		}
+	case 3:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:273
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
+			calcVAL.NodePt.ElementaryValue = &ElementaryValueNode{}
+			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_FLOAT
+			calcVAL.NodePt.ElementaryValue.FloatValue = calcDollar[1].Float
+		}
+	case 4:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:280
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
+			calcVAL.NodePt.ElementaryValue = &ElementaryValueNode{}
+			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
+			calcVAL.NodePt.ElementaryValue.StringValue = calcDollar[1].String
+		}
+	case 5:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:287
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
+			calcVAL.NodePt.ElementaryValue = &ElementaryValueNode{}
+			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_BOOLEAN
+			calcVAL.NodePt.ElementaryValue.BooleanValue = calcDollar[1].Boolean
 		}
 	}
 	goto calcstack /* stack new state and value */

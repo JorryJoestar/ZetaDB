@@ -7,6 +7,8 @@ import "C"
 import (
 	"errors"
 	"log"
+	"strconv"
+	"strings"
 )
 
 type calcLex struct {
@@ -39,8 +41,22 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	p.yytext = C.GoString(C.yytext)
 	switch tok {
 
-	case C.LPAREN:
-		return LPAREN
+	case C.INTVALUE:
+		yylval.Int, _ = strconv.Atoi(p.yytext)
+		return INTVALUE
+	case C.FLOATVALUE:
+		yylval.Float, _ = strconv.ParseFloat(p.yytext, 64)
+		return FLOATVALUE
+	case C.STRINGVALUE:
+		yylval.String = strings.Trim(p.yytext, "\"'")
+		return STRINGVALUE
+	case C.BOOLVALUE:
+		if p.yytext[0] == byte('t') {
+			yylval.Boolean = true
+		} else {
+			yylval.Boolean = false
+		}
+		return BOOLVALUE
 	}
 	return 0 //end of statement
 }

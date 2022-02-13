@@ -2,10 +2,14 @@
 state 0
 	$accept: .ast $end 
 
-	LPAREN  shift 2
+	INTVALUE  shift 3
+	FLOATVALUE  shift 4
+	STRINGVALUE  shift 5
+	BOOLVALUE  shift 6
 	.  error
 
 	ast  goto 1
+	elementaryValue  goto 2
 
 state 1
 	$accept:  ast.$end 
@@ -15,20 +19,44 @@ state 1
 
 
 state 2
-	ast:  LPAREN.    (1)
+	ast:  elementaryValue.    (1)
 
-	.  reduce 1 (src line 63)
+	.  reduce 1 (src line 125)
 
 
-4 terminals, 2 nonterminals
-2 grammar rules, 3/16000 states
+state 3
+	elementaryValue:  INTVALUE.    (2)
+
+	.  reduce 2 (src line 265)
+
+
+state 4
+	elementaryValue:  FLOATVALUE.    (3)
+
+	.  reduce 3 (src line 273)
+
+
+state 5
+	elementaryValue:  STRINGVALUE.    (4)
+
+	.  reduce 4 (src line 280)
+
+
+state 6
+	elementaryValue:  BOOLVALUE.    (5)
+
+	.  reduce 5 (src line 287)
+
+
+7 terminals, 3 nonterminals
+6 grammar rules, 7/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
-51 working sets used
-memory: parser 0/240000
+52 working sets used
+memory: parser 1/240000
 0 extra closures
-1 shift entries, 1 exceptions
-1 goto entries
+4 shift entries, 1 exceptions
+2 goto entries
 0 entries saved by goto default
-Optimizer space used: output 2/240000
-2 table entries, 0 zero
-maximum spread: 4, maximum offset: 4
+Optimizer space used: output 6/240000
+6 table entries, 0 zero
+maximum spread: 7, maximum offset: 4

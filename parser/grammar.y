@@ -90,30 +90,44 @@ type Node struct {
 %}
 
 %union {
-    NodePt *Node
+    NodePt  *Node
+    Int     int
+    Float   float64
+    String  string
+    Boolean bool
 }
 
 %type <NodePt> ast
 
-%type <NodePt> ddl
+// %type <NodePt> ddl
+// %type <NodePt> createTableStmt
+%type <NodePt> elementaryValue
 
-%type <NodePt> createTableStmt
-
-%token LPAREN
+%token <Int> INTVALUE 
+%token <Float> FLOATVALUE 
+%token <String> STRINGVALUE 
+%token <Boolean> BOOLVALUE
 
 %%
 
 /*  --------------------------------------------------------------------------------
     |                                      AST                                     |
     --------------------------------------------------------------------------------
+    
     ast
         ddl
         dml
         dcl
         dql
+
     -------------------------------------------------------------------------------- */
+
 ast
-    :ddl {
+    :elementaryValue {
+        fmt.Println("k")
+        fmt.Println($1.ElementaryValue.IntValue)
+
+
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
 	        Ddl: nil,
@@ -172,22 +186,6 @@ ast
 
 
    ------------------------------------------------------------------------------------- */
-ddl
-    :createTableStmt {
-        
-    }
-
-createTableStmt
-    :CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON {
-
-    }
-    |CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList LPAREN SEMICOLON {
-
-    }
-    ;
-
-attributeDeclarationList
-    :
 
 
 
@@ -260,10 +258,40 @@ attributeDeclarationList
         INTVALUE
         FLOATVALUE
         STRINGVALUE
-        BOOLEANVALUE
+        BOOLVALUE
 
    -------------------------------------------------------------------------------- */
 
+elementaryValue
+    :INTVALUE {
+        $$ = &Node{}
+        $$.Type = ELEMENTARY_VALUE_NODE
+        $$.ElementaryValue = &ElementaryValueNode{}
+        $$.ElementaryValue.Type = ELEMENTARY_VALUE_INT
+        $$.ElementaryValue.IntValue = $1
+    }
+    |FLOATVALUE {
+        $$ = &Node{}
+        $$.Type = ELEMENTARY_VALUE_NODE
+        $$.ElementaryValue = &ElementaryValueNode{}
+        $$.ElementaryValue.Type = ELEMENTARY_VALUE_FLOAT
+        $$.ElementaryValue.FloatValue = $1
+    }
+    |STRINGVALUE {
+        $$ = &Node{}
+        $$.Type = ELEMENTARY_VALUE_NODE
+        $$.ElementaryValue = &ElementaryValueNode{}
+        $$.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
+        $$.ElementaryValue.StringValue = $1
+    }
+    |BOOLVALUE {
+        $$ = &Node{}
+        $$.Type = ELEMENTARY_VALUE_NODE
+        $$.ElementaryValue = &ElementaryValueNode{}
+        $$.ElementaryValue.Type = ELEMENTARY_VALUE_BOOLEAN
+        $$.ElementaryValue.BooleanValue = $1
+    }
+    ;
 
 
 %%
