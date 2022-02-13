@@ -63,6 +63,12 @@ type Node struct {
 ast
     :LPAREN {
         fmt.Println("success")
+        GetInstance().AST = &ASTNode{
+            Type: AST_DQL,
+	        Ddl: nil,
+	        Dml: nil,
+	        Dcl: nil,
+	        Dql: nil}
     }
 
 %%

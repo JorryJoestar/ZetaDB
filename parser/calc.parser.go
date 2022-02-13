@@ -75,7 +75,7 @@ const calcEofCode = 1
 const calcErrCode = 2
 const calcInitialStackSize = 16
 
-//line parser/grammar.y:68
+//line parser/grammar.y:74
 
 //line yacctab:1
 var calcExca = [...]int{
@@ -470,6 +470,12 @@ calcdefault:
 //line parser/grammar.y:64
 		{
 			fmt.Println("success")
+			GetInstance().AST = &ASTNode{
+				Type: AST_DQL,
+				Ddl:  nil,
+				Dml:  nil,
+				Dcl:  nil,
+				Dql:  nil}
 		}
 	}
 	goto calcstack /* stack new state and value */
