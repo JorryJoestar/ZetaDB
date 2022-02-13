@@ -103,15 +103,15 @@ type Node struct {
 
 %%
 
-/* ---------------------------------------- AST ----------------------------------------
-    
+/* --------------------------------------------------------------------------------
+   |                                      AST                                     |
+   --------------------------------------------------------------------------------
     ast
         ddl
         dml
         dcl
         dql
-
-   ------------------------------------------------------------------------------------- */
+   -------------------------------------------------------------------------------- */
 ast
     :ddl {
         GetInstance().AST = &ASTNode{
@@ -122,8 +122,11 @@ ast
 	        Dql: nil}
     }
 
-/* ---------------------------------------- DDL ----------------------------------------
-   
+/* --------------------------------------------------------------------------------
+   |                                     DDL                                      |
+   --------------------------------------------------------------------------------
+
+   ------------------------------------- DDL --------------------------------------
     ddl
         createTableStmt
         dropTableStmt
@@ -144,11 +147,123 @@ ast
 
         createPsmStmt
         dropPsmStmt
+    
+    -------------------------------- createTableStmt ------------------------------
+
+    createTableStmt
+        CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON
+		CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintPhraseList LPAREN SEMICOLON
+
+    attributeDeclarationList
+        attributeDeclaration
+        attributeDeclarationList
+
+    attributeDeclaration
+        ID domain
+        ID domain constraintList
+
+    constraintList
+        constraint
+        constraintList constraint
+
+    -------------------------------------------------------------------------------------
+
+
+
 
    ------------------------------------------------------------------------------------- */
 ddl
     :createTableStmt {
+        
+    }
+
+createTableStmt
+    :CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON {
 
     }
+    |CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList LPAREN SEMICOLON {
+
+    }
+    ;
+
+attributeDeclarationList
+    :
+
+
+
+/*  --------------------------------------------------------------------------------
+    |                                      public                                  |
+    --------------------------------------------------------------------------------
+
+    ---------------------------------- constraint ----------------------------------
+    
+    constraint
+        	DEFAULT elementaryValue
+
+			UNIQUE
+			PRIMARYKEY
+			NOT NULLMARK
+
+			CHECK LPAREN condition RPAREN
+
+			REFERENCES ID LPAREN ID RPAREN
+
+			REFERENCES ID LPAREN ID RPAREN setDeferrable
+			REFERENCES ID LPAREN ID RPAREN onUpdateSet
+			REFERENCES ID LPAREN ID RPAREN onDeleteSet
+
+			REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+			REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+			REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+			REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+			REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+			REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+
+			REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+			REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+			REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+			REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+			REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+			REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+
+        	CONSTRAINT ID DEFAULT elementaryValue
+
+			CONSTRAINT ID UNIQUE
+			CONSTRAINT ID PRIMARYKEY
+			CONSTRAINT ID NOT NULLMARK
+
+			CONSTRAINT ID CHECK LPAREN condition RPAREN
+
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN
+
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet
+
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+			CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+
+    --------------------------------- elementaryValue -----------------------------
+    
+    elementaryValue
+        INTVALUE
+        FLOATVALUE
+        STRINGVALUE
+        BOOLEANVALUE
+
+   -------------------------------------------------------------------------------- */
+
+
 
 %%
