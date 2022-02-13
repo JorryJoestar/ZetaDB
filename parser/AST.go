@@ -10,7 +10,7 @@ const (
 	AST_DQL ASTEnum = 4
 )
 
-type AST struct {
+type ASTNode struct {
 	Type ASTEnum
 	Ddl  *DDLNode
 	Dml  *DMLNode
@@ -151,7 +151,7 @@ type QueryNode struct {
 
 	//group by
 	GroupByValid bool
-	GroupByList  []*AttriNameWithTableNameNode
+	GroupByList  []*AttriNameOptionTableNameNode
 
 	//having
 	HavingValid     bool
@@ -179,7 +179,7 @@ type SelectListEntry struct {
 	Type                   SelectListEntryEnum
 	AliasValid             bool
 	Alias                  string
-	AttriNameWithTableName *AttriNameWithTableNameNode
+	AttriNameWithTableName *AttriNameOptionTableNameNode
 	Aggregation            *AggregationNode
 	Expression             *ExpressionNode
 }
@@ -200,8 +200,8 @@ type FromListEntry struct {
 }
 
 type OnListEntry struct {
-	AttriNameWithTableNameL *AttriNameWithTableNameNode
-	AttriNameWithTableNameR *AttriNameWithTableNameNode
+	AttriNameWithTableNameL *AttriNameOptionTableNameNode
+	AttriNameWithTableNameR *AttriNameOptionTableNameNode
 }
 
 type OrderByListEntryEnum uint8
@@ -222,7 +222,7 @@ type OrderByListEntry struct {
 	Type                   OrderByListEntryEnum
 	Trend                  OrderTrendEnum
 	Expression             *ExpressionNode
-	AttriNameWithTableName *AttriNameWithTableNameNode
+	AttriNameWithTableName *AttriNameOptionTableNameNode
 }
 
 //---------------------------------------- DCL ----------------------------------------
@@ -335,7 +335,7 @@ type DomainNode struct {
 }
 
 //(TableName.)AttributeName
-type AttriNameWithTableNameNode struct {
+type AttriNameOptionTableNameNode struct {
 	TableNameValid bool
 	AttributeName  string
 	TableName      string
@@ -465,9 +465,9 @@ type PredicateNode struct {
 	Type                    PredicateEnum
 	CompareMark             CompareMarkEnum
 	ElementaryValue         *ElementaryValueNode
-	AttriNameWithTableNameL *AttriNameWithTableNameNode
-	AttriNameWithTableNameR *AttriNameWithTableNameNode
-	AttributeTuple          []*AttriNameWithTableNameNode
+	AttriNameWithTableNameL *AttriNameOptionTableNameNode
+	AttriNameWithTableNameR *AttriNameOptionTableNameNode
+	AttributeTuple          []*AttriNameOptionTableNameNode
 	Subquery                *QueryNode
 	TableName               string
 }
@@ -485,8 +485,8 @@ const (
 
 type ExpressionNode struct {
 	Type             ExpressionOperatorEnum
-	ExpressionEntryL *ExpressionEntryNode
-	ExpressionEntryR *ExpressionEntryNode
+	ExpressionEntryL *ExpressionEntry
+	ExpressionEntryR *ExpressionEntry
 }
 
 type ExpressionEntryEnum uint8
@@ -498,12 +498,12 @@ const (
 	EXPRESSION_ENTRY_EXPRESSION       ExpressionEntryEnum = 4
 )
 
-type ExpressionEntryNode struct {
+type ExpressionEntry struct {
 	Type                   ExpressionEntryEnum
-	ElementaryValue        *ElementaryValueNode        //EXPRESSION_ENTRY_ELEMENTARY_VALUE
-	AttriNameWithTableName *AttriNameWithTableNameNode //EXPRESSION_ENTRY_ATTRIBUTE_NAME
-	Aggregation            *AggregationNode            //EXPRESSION_ENTRY_AGGREGATION
-	Expression             *ExpressionNode             //EXPRESSION_ENTRY_EXPRESSION
+	ElementaryValue        *ElementaryValueNode          //EXPRESSION_ENTRY_ELEMENTARY_VALUE
+	AttriNameWithTableName *AttriNameOptionTableNameNode //EXPRESSION_ENTRY_ATTRIBUTE_NAME
+	Aggregation            *AggregationNode              //EXPRESSION_ENTRY_AGGREGATION
+	Expression             *ExpressionNode               //EXPRESSION_ENTRY_EXPRESSION
 }
 
 //aggregation
@@ -520,6 +520,6 @@ const (
 
 type AggregationNode struct {
 	Type                   AggregationEnum
-	DistinctValid          bool                        //invalid when AGGREGATION_COUNT_ALL
-	AttriNameWithTableName *AttriNameWithTableNameNode //invalid when AGGREGATION_COUNT_ALL
+	DistinctValid          bool                          //invalid when AGGREGATION_COUNT_ALL
+	AttriNameWithTableName *AttriNameOptionTableNameNode //invalid when AGGREGATION_COUNT_ALL
 }
