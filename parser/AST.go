@@ -48,7 +48,7 @@ type DDLNode struct {
 	View    *ViewNode
 	Index   *IndexNode
 	Trigger *TableNode
-	PSM     *PSMNode
+	PSM     *PsmNode
 }
 
 //table
@@ -93,7 +93,7 @@ type TriggerNode struct {
 }
 
 //PSM (function, procedure)
-type PSMNode struct {
+type PsmNode struct {
 }
 
 //---------------------------------------- DQL ----------------------------------------
@@ -135,15 +135,15 @@ type QueryNode struct {
 	//select
 	StarValid     bool
 	DistinctValid bool
-	SelectList    []*SelectListEntry
+	SelectList    []*SelectListEntryNode
 
 	//from
 	FromListValid  bool //true then FromList valid, false then Join valid
-	FromList       []*FromListEntry
+	FromList       []*FromListEntryNode
 	JoinType       JoinEnum
 	JoinTableNameL string
 	JoinTableNameR string
-	OnList         []*OnListEntry
+	OnList         []*OnListEntryNode
 
 	//where
 	WhereValid     bool
@@ -159,7 +159,7 @@ type QueryNode struct {
 
 	//order by
 	OrderByValid bool
-	OrderByList  []*OrderByListEntry
+	OrderByList  []*OrderByListEntryNode
 
 	//limit
 	LimitValid bool
@@ -175,7 +175,7 @@ const (
 	SELECT_LIST_ENTRY_EXPRESSION     SelectListEntryEnum = 3 //Expression
 )
 
-type SelectListEntry struct {
+type SelectListEntryNode struct {
 	Type                   SelectListEntryEnum
 	AliasValid             bool
 	Alias                  string
@@ -191,7 +191,7 @@ const (
 	FROM_LIST_ENTRY_TABLE    FromListEntryEnum = 2
 )
 
-type FromListEntry struct {
+type FromListEntryNode struct {
 	Type       FromListEntryEnum
 	TableName  string
 	Subquery   *QueryNode
@@ -199,7 +199,7 @@ type FromListEntry struct {
 	Alias      string
 }
 
-type OnListEntry struct {
+type OnListEntryNode struct {
 	AttriNameWithTableNameL *AttriNameOptionTableNameNode
 	AttriNameWithTableNameR *AttriNameOptionTableNameNode
 }
@@ -218,7 +218,7 @@ const (
 	ORDER_BY_LIST_ENTRY_DESC OrderTrendEnum = 2
 )
 
-type OrderByListEntry struct {
+type OrderByListEntryNode struct {
 	Type                   OrderByListEntryEnum
 	Trend                  OrderTrendEnum
 	Expression             *ExpressionNode
@@ -266,7 +266,7 @@ type DMLNode struct {
 type UpdateNode struct {
 	TableName  string
 	Condition  *ConditionNode
-	UpdateList []*UpdateListEntry
+	UpdateList []*UpdateListEntryNode
 }
 
 type UpdateListEntryEnum uint8
@@ -276,7 +276,7 @@ const (
 	UPDATE_LIST_ENTRY_ELEMENTARY_VALUE UpdateListEntryEnum = 2
 )
 
-type UpdateListEntry struct {
+type UpdateListEntryNode struct {
 	AttributeName   string
 	ElementaryValue *ElementaryValueNode
 	Expression      *ExpressionNode
@@ -485,8 +485,8 @@ const (
 
 type ExpressionNode struct {
 	Type             ExpressionOperatorEnum
-	ExpressionEntryL *ExpressionEntry
-	ExpressionEntryR *ExpressionEntry
+	ExpressionEntryL *ExpressionEntryNode
+	ExpressionEntryR *ExpressionEntryNode
 }
 
 type ExpressionEntryEnum uint8
@@ -498,7 +498,7 @@ const (
 	EXPRESSION_ENTRY_EXPRESSION       ExpressionEntryEnum = 4
 )
 
-type ExpressionEntry struct {
+type ExpressionEntryNode struct {
 	Type                   ExpressionEntryEnum
 	ElementaryValue        *ElementaryValueNode          //EXPRESSION_ENTRY_ELEMENTARY_VALUE
 	AttriNameWithTableName *AttriNameOptionTableNameNode //EXPRESSION_ENTRY_ATTRIBUTE_NAME

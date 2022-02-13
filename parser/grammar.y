@@ -47,6 +47,44 @@ const (
 type Node struct {
     Type NodeEnum
 
+/* ast */
+    Ast *ASTNode
+    Ddl *DDLNode
+    Dql *DQLNode
+    Dcl *DCLNode
+    Dml *DMLNode
+
+/* ddl */
+    Table   *TableNode
+    Assert  *AssertNode
+    View    *ViewNode
+    Index   *IndexNode
+    Trigger *TriggerNode
+    Psm     *PsmNode
+
+/* dql */
+    Query            *QueryNode
+    SelectListEntry  *SelectListEntryNode
+    FromListEntry    *FromListEntryNode
+    OnListEntry      *OnListEntryNode
+    OrderByListEntry *OrderByListEntryNode
+
+/* dml */
+    Update          *UpdateNode
+    UpdateListEntry *UpdateListEntryNode
+    Insert          *InsertNode
+    DeleteNode      *DeleteNode
+
+/* public */
+    Domain                   *DomainNode
+    AttriNameOptionTableName *AttriNameOptionTableNameNode
+    Constraint               *ConstraintNode
+    ElementaryValue          *ElementaryValueNode
+    Condition                *ConditionNode
+    Predicate                *PredicateNode
+    Expression               *ExpressionNode
+    ExpressionEntry          *ExpressionEntryNode
+    Aggregation              *AggregationNode
 }
 
 %}
@@ -57,18 +95,60 @@ type Node struct {
 
 %type <NodePt> ast
 
+%type <NodePt> ddl
+
+%type <NodePt> createTableStmt
+
 %token LPAREN
 
 %%
+
+/* ---------------------------------------- AST ----------------------------------------
+    
+    ast
+        ddl
+        dml
+        dcl
+        dql
+
+   ------------------------------------------------------------------------------------- */
 ast
-    :LPAREN {
-        fmt.Println("success")
+    :ddl {
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
 	        Ddl: nil,
 	        Dml: nil,
 	        Dcl: nil,
 	        Dql: nil}
+    }
+
+/* ---------------------------------------- DDL ----------------------------------------
+   
+    ddl
+        createTableStmt
+        dropTableStmt
+        alterTableAddStmt
+        alterTableDropStmt
+
+        createAssertStmt
+        dropAssertStmt
+        
+        createViewStmt
+        dropViewStmt
+
+        createIndexStmt
+        dropIndexStmt
+
+        createTriggerStmt
+        dropTriggerStmt
+
+        createPsmStmt
+        dropPsmStmt
+
+   ------------------------------------------------------------------------------------- */
+ddl
+    :createTableStmt {
+
     }
 
 %%
