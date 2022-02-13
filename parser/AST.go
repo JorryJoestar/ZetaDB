@@ -4,10 +4,10 @@ package parser
 type ASTEnum uint8
 
 const (
-	AST_DDL ASTEnum = 0
-	AST_DML ASTEnum = 1
-	AST_DCL ASTEnum = 2
-	AST_DQL ASTEnum = 3
+	AST_DDL ASTEnum = 1
+	AST_DML ASTEnum = 2
+	AST_DCL ASTEnum = 3
+	AST_DQL ASTEnum = 4
 )
 
 type AST struct {
@@ -22,20 +22,20 @@ type AST struct {
 type DDLEnum uint8
 
 const (
-	DDL_TABLE_CREATE     DDLEnum = 0
-	DDL_TABLE_DROP       DDLEnum = 1
-	DDL_TABLE_ALTER_ADD  DDLEnum = 2
-	DDL_TABLE_ALTER_DROP DDLEnum = 3
-	DDL_ASSERT_CREATE    DDLEnum = 4
-	DDL_ASSERT_DROP      DDLEnum = 5
-	DDL_VIEW_CREATE      DDLEnum = 6
-	DDL_VIEW_DROP        DDLEnum = 7
-	DDL_INDEX_CREATE     DDLEnum = 8
-	DDL_INDEX_DROP       DDLEnum = 9
-	DDL_TRIGGER_CREATE   DDLEnum = 10
-	DDL_TRIGGER_DROP     DDLEnum = 11
-	DDL_PSM_CREATE       DDLEnum = 12
-	DDL_PSM_DROP         DDLEnum = 13
+	DDL_TABLE_CREATE     DDLEnum = 1
+	DDL_TABLE_DROP       DDLEnum = 2
+	DDL_TABLE_ALTER_ADD  DDLEnum = 3
+	DDL_TABLE_ALTER_DROP DDLEnum = 4
+	DDL_ASSERT_CREATE    DDLEnum = 5
+	DDL_ASSERT_DROP      DDLEnum = 6
+	DDL_VIEW_CREATE      DDLEnum = 7
+	DDL_VIEW_DROP        DDLEnum = 8
+	DDL_INDEX_CREATE     DDLEnum = 9
+	DDL_INDEX_DROP       DDLEnum = 10
+	DDL_TRIGGER_CREATE   DDLEnum = 11
+	DDL_TRIGGER_DROP     DDLEnum = 12
+	DDL_PSM_CREATE       DDLEnum = 13
+	DDL_PSM_DROP         DDLEnum = 14
 )
 
 //data definition language
@@ -167,7 +167,21 @@ type QueryNode struct {
 	OffsetPos  uint32
 }
 
+type SelectListEntryEnum uint8
+
+const (
+	SELECT_LIST_ENTRY_ATTRIBUTE_NAME SelectListEntryEnum = 1 //AttriNameWithTableName
+	SELECT_LIST_ENTRY_AGGREGATION    SelectListEntryEnum = 2 //Aggregation
+	SELECT_LIST_ENTRY_EXPRESSION     SelectListEntryEnum = 3 //Expression
+)
+
 type SelectListEntry struct {
+	Type                   SelectListEntryEnum
+	AliasValid             bool
+	Alias                  string
+	AttriNameWithTableName *AttriNameWithTableNameNode
+	Aggregation            *AggregationNode
+	Expression             *ExpressionNode
 }
 
 type FromListEntryEnum uint8
