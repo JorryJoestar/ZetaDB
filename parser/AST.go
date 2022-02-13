@@ -311,21 +311,21 @@ type DeleteNode struct {
 type DomainEnum uint8
 
 const (
-	DOMAIN_CHAR            DomainEnum = 0
-	DOMAIN_VARCHAR         DomainEnum = 1 //VARCHAR(n)
-	DOMAIN_BIT             DomainEnum = 2 //BIT(n)
-	DOMAIN_BITVARYING      DomainEnum = 3 //BITVARYING(n)
-	DOMAIN_BOOLEAN         DomainEnum = 4
-	DOMAIN_INT             DomainEnum = 5
-	DOMAIN_INTEGER         DomainEnum = 6
-	DOMAIN_SHORTINT        DomainEnum = 7
-	DOMAIN_FLOAT           DomainEnum = 8
-	DOMAIN_REAL            DomainEnum = 9
-	DOMAIN_DOUBLEPRECISION DomainEnum = 10
-	DOMAIN_DECIMAL         DomainEnum = 11 //DECIMAL(n,d)
-	DOMAIN_NUMERIC         DomainEnum = 12 //NUMERIC(n,d)
-	DOMAIN_DATE            DomainEnum = 13
-	DOMAIN_TIME            DomainEnum = 14
+	DOMAIN_CHAR            DomainEnum = 1
+	DOMAIN_VARCHAR         DomainEnum = 2 //VARCHAR(n)
+	DOMAIN_BIT             DomainEnum = 3 //BIT(n)
+	DOMAIN_BITVARYING      DomainEnum = 4 //BITVARYING(n)
+	DOMAIN_BOOLEAN         DomainEnum = 5
+	DOMAIN_INT             DomainEnum = 6
+	DOMAIN_INTEGER         DomainEnum = 7
+	DOMAIN_SHORTINT        DomainEnum = 8
+	DOMAIN_FLOAT           DomainEnum = 9
+	DOMAIN_REAL            DomainEnum = 10
+	DOMAIN_DOUBLEPRECISION DomainEnum = 11
+	DOMAIN_DECIMAL         DomainEnum = 12 //DECIMAL(n,d)
+	DOMAIN_NUMERIC         DomainEnum = 13 //NUMERIC(n,d)
+	DOMAIN_DATE            DomainEnum = 14
+	DOMAIN_TIME            DomainEnum = 15
 )
 
 type DomainNode struct {
@@ -342,17 +342,61 @@ type AttriNameWithTableNameNode struct {
 }
 
 //constraint
+type ConstraintEnum uint8
+
+const (
+	CONSTRAINT_UNIQUE      ConstraintEnum = 1
+	CONSTRAINT_PRIMARY_KEY ConstraintEnum = 2
+	CONSTRAINT_FOREIGN_KEY ConstraintEnum = 3
+	CONSTRAINT_NOT_NULL    ConstraintEnum = 4
+	CONSTRAINT_DEFAULT     ConstraintEnum = 5
+	CONSTRAINT_CHECK       ConstraintEnum = 6
+)
+
+type ConstraintDeferrableEnum uint8
+
+const (
+	CONSTRAINT_NOT_DEFERRABLE      ConstraintDeferrableEnum = 1
+	CONSTRAINT_INITIALLY_DEFERRED  ConstraintDeferrableEnum = 2
+	CONSTRAINT_INITIALLY_IMMEDIATE ConstraintDeferrableEnum = 3
+)
+
+type ConstraintUpdateSetEnum uint8
+
+const (
+	CONSTRAINT_UPDATE_SET_NULL    ConstraintUpdateSetEnum = 1
+	CONSTRAINT_UPDATE_SET_CASCADE ConstraintUpdateSetEnum = 2
+)
+
+type ConstraintDeleteSetEnum uint8
+
+const (
+	CONSTRAINT_DELETE_SET_NULL    ConstraintDeleteSetEnum = 1
+	CONSTRAINT_DELETE_SET_CASCADE ConstraintDeleteSetEnum = 2
+)
+
 type ConstraintNode struct {
+	Type                 ConstraintEnum
+	ConstraintNameValid  bool
+	ConstraintName       string
+	AttriNameList        []string                 //CONSTRAINT_UNIQUE,CONSTRAINT_PRIMARY_KEY
+	Condition            *ConditionNode           //CONSTRAINT_CHECK
+	AttributeNameLocal   string                   //CONSTRAINT_FOREIGN_KEY
+	AttributeNameForeign string                   //CONSTRAINT_FOREIGN_KEY
+	ForeignTableName     string                   //CONSTRAINT_FOREIGN_KEY
+	Deferrable           ConstraintDeferrableEnum //CONSTRAINT_FOREIGN_KEY
+	UpdateSet            ConstraintUpdateSetEnum  //CONSTRAINT_FOREIGN_KEY
+	DeleteSet            ConstraintDeleteSetEnum  //CONSTRAINT_FOREIGN_KEY
 }
 
 //elementary value
 type ElementaryValueEnum uint8
 
 const (
-	ELEMENTARY_VALUE_INT     ElementaryValueEnum = 0
-	ELEMENTARY_VALUE_FLOAT   ElementaryValueEnum = 1
-	ELEMENTARY_VALUE_STRING  ElementaryValueEnum = 2
-	ELEMENTARY_VALUE_BOOLEAN ElementaryValueEnum = 3
+	ELEMENTARY_VALUE_INT     ElementaryValueEnum = 1
+	ELEMENTARY_VALUE_FLOAT   ElementaryValueEnum = 2
+	ELEMENTARY_VALUE_STRING  ElementaryValueEnum = 3
+	ELEMENTARY_VALUE_BOOLEAN ElementaryValueEnum = 4
 )
 
 type ElementaryValueNode struct {
@@ -440,9 +484,9 @@ const (
 )
 
 type ExpressionNode struct {
-	Type        ExpressionOperatorEnum
-	ExpressionL *ExpressionNode
-	ExpressionR *ExpressionNode
+	Type             ExpressionOperatorEnum
+	ExpressionEntryL *ExpressionEntryNode
+	ExpressionEntryR *ExpressionEntryNode
 }
 
 type ExpressionEntryEnum uint8
@@ -476,6 +520,6 @@ const (
 
 type AggregationNode struct {
 	Type                   AggregationEnum
-	DistinctValid          bool
+	DistinctValid          bool                        //invalid when AGGREGATION_COUNT_ALL
 	AttriNameWithTableName *AttriNameWithTableNameNode //invalid when AGGREGATION_COUNT_ALL
 }
