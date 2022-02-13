@@ -215,15 +215,19 @@ type OrderByListEntry struct {
 type DCLEnum uint8
 
 const (
-	DCL_TRANSACTION_BEGIN    DCLEnum = 0
-	DCL_TRANSACTION_COMMIT   DCLEnum = 1
-	DCL_TRANSACTION_ROLLBACK DCLEnum = 2
+	DCL_TRANSACTION_BEGIN    DCLEnum = 1
+	DCL_TRANSACTION_COMMIT   DCLEnum = 2
+	DCL_TRANSACTION_ROLLBACK DCLEnum = 3
+	DCL_CONNECTION           DCLEnum = 4
 )
 
 //data control language
 //transaction, connection
 type DCLNode struct {
-	Type DCLEnum
+	Type       DCLEnum
+	ServerName string
+	UserName   string
+	Password   string
 }
 
 //---------------------------------------- DML ----------------------------------------
@@ -238,7 +242,53 @@ const (
 //data manipulation language
 //UPDATE, INSERT, DELETE
 type DMLNode struct {
-	Type DMLEnum
+	Type   DMLEnum
+	Update *UpdateNode
+	Insert *InsertNode
+	Delete *DeleteNode
+}
+
+//update
+type UpdateNode struct {
+	TableName  string
+	Condition  *ConditionNode
+	UpdateList []*UpdateListEntry
+}
+
+type UpdateListEntryEnum uint8
+
+const (
+	UPDATE_LIST_ENTRY_EXPRESSION       UpdateListEntryEnum = 1
+	UPDATE_LIST_ENTRY_ELEMENTARY_VALUE UpdateListEntryEnum = 2
+)
+
+type UpdateListEntry struct {
+	AttributeName   string
+	ElementaryValue *ElementaryValueNode
+	Expression      *ExpressionNode
+}
+
+//insert
+type InsertEnum uint8
+
+const (
+	INSERT_FROM_SUBQUERY  InsertEnum = 1
+	INSERT_FROM_VALUELIST InsertEnum = 2
+)
+
+type InsertNode struct {
+	Type                InsertEnum
+	TableName           string
+	Subquery            *QueryNode
+	AttriNameListValid  bool
+	AttriNameList       []string
+	ElementaryValueList []*ElementaryValueNode
+}
+
+//delete
+type DeleteNode struct {
+	TableName string
+	Condition *ConditionNode
 }
 
 //---------------------------------------- public ----------------------------------------
@@ -327,8 +377,41 @@ const (
 	COMPAREMARK_GREATEREQUAL CompareMarkEnum = 6 // >=
 )
 
+type PredicateEnum uint8
+
+const (
+	PREDICATE_COMPARE_ELEMENTARY_VALUE PredicateEnum = 1  //AttriNameWithTableNameL, ElementaryValue, CompareMark
+	PREDICATE_COMPARE_ATTRIBUTE_NAME   PredicateEnum = 2  //AttriNameWithTableNameL, AttriNameWithTableNameR, CompareMark
+	PREDICATE_LIKE_STRING_VALUE        PredicateEnum = 3  //AttriNameWithTableNameL, ElementaryValue(string)
+	PREDICATE_IN_SUBQUERY              PredicateEnum = 4  //AttriNameWithTableNameL, Subquery
+	PREDICATE_NOT_IN_SUBQUERY          PredicateEnum = 5  //AttriNameWithTableNameL, Subquery
+	PREDICATE_IN_TABLE                 PredicateEnum = 6  //AttriNameWithTableNameL, TableName
+	PREDICATE_NOT_IN_TABLE             PredicateEnum = 7  //AttriNameWithTableNameL, TableName
+	PREDICATE_COMPARE_ALL_SUBQUERY     PredicateEnum = 8  //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_NOT_ALL_SUBQUERY PredicateEnum = 9  //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_ANY_SUBQUERY     PredicateEnum = 10 //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_NOT_ANY_SUBQUERY PredicateEnum = 11 //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_ALL_TABLE        PredicateEnum = 12 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_COMPARE_NOT_ALL_TABLE    PredicateEnum = 13 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_COMPARE_ANY_TABLE        PredicateEnum = 14 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_COMPARE_NOT_ANY_TABLE    PredicateEnum = 15 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_IS_NULL                  PredicateEnum = 16 //AttriNameWithTableNameL
+	PREDICATE_IS_NOT_NULL              PredicateEnum = 17 //AttriNameWithTableNameL
+	PREDICATE_TUPLE_IN_SUBQUERY        PredicateEnum = 18 //AttributeTuple, Subquery
+	PREDICATE_TUPLE_NOT_IN_SUBQUERY    PredicateEnum = 19 //AttributeTuple, Subquery
+	PREDICATE_TUPLE_IN_TABLE           PredicateEnum = 20 //AttributeTuple, TableName
+	PREDICATE_TUPLE_NOT_IN_TABLE       PredicateEnum = 21 //AttributeTuple, TableName
+)
+
 type PredicateNode struct {
-	
+	Type                    PredicateEnum
+	CompareMark             CompareMarkEnum
+	ElementaryValue         *ElementaryValueNode
+	AttriNameWithTableNameL *AttriNameWithTableNameNode
+	AttriNameWithTableNameR *AttriNameWithTableNameNode
+	AttributeTuple          []*AttriNameWithTableNameNode
+	Subquery                *QueryNode
+	TableName               string
 }
 
 //expression
