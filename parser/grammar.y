@@ -5,6 +5,7 @@ import (
     "fmt"
 )
 
+// Node
 type NodeEnum uint8
 
 const (
@@ -87,6 +88,20 @@ type Node struct {
     Aggregation              *AggregationNode
 }
 
+// List
+type ListEnum uint8
+
+const (
+    CONSTRAINT_AFTER_ATTRIBUTE_LIST ListEnum = 1
+    CONSTRAINT_LIST                 ListEnum = 2
+)
+
+type List struct {
+    Type                         ListEnum
+    ConstraintAfterAttributeList []*ConstraintNode
+    ConstraintList               []*ConstraintNode
+}
+
 %}
 
 %union {
@@ -101,7 +116,16 @@ type Node struct {
 
 // %type <NodePt> ddl
 // %type <NodePt> createTableStmt
+
+%type <NodePt> constraintAfterAttribute
+
 %type <NodePt> elementaryValue
+
+%token UNIQUE PRIMARYKEY CHECK FOREIGNKEY REFERENCES
+%token NOT_DEFERRABLE DEFERED_DEFERRABLE IMMEDIATE_DEFERRABLE
+%token UPDATE_NULL UPDATE_CASCADE
+%token DELETE_NULL DELETE_CASCADE
+%token DEFERRED IMMEDIATE CONSTRAINT
 
 %token <Int> INTVALUE 
 %token <Float> FLOATVALUE 
@@ -162,7 +186,7 @@ ast
         createPsmStmt
         dropPsmStmt
     
-    -------------------------------- createTableStmt ------------------------------
+    -------------------------------- createTableStmt -------------------------------
 
     createTableStmt
         CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON
@@ -174,28 +198,355 @@ ast
 
     attributeDeclaration
         ID domain
-        ID domain constraintList
+        ID domain constraintAfterAttributeList
+
+    --------------------------------------------------------------------------------
+
+
+
+
+    -------------------------------------------------------------------------------- */
+
+/*  --------------------------------------------------------------------------------
+    |                                   constraint                                 |
+    --------------------------------------------------------------------------------
+
+/*  ----------------------- constraintAfterAttributeList ---------------------------
+
+    constraintAfterAttributeList
+        constraintAfterAttribute
+        constraintAfterAttributeList constraintAfterAttribute
+
+    -------------------------------------------------------------------------------- */
+constraintAfterAttributeList
+    :constraintAfterAttribute {
+        $$ = &List{}
+        $$.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
+        $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$1.Constraint)
+    }
+    |constraintAfterAttributeList constraintAfterAttribute {
+        $$ = $1
+        $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$1.Constraint)        
+    }
+    ;
+
+/*  ------------------------------ constraintList ----------------------------------
 
     constraintList
         constraint
         constraintList constraint
 
-    -------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------- */
+constraintList
+    :constraint {
+        $$ = List{}
+        $$.Type = CONSTRAINT_LIST
+        $$.ConstraintList = append($$.ConstraintList,$1.Constraint)
+    }
+    |constraintList constraint {
+        $$ = $1
+        $$.ConstraintList = append($$.ConstraintList,$1.Constraint)
+    }
+    ;
 
+/*  ------------------------------- constraintWithName -----------------------------
+    
+    constraintWithName
+        CONSTRAINT ID constraint
 
+    -------------------------------------------------------------------------------- */
+constraintWithName
+    :CONSTRAINT ID constraint {
+        $$ = $3
+        $$.Constraint.ConstraintNameValid = true
+        $$.Constraint.ConstraintName = $2
+    }
+    ;
 
-
-   ------------------------------------------------------------------------------------- */
-
-
-
-/*  --------------------------------------------------------------------------------
-    |                                      public                                  |
-    --------------------------------------------------------------------------------
-
-    ---------------------------------- constraint ----------------------------------
+/*  ---------------------------------- constraint ----------------------------------
     
     constraint
+        UNIQUE LPAREN attriNameList RPAREN
+		PRIMARYKEY LPAREN attriNameList RPAREN
+		CHECK LPAREN condition RPAREN
+
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN
+
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet
+
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+
+    -------------------------------------------------------------------------------- */
+constraint
+    :UNIQUE LPAREN attriNameList RPAREN {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_UNIQUE
+        $$.Constraint.AttriNameList = $3
+    }
+    |PRIMARYKEY LPAREN attriNameList RPAREN {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_PRIMARY_KEY
+        $$.Constraint.AttriNameList = $3
+    }
+	|CHECK LPAREN condition RPAREN {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CHECK
+        $$.Constraint.Condition = $3.Condition
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.UpdateSet = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.DeleteSet = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $10
+        $$.Constraint.UpdateSet = $11
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $10
+        $$.Constraint.DeleteSet = $11
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $11
+        $$.Constraint.UpdateSet = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.UpdateSet = $10
+        $$.Constraint.DeleteSet = $11
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $11
+        $$.Constraint.DeleteSet = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.UpdateSet = $11
+        $$.Constraint.DeleteSet = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $10
+        $$.Constraint.UpdateSet = $11
+        $$.Constraint.DeleteSet = $12
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $10
+        $$.Constraint.UpdateSet = $12
+        $$.Constraint.DeleteSet = $11
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $11
+        $$.Constraint.UpdateSet = $10
+        $$.Constraint.DeleteSet = $12
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $12
+        $$.Constraint.UpdateSet = $10
+        $$.Constraint.DeleteSet = $11
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $11
+        $$.Constraint.UpdateSet = $12
+        $$.Constraint.DeleteSet = $10
+    }
+	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.AttributeNameLocal = $3
+        $$.Constraint.ForeignTableName = $6
+        $$.Constraint.AttributeNameForeign = $8
+        $$.Constraint.Deferrable = $12
+        $$.Constraint.UpdateSet = $11
+        $$.Constraint.DeleteSet = $10
+    }
+    ;
+
+/*  ---------------------- constraintAfterAttributeWithName ------------------------
+    
+    constraintAfterAttributeWithName
+        CONSTRAINT ID constraintAfterAttribute
+
+    -------------------------------------------------------------------------------- */
+constraintAfterAttributeWithName
+    :CONSTRAINT ID constraintAfterAttribute {
+        $$ = $3
+        $$.Constraint.ConstraintNameValid = true
+        $$.Constraint.ConstraintName = $2
+    }
+    ;
+
+/*  -------------------------- constraintAfterAttribute ----------------------------
+    
+    constraintAfterAttribute
         DEFAULT elementaryValue
 
 		UNIQUE
@@ -224,35 +575,250 @@ ast
 		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
 		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
 
-    	CONSTRAINT ID DEFAULT elementaryValue
+    -------------------------------------------------------------------------------- */
+constraintAfterAttribute
+    :DEFAULT elementaryValue {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-		CONSTRAINT ID UNIQUE
-		CONSTRAINT ID PRIMARYKEY
-		CONSTRAINT ID NOT NULLMARK
+        $$.Constraint.Type = CONSTRAINT_DEFAULT
+        $$.Constraint.ElementaryValue = $2.ElementaryValue
+    }
+    |UNIQUE {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-		CONSTRAINT ID CHECK LPAREN condition RPAREN
+        $$.Constraint.Type = CONSTRAINT_UNIQUE
+    }
+    |PRIMARYKEY {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN
+        $$.Constraint.Type = CONSTRAINT_PRIMARY_KEY
+    }
+    |NOT NULLMARK {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet
+        $$.Constraint.Type = CONSTRAINT_NOT_NULL
+    }
+    |CHECK LPAREN condition RPAREN {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+        $$.Constraint.Type = CONSTRAINT_CHECK
+        $$.Constraint.Condition = $3.Condition
+    }
+    |REFERENCES ID LPAREN ID RPAREN {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
-		CONSTRAINT ID REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+    }
+    |REFERENCES ID LPAREN ID RPAREN setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
 
-    --------------------------------- elementaryValue -----------------------------
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.Deferrable = $6
+    }
+    |REFERENCES ID LPAREN ID RPAREN onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.UpdateSet = $6
+    }
+    |REFERENCES ID LPAREN ID RPAREN onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.DeleteSet = $6
+    }
+    |REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.Deferrable = $6
+        $$.Constraint.UpdateSet = $7
+    }
+    |REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.Deferrable = $6
+        $$.Constraint.DeleteSet = $7
+    }
+	|REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.UpdateSet = $6
+        $$.Constraint.Deferrable = $7
+    }
+	|REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.UpdateSet = $6
+        $$.Constraint.DeleteSet = $7
+    }
+	|REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.DeleteSet = $6
+        $$.Constraint.Deferrable = $7
+    }
+	|REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.DeleteSet = $6
+        $$.Constraint.UpdateSet = $7
+    }
+	|REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.Deferrable = $6
+        $$.Constraint.UpdateSet = $7
+        $$.Constraint.DeleteSet = $8
+    }
+	|REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.Deferrable = $6
+        $$.Constraint.DeleteSet = $7
+        $$.Constraint.UpdateSet = $8
+    }
+	|REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.UpdateSet = $6
+        $$.Constraint.Deferrable = $7
+        $$.Constraint.DeleteSet = $8
+    }
+	|REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.UpdateSet = $6
+        $$.Constraint.DeleteSet = $7
+        $$.Constraint.Deferrable = $8
+    }
+	|REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.DeleteSet = $6
+        $$.Constraint.Deferrable = $7
+        $$.Constraint.UpdateSet = $8
+    }
+	|REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable {
+        $$ = &Node{}
+        $$.Type = CONSTRAINT_NODE
+        $$.Constraint = &ConstraintNode{}
+        $$.Constraint.ConstraintNameValid = false
+
+        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.ForeignTableName = $2
+        $$.Constraint.AttributeNameForeign = $4
+        $$.Constraint.DeleteSet = $6
+        $$.Constraint.UpdateSet = $7
+        $$.Constraint.Deferrable = $8
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                    public                                    |
+    --------------------------------------------------------------------------------
+
+/* --------------------------------- elementaryValue -----------------------------
     
     elementaryValue
         INTVALUE
@@ -292,6 +858,5 @@ elementaryValue
         $$.ElementaryValue.BooleanValue = $1
     }
     ;
-
 
 %%

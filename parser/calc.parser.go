@@ -11,6 +11,7 @@ import (
 	"fmt"
 )
 
+// Node
 type NodeEnum uint8
 
 const (
@@ -93,7 +94,21 @@ type Node struct {
 	Aggregation              *AggregationNode
 }
 
-//line parser/grammar.y:92
+// List
+type ListEnum uint8
+
+const (
+	CONSTRAINT_AFTER_ATTRIBUTE_LIST ListEnum = 1
+	CONSTRAINT_LIST                 ListEnum = 2
+)
+
+type List struct {
+	Type                         ListEnum
+	ConstraintAfterAttributeList []*ConstraintNode
+	ConstraintList               []*ConstraintNode
+}
+
+//line parser/grammar.y:107
 type calcSymType struct {
 	yys     int
 	NodePt  *Node
@@ -103,15 +118,45 @@ type calcSymType struct {
 	Boolean bool
 }
 
-const INTVALUE = 57346
-const FLOATVALUE = 57347
-const STRINGVALUE = 57348
-const BOOLVALUE = 57349
+const UNIQUE = 57346
+const PRIMARYKEY = 57347
+const CHECK = 57348
+const FOREIGNKEY = 57349
+const REFERENCES = 57350
+const NOT_DEFERRABLE = 57351
+const DEFERED_DEFERRABLE = 57352
+const IMMEDIATE_DEFERRABLE = 57353
+const UPDATE_NULL = 57354
+const UPDATE_CASCADE = 57355
+const DELETE_NULL = 57356
+const DELETE_CASCADE = 57357
+const DEFERRED = 57358
+const IMMEDIATE = 57359
+const CONSTRAINT = 57360
+const INTVALUE = 57361
+const FLOATVALUE = 57362
+const STRINGVALUE = 57363
+const BOOLVALUE = 57364
 
 var calcToknames = [...]string{
 	"$end",
 	"error",
 	"$unk",
+	"UNIQUE",
+	"PRIMARYKEY",
+	"CHECK",
+	"FOREIGNKEY",
+	"REFERENCES",
+	"NOT_DEFERRABLE",
+	"DEFERED_DEFERRABLE",
+	"IMMEDIATE_DEFERRABLE",
+	"UPDATE_NULL",
+	"UPDATE_CASCADE",
+	"DELETE_NULL",
+	"DELETE_CASCADE",
+	"DEFERRED",
+	"IMMEDIATE",
+	"CONSTRAINT",
 	"INTVALUE",
 	"FLOATVALUE",
 	"STRINGVALUE",
@@ -124,7 +169,7 @@ const calcEofCode = 1
 const calcErrCode = 2
 const calcInitialStackSize = 16
 
-//line parser/grammar.y:297
+//line parser/grammar.y:353
 
 //line yacctab:1
 var calcExca = [...]int{
@@ -142,7 +187,7 @@ var calcAct = [...]int{
 }
 
 var calcPact = [...]int{
-	-4, -1000, -1000, -1000, -1000, -1000, -1000,
+	-19, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 
 var calcPgo = [...]int{
@@ -158,7 +203,7 @@ var calcR2 = [...]int{
 }
 
 var calcChk = [...]int{
-	-1000, -1, -2, 4, 5, 6, 7,
+	-1000, -1, -2, 19, 20, 21, 22,
 }
 
 var calcDef = [...]int{
@@ -170,7 +215,9 @@ var calcTok1 = [...]int{
 }
 
 var calcTok2 = [...]int{
-	2, 3, 4, 5, 6, 7,
+	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+	22,
 }
 
 var calcTok3 = [...]int{
@@ -516,7 +563,7 @@ calcdefault:
 
 	case 1:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:126
+//line parser/grammar.y:147
 		{
 			fmt.Println("k")
 			fmt.Println(calcDollar[1].NodePt.ElementaryValue.IntValue)
@@ -530,7 +577,7 @@ calcdefault:
 		}
 	case 2:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:266
+//line parser/grammar.y:323
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -540,7 +587,7 @@ calcdefault:
 		}
 	case 3:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:273
+//line parser/grammar.y:330
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -550,7 +597,7 @@ calcdefault:
 		}
 	case 4:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:280
+//line parser/grammar.y:337
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -560,7 +607,7 @@ calcdefault:
 		}
 	case 5:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:287
+//line parser/grammar.y:344
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE

@@ -21,34 +21,34 @@ state 1
 state 2
 	ast:  elementaryValue.    (1)
 
-	.  reduce 1 (src line 125)
+	.  reduce 1 (src line 146)
 
 
 state 3
 	elementaryValue:  INTVALUE.    (2)
 
-	.  reduce 2 (src line 265)
+	.  reduce 2 (src line 322)
 
 
 state 4
 	elementaryValue:  FLOATVALUE.    (3)
 
-	.  reduce 3 (src line 273)
+	.  reduce 3 (src line 330)
 
 
 state 5
 	elementaryValue:  STRINGVALUE.    (4)
 
-	.  reduce 4 (src line 280)
+	.  reduce 4 (src line 337)
 
 
 state 6
 	elementaryValue:  BOOLVALUE.    (5)
 
-	.  reduce 5 (src line 287)
+	.  reduce 5 (src line 344)
 
 
-7 terminals, 3 nonterminals
+22 terminals, 3 nonterminals
 6 grammar rules, 7/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 52 working sets used
@@ -59,4 +59,4 @@ memory: parser 1/240000
 0 entries saved by goto default
 Optimizer space used: output 6/240000
 6 table entries, 0 zero
-maximum spread: 7, maximum offset: 4
+maximum spread: 22, maximum offset: 19

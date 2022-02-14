@@ -1,15 +1,52 @@
 enum {
 
-    LPAREN          = 200,  //(
-    RPAREN          = 201,  //)
-    SEMICOLON       = 202,  //;
-    COMMA           = 203,  //,
-    INTVALUE        = 204,  //int value
-    FLOATVALUE      = 205,  //float value
-    STRINGVALUE     = 206,  //string surrounded by single or double quotation marks
-    ID              = 207,  //begin with non-number character
-    PASSWORD        = 208,
+//constraint
+    UNIQUE            = 231,
+    PRIMARYKEY        = 230,  //PRIMARY KEY
+    CHECK             = 289,
+    FOREIGNKEY        = 291,
+    REFERENCES        = 290,
+    NOT_DEFERRABLE           = 292,  //NOT DEFERRABLE
+    DEFERED_DEFERRABLE       = 293,  //DEFERRABLE INITIALLY DEFERRED
+    IMMEDIATE_DEFERRABLE     = 294,  //DEFERRABLE INITIALLY IMMEDIATE
+    UPDATE_NULL      = 295,  //ON UPDATE SET NULL
+    UPDATE_CASCADE   = 296,  //ON UPDATE SET CASCADE
+    DELETE_NULL      = 297,  //ON DELETE SET NULL
+    DELETE_CASCADE   = 298,  //ON DELETE SET CASCADE
+    DEFERRED        = 299,
+    IMMEDIATE       = 300,
+    CONSTRAINT      = 288,
+
+
+
+
+//public
+    LPAREN            = 200,  //(
+    RPAREN            = 201,  //)
+    SEMICOLON         = 202,  //;
+    COMMA             = 203,  //,
+    ID                = 207,  //begin with non-number character
+    PASSWORD          = 208,
     TABLEDOTATTRIBUTE = 209, //tableName.attributeName
+
+    INTVALUE          = 204,  //int value
+    FLOATVALUE        = 205,  //float value
+    STRINGVALUE       = 206,  //string surrounded by single or double quotation marks
+    BOOLVALUE         = 551,  //BOOLVALUE true/false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     VARCHAR         = 210,  //VARCHAR(n)
     BIT             = 211,  //BIT(n)
@@ -32,8 +69,8 @@ enum {
     ALTER           = 227,
     ADD             = 228,
     DEFAULT         = 229,
-    PRIMARYKEY      = 230,  //PRIMARY KEY
-    UNIQUE          = 231,
+
+
     CREATE          = 232,
 
     FROM            = 233,
@@ -101,20 +138,12 @@ enum {
     COMMIT          = 286,
     ROLLBACK        = 287,
 
-    CONSTRAINT      = 288,
-    CHECK           = 289,
-    REFERENCES      = 290,
-    FOREIGNKEY      = 291,
 
-    NOT_DEFERRABLE           = 292,  //NOT DEFERRABLE
-    DEFERED_DEFERRABLE       = 293,  //DEFERRABLE INITIALLY DEFERRED
-    IMMEDIATE_DEFERRABLE     = 294,  //DEFERRABLE INITIALLY IMMEDIATE
-    UPDATE_NULL      = 295,  //ON UPDATE SET NULL
-    UPDATE_CASCADE   = 296,  //ON UPDATE SET CASCADE
-    DELETE_NULL      = 297,  //ON DELETE SET NULL
-    DELETE_CASCADE   = 298,  //ON DELETE SET CASCADE
-    DEFERRED        = 299,
-    IMMEDIATE       = 300,
+
+
+
+
+
 
     ASSERTION       = 301, 
     TRIGGER         = 302,
@@ -142,7 +171,7 @@ enum {
     CONNECTION      = 323,
 
     CALL            = 550,
-    BOOLVALUE       = 551,  //BOOLVALUE true/false              UUUUUUUUUUU
+
     FUNCTION        = 552,
     RETURNS         = 553,
     OUT             = 554,

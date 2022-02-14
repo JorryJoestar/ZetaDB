@@ -380,8 +380,9 @@ type ConstraintNode struct {
 	ConstraintNameValid  bool
 	ConstraintName       string
 	AttriNameList        []string                 //CONSTRAINT_UNIQUE,CONSTRAINT_PRIMARY_KEY
+	ElementaryValue      *ElementaryValueNode     //DEFAULT
 	Condition            *ConditionNode           //CONSTRAINT_CHECK
-	AttributeNameLocal   string                   //CONSTRAINT_FOREIGN_KEY
+	AttributeNameLocal   string                   //CONSTRAINT_FOREIGN_KEY, CONSTRAINT_NOT_NULL,CONSTRAINT_DEFAULT
 	AttributeNameForeign string                   //CONSTRAINT_FOREIGN_KEY
 	ForeignTableName     string                   //CONSTRAINT_FOREIGN_KEY
 	Deferrable           ConstraintDeferrableEnum //CONSTRAINT_FOREIGN_KEY

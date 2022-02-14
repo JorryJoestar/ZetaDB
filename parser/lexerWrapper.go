@@ -41,6 +41,39 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	p.yytext = C.GoString(C.yytext)
 	switch tok {
 
+	//constraint
+	case C.UNIQUE:
+		return UNIQUE
+	case C.PRIMARYKEY:
+		return PRIMARYKEY
+	case C.CHECK:
+		return CHECK
+	case C.FOREIGNKEY:
+		return FOREIGNKEY
+	case C.REFERENCES:
+		return REFERENCES
+	case C.NOT_DEFERRABLE:
+		return NOT_DEFERRABLE
+	case C.DEFERED_DEFERRABLE:
+		return DEFERED_DEFERRABLE
+	case C.IMMEDIATE_DEFERRABLE:
+		return IMMEDIATE_DEFERRABLE
+	case C.UPDATE_NULL:
+		return UPDATE_NULL
+	case C.UPDATE_CASCADE:
+		return UPDATE_CASCADE
+	case C.DELETE_NULL:
+		return DELETE_NULL
+	case C.DELETE_CASCADE:
+		return DELETE_CASCADE
+	case C.DEFERRED:
+		return DEFERRED
+	case C.IMMEDIATE:
+		return IMMEDIATE
+	case C.CONSTRAINT:
+		return CONSTRAINT
+
+	//public
 	case C.INTVALUE:
 		yylval.Int, _ = strconv.Atoi(p.yytext)
 		return INTVALUE
