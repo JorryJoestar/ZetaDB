@@ -127,12 +127,14 @@ type ListEnum uint8
 const (
     CONSTRAINT_AFTER_ATTRIBUTE_LIST ListEnum = 1
     CONSTRAINT_LIST                 ListEnum = 2
+    ATTRINAME_OPTION_TABLENAME_LIST ListEnum = 3
 )
 
 type List struct {
     Type                         ListEnum
     ConstraintAfterAttributeList []*ConstraintNode
     ConstraintList               []*ConstraintNode
+    AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
 }
 
 %}
@@ -189,6 +191,7 @@ type List struct {
 %token <Boolean> BOOLVALUE
 
 // public
+%type <List> attriNameOptionTableNameList
 %type <StringList> attriNameList
 %token LPAREN RPAREN NOT NULLMARK COMMA
 %token <String> ID
@@ -982,10 +985,10 @@ condition
 			NOT attriNameOptionTableName compareMark ANY ID
 			attriNameOptionTableName IS NULLMARK
 			attriNameOptionTableName IS NOT NULLMARK
-			LPAREN attriNameList RPAREN IN subQuery
-			LPAREN attriNameList RPAREN NOT IN subQuery
-			LPAREN attriNameList RPAREN IN ID
-			LPAREN attriNameList RPAREN NOT IN ID
+			LPAREN attriNameOptionTableNameList RPAREN IN subQuery
+			LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery
+			LPAREN attriNameOptionTableNameList RPAREN IN ID
+			LPAREN attriNameOptionTableNameList RPAREN NOT IN ID
 			EXISTS subQuery
 			NOT EXISTS subQuery
 
@@ -1002,7 +1005,7 @@ condition
 /*  ----------------------------------- predicate ---------------------------------- */
 predicate
 	:attriNameOptionTableName compareMark elementaryValue {
-
+        
     }
 	|attriNameOptionTableName LIKE STRINGVALUE {
 
@@ -1049,16 +1052,16 @@ predicate
 	|attriNameOptionTableName IS NOT NULLMARK {
 
     }
-	|LPAREN attriNameList RPAREN IN subQuery {
+	|LPAREN attriNameOptionTableNameList RPAREN IN subQuery {
 
     }
-	|LPAREN attriNameList RPAREN NOT IN subQuery {
+	|LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery {
 
     }
-	|LPAREN attriNameList RPAREN IN ID {
+	|LPAREN attriNameOptionTableNameList RPAREN IN ID {
 
     }
-	|LPAREN attriNameList RPAREN NOT IN ID {
+	|LPAREN attriNameOptionTableNameList RPAREN NOT IN ID {
 
     }
 	|EXISTS subQuery {
@@ -1138,7 +1141,7 @@ attriNameOptionTableName
 
    -------------------------------------------------------------------------------- */
 subQuery
-    :ID {
+    :DOT {
         $$ = &Node{}
     }
     ;
@@ -1194,6 +1197,10 @@ elementaryValue
         attriNameList COMMA ID
         ID
     
+    attriNameOptionTableNameList
+        attriNameOptionTableNameList COMMA attriNameOptionTableName
+        attriNameOptionTableName
+    
     -------------------------------------------------------------------------------- */
 
 /*  -------------------------------- attriNameList --------------------------------- */
@@ -1203,6 +1210,19 @@ elementaryValue
         }
         |ID {
             $$ = append($$,$1)
+        }
+        ;
+
+/*  ------------------------- attriNameOptionTableNameList ------------------------- */
+    attriNameOptionTableNameList
+        :attriNameOptionTableNameList COMMA attriNameOptionTableName {
+            $$ = $1
+            $$.AttriNameOptionTableNameList = append($$.AttriNameOptionTableNameList,$3.AttriNameOptionTableName)
+        }
+        |attriNameOptionTableName {
+            $$ = List{}
+            $$.Type = ATTRINAME_OPTION_TABLENAME_LIST
+            $$.AttriNameOptionTableNameList = append($$.AttriNameOptionTableNameList,$1.AttriNameOptionTableName)
         }
         ;
 

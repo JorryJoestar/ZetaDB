@@ -131,15 +131,17 @@ type ListEnum uint8
 const (
 	CONSTRAINT_AFTER_ATTRIBUTE_LIST ListEnum = 1
 	CONSTRAINT_LIST                 ListEnum = 2
+	ATTRINAME_OPTION_TABLENAME_LIST ListEnum = 3
 )
 
 type List struct {
 	Type                         ListEnum
 	ConstraintAfterAttributeList []*ConstraintNode
 	ConstraintList               []*ConstraintNode
+	AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
 }
 
-//line parser/grammar.y:140
+//line parser/grammar.y:142
 type calcSymType struct {
 	yys        int
 	NodePt     *Node
@@ -242,7 +244,7 @@ const calcEofCode = 1
 const calcErrCode = 2
 const calcInitialStackSize = 16
 
-//line parser/grammar.y:1209
+//line parser/grammar.y:1229
 
 //line yacctab:1
 var calcExca = [...]int{
@@ -253,55 +255,56 @@ var calcExca = [...]int{
 
 const calcPrivate = 57344
 
-const calcLast = 216
+const calcLast = 224
 
 var calcAct = [...]int{
-	115, 44, 42, 41, 139, 116, 14, 15, 16, 18,
-	19, 17, 14, 15, 16, 18, 19, 17, 39, 125,
-	20, 13, 114, 14, 24, 25, 109, 12, 17, 14,
-	24, 25, 68, 107, 17, 105, 117, 101, 23, 11,
-	98, 10, 100, 74, 20, 76, 27, 26, 99, 92,
-	28, 76, 140, 90, 88, 79, 80, 86, 26, 85,
-	84, 67, 83, 43, 26, 45, 69, 87, 89, 29,
-	30, 75, 91, 32, 76, 34, 35, 36, 37, 38,
-	33, 58, 54, 46, 72, 71, 96, 93, 31, 65,
-	66, 73, 39, 111, 103, 102, 104, 106, 108, 132,
-	48, 49, 50, 51, 97, 48, 49, 50, 51, 47,
-	53, 52, 113, 81, 56, 55, 57, 128, 130, 94,
-	95, 126, 110, 131, 34, 35, 36, 37, 38, 33,
-	136, 7, 138, 134, 77, 8, 137, 70, 64, 123,
-	124, 141, 112, 146, 148, 4, 142, 144, 153, 149,
-	155, 151, 127, 129, 154, 62, 63, 18, 19, 59,
-	121, 122, 60, 133, 82, 135, 118, 119, 120, 61,
-	118, 119, 120, 121, 122, 123, 124, 143, 145, 147,
-	3, 150, 2, 152, 118, 119, 120, 1, 0, 123,
-	124, 121, 122, 123, 124, 118, 119, 120, 121, 122,
-	62, 63, 18, 19, 9, 78, 6, 5, 22, 0,
-	21, 0, 0, 0, 0, 40,
+	118, 44, 9, 79, 142, 119, 14, 15, 16, 18,
+	19, 17, 45, 40, 43, 14, 15, 16, 18, 19,
+	17, 13, 117, 41, 45, 45, 128, 12, 113, 103,
+	20, 87, 68, 86, 111, 109, 120, 45, 39, 11,
+	20, 10, 85, 74, 20, 29, 30, 107, 84, 32,
+	26, 34, 35, 36, 37, 38, 33, 81, 14, 24,
+	25, 45, 80, 17, 31, 45, 45, 88, 90, 58,
+	54, 93, 92, 23, 45, 91, 89, 46, 27, 99,
+	14, 24, 25, 102, 69, 17, 101, 100, 75, 28,
+	101, 76, 97, 26, 72, 71, 94, 106, 108, 110,
+	39, 48, 49, 50, 51, 65, 66, 143, 114, 135,
+	98, 105, 104, 67, 116, 26, 48, 49, 50, 51,
+	131, 133, 53, 52, 129, 82, 134, 56, 55, 45,
+	73, 57, 112, 139, 70, 141, 137, 7, 47, 140,
+	115, 77, 8, 4, 144, 5, 149, 151, 21, 145,
+	147, 156, 152, 158, 154, 130, 132, 157, 34, 35,
+	36, 37, 38, 33, 42, 59, 136, 64, 138, 60,
+	95, 96, 83, 62, 63, 18, 19, 126, 127, 3,
+	146, 148, 150, 2, 153, 1, 155, 61, 121, 122,
+	123, 124, 125, 126, 127, 121, 122, 123, 0, 0,
+	126, 127, 124, 125, 126, 127, 121, 122, 123, 124,
+	125, 124, 125, 121, 122, 123, 62, 63, 18, 19,
+	78, 6, 0, 22,
 }
 
 var calcPact = [...]int{
-	2, -1000, 19, 5, -1000, -1000, -1000, -1000, -1000, 49,
-	-22, 21, 23, 41, 72, 74, 73, 40, 78, 77,
-	84, -1000, -1000, 39, -1000, -1000, 52, 150, 67, 26,
-	24, 116, 45, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	98, 23, 33, -1000, -1000, -1000, 8, -1000, -1000, -1000,
-	-1000, -1000, 21, 21, 76, 20, 18, 17, 25, -1000,
-	-1000, 15, 74, 73, -1000, 12, 11, -1000, -1000, -1000,
-	7, -1000, 47, 97, -1000, 65, -2, -1000, -1000, 10,
-	4, -5, 57, -1000, 56, -1000, 195, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -7, -9, -16, 101, -1000, -1000,
-	-1000, 55, -1000, 133, -1000, -1000, -1000, -1000, -1000, -1000,
-	-20, 160, -23, -1000, -1000, 178, 174, 185, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, 62, 124, 147, 124, 156,
-	147, 156, -38, -1000, -1000, -1000, -1000, -1000, -1000, 14,
-	160, 178, 174, 185, 124, 147, 124, 156, 147, 156,
-	-1000, -1000, -1000, -1000, -1000, -1000,
+	2, -1000, 54, 37, -1000, -1000, -1000, -1000, -1000, 25,
+	-2, -12, 97, 35, 68, 86, 85, 28, 91, 90,
+	99, -1000, -1000, 27, -1000, -1000, 60, 168, 83, 78,
+	42, 113, 55, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	132, 97, 50, -1000, -1000, -1000, 11, -1000, -1000, -1000,
+	-1000, -1000, 20, 20, 88, 6, 0, -9, 76, -1000,
+	-1000, -11, 86, 85, -1000, 34, 33, -1000, -1000, -1000,
+	29, -1000, 56, 148, -1000, 71, -12, -1000, -1000, 49,
+	-1000, 45, -13, 74, -1000, 73, -1000, 211, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 5, -7, -8, 111, -1000,
+	-1000, -14, -1000, 70, -1000, 131, -1000, -1000, -1000, -1000,
+	-1000, -1000, -20, -1000, 178, -16, -1000, -1000, 189, 185,
+	196, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 72, 162,
+	198, 162, 203, 198, 203, -38, -1000, -1000, -1000, -1000,
+	-1000, -1000, 69, 178, 189, 185, 196, 162, 198, 162,
+	203, 198, 203, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 
 var calcPgo = [...]int{
-	0, 187, 182, 205, 207, 180, 134, 131, 0, 5,
-	36, 164, 50, 204, 1, 109, 2, 145,
+	0, 185, 183, 220, 145, 179, 141, 137, 0, 5,
+	36, 172, 89, 2, 1, 138, 164, 3, 143,
 }
 
 var calcR1 = [...]int{
@@ -311,10 +314,10 @@ var calcR1 = [...]int{
 	6, 6, 4, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 8, 8, 8, 9, 9, 10, 10,
-	11, 17, 17, 17, 17, 17, 17, 17, 17, 17,
-	17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
-	17, 17, 17, 12, 12, 12, 12, 12, 12, 13,
-	13, 14, 15, 15, 15, 15, 16, 16,
+	11, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+	18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
+	18, 18, 18, 12, 12, 12, 12, 12, 12, 13,
+	13, 14, 15, 15, 15, 15, 17, 17, 16, 16,
 }
 
 var calcR2 = [...]int{
@@ -327,26 +330,26 @@ var calcR2 = [...]int{
 	1, 3, 3, 3, 4, 3, 4, 4, 5, 4,
 	5, 4, 5, 4, 5, 3, 4, 5, 6, 5,
 	6, 2, 3, 1, 1, 1, 1, 1, 1, 1,
-	3, 1, 1, 1, 1, 1, 3, 1,
+	3, 1, 1, 1, 1, 1, 3, 1, 3, 1,
 }
 
 var calcChk = [...]int{
-	-1000, -1, -2, -5, -17, -4, -3, -7, -6, -13,
+	-1000, -1, -2, -5, -18, -4, -3, -7, -6, -13,
 	39, 37, 25, 19, 4, 5, 6, 9, 7, 8,
 	42, -4, -3, 19, 5, 6, 39, 41, -12, 20,
 	21, 39, 24, 31, 26, 27, 28, 29, 30, 40,
-	-13, 25, -16, 42, -14, 42, 42, -15, 33, 34,
+	-13, 25, -16, -13, -14, 32, 42, -15, 33, 34,
 	35, 36, 37, 37, 42, 37, 37, 32, 42, -7,
 	-6, 19, 5, 6, -15, 22, 23, 35, -14, 42,
-	21, 40, 39, -12, -14, 38, 41, -6, -3, -16,
-	-16, 37, -11, 42, 42, 42, 42, -14, 42, -14,
-	42, -14, 42, 40, 22, 23, 21, 39, 42, 38,
-	38, 42, 38, 38, -14, 42, -14, 42, -14, 42,
-	21, 38, 9, -14, 42, -8, -9, -10, 10, 11,
-	12, 13, 14, 15, 16, 42, -9, -10, -8, -10,
-	-8, -9, 37, -10, -9, -10, -8, -9, -8, 42,
-	38, -8, -9, -10, -9, -10, -8, -10, -8, -9,
-	-10, -9, -10, -8, -9, -8,
+	21, 40, 39, -12, -14, 38, 41, -6, -3, -17,
+	42, -17, 37, -11, 42, 42, 42, 42, -14, 42,
+	-14, 42, -14, 42, 40, 22, 23, 21, 39, -13,
+	38, 41, 38, 42, 38, 38, -14, 42, -14, 42,
+	-14, 42, 21, 42, 38, 9, -14, 42, -8, -9,
+	-10, 10, 11, 12, 13, 14, 15, 16, 42, -9,
+	-10, -8, -10, -8, -9, 37, -10, -9, -10, -8,
+	-9, -8, 42, 38, -8, -9, -10, -9, -10, -8,
+	-10, -8, -9, -10, -9, -10, -8, -9, -8,
 }
 
 var calcDef = [...]int{
@@ -354,18 +357,18 @@ var calcDef = [...]int{
 	0, 0, 0, 0, 0, 34, 35, 0, 0, 0,
 	89, 6, 7, 0, 34, 35, 0, 0, 0, 0,
 	0, 0, 0, 83, 84, 85, 86, 87, 88, 36,
-	0, 0, 0, 97, 81, 91, 0, 33, 92, 93,
+	0, 0, 0, 99, 81, 91, 0, 33, 92, 93,
 	94, 95, 0, 0, 0, 0, 0, 0, 0, 10,
 	11, 0, 0, 0, 61, 0, 0, 62, 63, 65,
 	0, 75, 0, 0, 82, 0, 0, 12, 32, 0,
-	0, 0, 0, 60, 0, 90, 0, 67, 71, 69,
-	73, 64, 66, 76, 0, 0, 0, 0, 96, 13,
-	14, 0, 15, 0, 68, 72, 70, 74, 77, 79,
-	0, 37, 0, 78, 80, 38, 39, 40, 53, 54,
-	55, 56, 57, 58, 59, 0, 41, 42, 43, 44,
-	45, 46, 0, 47, 48, 49, 50, 51, 52, 0,
-	16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
-	26, 27, 28, 29, 30, 31,
+	97, 0, 0, 0, 60, 0, 90, 0, 67, 71,
+	69, 73, 64, 66, 76, 0, 0, 0, 0, 98,
+	13, 0, 14, 0, 15, 0, 68, 72, 70, 74,
+	77, 79, 0, 96, 37, 0, 78, 80, 38, 39,
+	40, 53, 54, 55, 56, 57, 58, 59, 0, 41,
+	42, 43, 44, 45, 46, 0, 47, 48, 49, 50,
+	51, 52, 0, 16, 17, 18, 19, 20, 21, 22,
+	23, 24, 25, 26, 27, 28, 29, 30, 31,
 }
 
 var calcTok1 = [...]int{
@@ -723,7 +726,7 @@ calcdefault:
 
 	case 1:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:210
+//line parser/grammar.y:213
 		{
 			fmt.Println("157: constraintAfterAttributeList")
 
@@ -736,7 +739,7 @@ calcdefault:
 		}
 	case 2:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:220
+//line parser/grammar.y:223
 		{
 			fmt.Println("178: constraintList")
 
@@ -749,7 +752,7 @@ calcdefault:
 		}
 	case 3:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:230
+//line parser/grammar.y:233
 		{
 			fmt.Println("251: predicate")
 
@@ -762,7 +765,7 @@ calcdefault:
 		}
 	case 4:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:370
+//line parser/grammar.y:373
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
@@ -770,7 +773,7 @@ calcdefault:
 		}
 	case 5:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:375
+//line parser/grammar.y:378
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
@@ -778,21 +781,21 @@ calcdefault:
 		}
 	case 6:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:380
+//line parser/grammar.y:383
 		{
 			calcVAL.List = calcDollar[1].List
 			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[2].NodePt.Constraint)
 		}
 	case 7:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:384
+//line parser/grammar.y:387
 		{
 			calcVAL.List = calcDollar[1].List
 			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[2].NodePt.Constraint)
 		}
 	case 8:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:392
+//line parser/grammar.y:395
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = CONSTRAINT_LIST
@@ -800,7 +803,7 @@ calcdefault:
 		}
 	case 9:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:397
+//line parser/grammar.y:400
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = CONSTRAINT_LIST
@@ -808,21 +811,21 @@ calcdefault:
 		}
 	case 10:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:402
+//line parser/grammar.y:405
 		{
 			calcVAL.List = calcDollar[1].List
 			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[3].NodePt.Constraint)
 		}
 	case 11:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:406
+//line parser/grammar.y:409
 		{
 			calcVAL.List = calcDollar[1].List
 			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[3].NodePt.Constraint)
 		}
 	case 12:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:414
+//line parser/grammar.y:417
 		{
 			calcVAL.NodePt = calcDollar[3].NodePt
 			calcVAL.NodePt.Constraint.ConstraintNameValid = true
@@ -830,7 +833,7 @@ calcdefault:
 		}
 	case 13:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:423
+//line parser/grammar.y:426
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -842,7 +845,7 @@ calcdefault:
 		}
 	case 14:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:432
+//line parser/grammar.y:435
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -854,7 +857,7 @@ calcdefault:
 		}
 	case 15:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:441
+//line parser/grammar.y:444
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -866,7 +869,7 @@ calcdefault:
 		}
 	case 16:
 		calcDollar = calcS[calcpt-9 : calcpt+1]
-//line parser/grammar.y:450
+//line parser/grammar.y:453
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -880,7 +883,7 @@ calcdefault:
 		}
 	case 17:
 		calcDollar = calcS[calcpt-10 : calcpt+1]
-//line parser/grammar.y:461
+//line parser/grammar.y:464
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -895,7 +898,7 @@ calcdefault:
 		}
 	case 18:
 		calcDollar = calcS[calcpt-10 : calcpt+1]
-//line parser/grammar.y:473
+//line parser/grammar.y:476
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -910,7 +913,7 @@ calcdefault:
 		}
 	case 19:
 		calcDollar = calcS[calcpt-10 : calcpt+1]
-//line parser/grammar.y:485
+//line parser/grammar.y:488
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -925,7 +928,7 @@ calcdefault:
 		}
 	case 20:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:497
+//line parser/grammar.y:500
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -941,7 +944,7 @@ calcdefault:
 		}
 	case 21:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:510
+//line parser/grammar.y:513
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -957,7 +960,7 @@ calcdefault:
 		}
 	case 22:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:523
+//line parser/grammar.y:526
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -973,7 +976,7 @@ calcdefault:
 		}
 	case 23:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:536
+//line parser/grammar.y:539
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -989,7 +992,7 @@ calcdefault:
 		}
 	case 24:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:549
+//line parser/grammar.y:552
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1005,7 +1008,7 @@ calcdefault:
 		}
 	case 25:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:562
+//line parser/grammar.y:565
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1021,7 +1024,7 @@ calcdefault:
 		}
 	case 26:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:575
+//line parser/grammar.y:578
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1038,7 +1041,7 @@ calcdefault:
 		}
 	case 27:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:589
+//line parser/grammar.y:592
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1055,7 +1058,7 @@ calcdefault:
 		}
 	case 28:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:603
+//line parser/grammar.y:606
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1072,7 +1075,7 @@ calcdefault:
 		}
 	case 29:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:617
+//line parser/grammar.y:620
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1089,7 +1092,7 @@ calcdefault:
 		}
 	case 30:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:631
+//line parser/grammar.y:634
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1106,7 +1109,7 @@ calcdefault:
 		}
 	case 31:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:645
+//line parser/grammar.y:648
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1123,7 +1126,7 @@ calcdefault:
 		}
 	case 32:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:663
+//line parser/grammar.y:666
 		{
 			calcVAL.NodePt = calcDollar[3].NodePt
 			calcVAL.NodePt.Constraint.ConstraintNameValid = true
@@ -1131,7 +1134,7 @@ calcdefault:
 		}
 	case 33:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:672
+//line parser/grammar.y:675
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1143,7 +1146,7 @@ calcdefault:
 		}
 	case 34:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:681
+//line parser/grammar.y:684
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1154,7 +1157,7 @@ calcdefault:
 		}
 	case 35:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:689
+//line parser/grammar.y:692
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1165,7 +1168,7 @@ calcdefault:
 		}
 	case 36:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:697
+//line parser/grammar.y:700
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1176,7 +1179,7 @@ calcdefault:
 		}
 	case 37:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:705
+//line parser/grammar.y:708
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1189,7 +1192,7 @@ calcdefault:
 		}
 	case 38:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:715
+//line parser/grammar.y:718
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1203,7 +1206,7 @@ calcdefault:
 		}
 	case 39:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:726
+//line parser/grammar.y:729
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1217,7 +1220,7 @@ calcdefault:
 		}
 	case 40:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:737
+//line parser/grammar.y:740
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1231,7 +1234,7 @@ calcdefault:
 		}
 	case 41:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:748
+//line parser/grammar.y:751
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1246,7 +1249,7 @@ calcdefault:
 		}
 	case 42:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:760
+//line parser/grammar.y:763
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1261,7 +1264,7 @@ calcdefault:
 		}
 	case 43:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:772
+//line parser/grammar.y:775
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1276,7 +1279,7 @@ calcdefault:
 		}
 	case 44:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:784
+//line parser/grammar.y:787
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1291,7 +1294,7 @@ calcdefault:
 		}
 	case 45:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:796
+//line parser/grammar.y:799
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1306,7 +1309,7 @@ calcdefault:
 		}
 	case 46:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:808
+//line parser/grammar.y:811
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1321,7 +1324,7 @@ calcdefault:
 		}
 	case 47:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:820
+//line parser/grammar.y:823
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1337,7 +1340,7 @@ calcdefault:
 		}
 	case 48:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:833
+//line parser/grammar.y:836
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1353,7 +1356,7 @@ calcdefault:
 		}
 	case 49:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:846
+//line parser/grammar.y:849
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1369,7 +1372,7 @@ calcdefault:
 		}
 	case 50:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:859
+//line parser/grammar.y:862
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1385,7 +1388,7 @@ calcdefault:
 		}
 	case 51:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:872
+//line parser/grammar.y:875
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1401,7 +1404,7 @@ calcdefault:
 		}
 	case 52:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:885
+//line parser/grammar.y:888
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1417,7 +1420,7 @@ calcdefault:
 		}
 	case 53:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:902
+//line parser/grammar.y:905
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DEFERRABLE_ENUM
@@ -1425,7 +1428,7 @@ calcdefault:
 		}
 	case 54:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:907
+//line parser/grammar.y:910
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DEFERRABLE_ENUM
@@ -1433,7 +1436,7 @@ calcdefault:
 		}
 	case 55:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:912
+//line parser/grammar.y:915
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DEFERRABLE_ENUM
@@ -1441,7 +1444,7 @@ calcdefault:
 		}
 	case 56:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:921
+//line parser/grammar.y:924
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_UPDATE_SET_ENUM
@@ -1449,7 +1452,7 @@ calcdefault:
 		}
 	case 57:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:926
+//line parser/grammar.y:929
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_UPDATE_SET_ENUM
@@ -1457,7 +1460,7 @@ calcdefault:
 		}
 	case 58:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:935
+//line parser/grammar.y:938
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DELETE_SET_ENUM
@@ -1465,7 +1468,7 @@ calcdefault:
 		}
 	case 59:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:940
+//line parser/grammar.y:943
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DELETE_SET_ENUM
@@ -1473,145 +1476,145 @@ calcdefault:
 		}
 	case 60:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:959
+//line parser/grammar.y:962
 		{
 			calcVAL.NodePt = &Node{}
 		}
 	case 61:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1004
+//line parser/grammar.y:1007
 		{
 
 		}
 	case 62:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1007
+//line parser/grammar.y:1010
 		{
 
 		}
 	case 63:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1010
+//line parser/grammar.y:1013
 		{
 
 		}
 	case 64:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1013
+//line parser/grammar.y:1016
 		{
 
 		}
 	case 65:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1016
+//line parser/grammar.y:1019
 		{
 
 		}
 	case 66:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1019
+//line parser/grammar.y:1022
 		{
 
 		}
 	case 67:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1022
+//line parser/grammar.y:1025
 		{
 
 		}
 	case 68:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1025
+//line parser/grammar.y:1028
 		{
 
 		}
 	case 69:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1028
+//line parser/grammar.y:1031
 		{
 
 		}
 	case 70:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1031
+//line parser/grammar.y:1034
 		{
 
 		}
 	case 71:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1034
+//line parser/grammar.y:1037
 		{
 
 		}
 	case 72:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1037
+//line parser/grammar.y:1040
 		{
 
 		}
 	case 73:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1040
+//line parser/grammar.y:1043
 		{
 
 		}
 	case 74:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1043
+//line parser/grammar.y:1046
 		{
 
 		}
 	case 75:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1046
+//line parser/grammar.y:1049
 		{
 
 		}
 	case 76:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1049
+//line parser/grammar.y:1052
 		{
 
 		}
 	case 77:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1052
+//line parser/grammar.y:1055
 		{
 
 		}
 	case 78:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:1055
+//line parser/grammar.y:1058
 		{
 
 		}
 	case 79:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1058
+//line parser/grammar.y:1061
 		{
 
 		}
 	case 80:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:1061
+//line parser/grammar.y:1064
 		{
 
 		}
 	case 81:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:1064
+//line parser/grammar.y:1067
 		{
 
 		}
 	case 82:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1067
+//line parser/grammar.y:1070
 		{
 
 		}
 	case 83:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1074
+//line parser/grammar.y:1077
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
@@ -1619,7 +1622,7 @@ calcdefault:
 		}
 	case 84:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1079
+//line parser/grammar.y:1082
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
@@ -1627,7 +1630,7 @@ calcdefault:
 		}
 	case 85:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1084
+//line parser/grammar.y:1087
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
@@ -1635,7 +1638,7 @@ calcdefault:
 		}
 	case 86:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1089
+//line parser/grammar.y:1092
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
@@ -1643,7 +1646,7 @@ calcdefault:
 		}
 	case 87:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1094
+//line parser/grammar.y:1097
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
@@ -1651,7 +1654,7 @@ calcdefault:
 		}
 	case 88:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1099
+//line parser/grammar.y:1102
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
@@ -1659,7 +1662,7 @@ calcdefault:
 		}
 	case 89:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1116
+//line parser/grammar.y:1119
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ATTRINAME_OPTION_TABLENAME_NODE
@@ -1669,7 +1672,7 @@ calcdefault:
 		}
 	case 90:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1123
+//line parser/grammar.y:1126
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ATTRINAME_OPTION_TABLENAME_NODE
@@ -1680,13 +1683,13 @@ calcdefault:
 		}
 	case 91:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1141
+//line parser/grammar.y:1144
 		{
 			calcVAL.NodePt = &Node{}
 		}
 	case 92:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1159
+//line parser/grammar.y:1162
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -1696,7 +1699,7 @@ calcdefault:
 		}
 	case 93:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1166
+//line parser/grammar.y:1169
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -1706,7 +1709,7 @@ calcdefault:
 		}
 	case 94:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1173
+//line parser/grammar.y:1176
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -1716,7 +1719,7 @@ calcdefault:
 		}
 	case 95:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1180
+//line parser/grammar.y:1183
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -1726,15 +1729,30 @@ calcdefault:
 		}
 	case 96:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1201
+//line parser/grammar.y:1208
 		{
 			calcVAL.StringList = append(calcDollar[1].StringList, calcDollar[3].String)
 		}
 	case 97:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1204
+//line parser/grammar.y:1211
 		{
 			calcVAL.StringList = append(calcVAL.StringList, calcDollar[1].String)
+		}
+	case 98:
+		calcDollar = calcS[calcpt-3 : calcpt+1]
+//line parser/grammar.y:1218
+		{
+			calcVAL.List = calcDollar[1].List
+			calcVAL.List.AttriNameOptionTableNameList = append(calcVAL.List.AttriNameOptionTableNameList, calcDollar[3].NodePt.AttriNameOptionTableName)
+		}
+	case 99:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:1222
+		{
+			calcVAL.List = List{}
+			calcVAL.List.Type = ATTRINAME_OPTION_TABLENAME_LIST
+			calcVAL.List.AttriNameOptionTableNameList = append(calcVAL.List.AttriNameOptionTableNameList, calcDollar[1].NodePt.AttriNameOptionTableName)
 		}
 	}
 	goto calcstack /* stack new state and value */

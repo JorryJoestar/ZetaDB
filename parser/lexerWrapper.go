@@ -101,7 +101,6 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return IS
 	case C.EXISTS:
 		return EXISTS
-
 	case C.NOTEQUAL:
 		return NOTEQUAL
 	case C.LESS:
