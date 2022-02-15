@@ -918,12 +918,77 @@ constraintAfterAttribute
 
 /*  --------------------------------------------------------------------------------
     |                                   condition                                  |
+    --------------------------------------------------------------------------------
+
+        condition
+			predicate
+			LPAREN condition RPAREN
+			condition AND condition
+			condition OR condition
+
     -------------------------------------------------------------------------------- */
 condition
     :ID {
         $$ = &Node{}
     }
     ;
+
+
+
+/*  --------------------------------------------------------------------------------
+    |                                   predicate                                  |
+    --------------------------------------------------------------------------------
+
+        predicate
+			attriNameOptionTableName compareMark elementaryValue
+			attriNameOptionTableName LIKE STRINGVALUE
+			attriNameOptionTableName IN subQuery
+			attriNameOptionTableName NOT IN subQuery
+			attriNameOptionTableName IN ID
+			attriNameOptionTableName NOT IN ID
+			attriNameOptionTableName compareMark ALL subQuery
+			NOT attriNameOptionTableName compareMark ALL subQuery
+			attriNameOptionTableName compareMark ANY subQuery
+			NOT attriNameOptionTableName compareMark ANY subQuery
+			attriNameOptionTableName compareMark ALL ID
+			NOT attriNameOptionTableName compareMark ALL ID
+			attriNameOptionTableName compareMark ANY ID
+			NOT attriNameOptionTableName compareMark ANY ID
+			attriNameOptionTableName IS NULLMARK
+			attriNameOptionTableName IS NOT NULLMARK
+			attributeNameTuple IN subQuery
+			attributeNameTuple NOT IN subQuery
+			attributeNameTuple IN ID
+			attributeNameTuple NOT IN ID
+			EXISTS subQuery
+			NOT EXISTS subQuery
+
+        compareMark
+			EQUAL
+    		NOTEQUAL
+    		LESS
+    		GREATER
+    		LESSEQUAL
+    		GREATEREQUAL
+
+        attributeNameTuple
+            LPAREN attributeNameTupleList RPAREN
+
+        attributeNameTupleList
+            attributeNameTuple
+            attributeNameTupleList COMMA attributeNameTuple
+            
+    -------------------------------------------------------------------------------- */
+
+/*  --------------------------------------------------------------------------------
+    |                                    subQuery                                  |
+    --------------------------------------------------------------------------------
+
+        subQuery
+
+   -------------------------------------------------------------------------------- */
+// TODO
+
 
 /*  --------------------------------------------------------------------------------
     |                                elementaryValue                               |

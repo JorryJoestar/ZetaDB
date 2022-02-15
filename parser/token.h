@@ -16,6 +16,9 @@ enum {
     CONSTRAINT      = 288,
     DEFAULT         = 229,
 
+//condition
+    
+
 //elementary value
     INTVALUE          = 204,  //int value
     FLOATVALUE        = 205,  //float value
