@@ -24,7 +24,7 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("check (not exists .)")
+	ast := kernel.parser.ParseSql("decimal(9,1)")
 
 	tester := Tester{}
 	tester.PrintAST(ast)

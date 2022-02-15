@@ -21,10 +21,21 @@
 [Cc][Oo][Nn][Ss][Tt][Rr][Aa][Ii][Nn][Tt]                        {return CONSTRAINT;}
 [Dd][Ee][Ff][Aa][Uu][Ll][Tt]                                    {return DEFAULT;}
 
-[1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
-[1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}
-["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
-[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
+[Cc][Hh][Aa][Rr]                                                {return CHAR;}
+[Vv][Aa][Rr][Cc][Hh][Aa][Rr]                                    {return VARCHAR;}
+[Bb][Ii][Tt]                                                    {return BIT;}
+[Bb][Ii][Tt][Vv][Aa][Rr][Yy][Ii][Nn][Gg]                        {return BITVARYING;}
+[Bb][Oo][Oo][Ll][Ee][Aa][Nn]                                    {return BOOLEAN;}
+[Ii][Nn][Tt]                                                    {return INT;}
+[Ii][Nn][Tt][Ee][Gg][Ee][Rr]                                    {return INTEGER;}
+[Ss][Hh][Oo][Rr][Tt][Ii][Nn][Tt]                                {return SHORTINT;}
+[Ff][Ll][Oo][Aa][Tt]                                            {return FLOAT;}
+[Rr][Ee][Aa][Ll]                                                {return REAL;}
+[Dd][Oo][Uu][Bb][Ll][Ee][ ][Pp][Rr][Ee][Cc][Ii][Ss][Ii][Oo][Nn] {return DOUBLEPRECISION;}
+[Dd][Ee][Cc][Ii][Mm][Aa][Ll]                                    {return DECIMAL;}
+[Nn][Uu][Mm][Ee][Rr][Ii][Cc]                                    {return NUMERIC;}
+[Dd][Aa][Tt][Ee]                                                {return DATE;}
+[Tt][Ii][Mm][Ee]                                                {return TIME;}
 
 [Ll][Ii][Kk][Ee]                                                {return LIKE;}
 [Ii][Nn]                                                        {return IN;}
@@ -44,6 +55,11 @@
 [Oo][Rr]                                                        {return OR;}
 
 [.]                                                             {return DOT;}
+
+[1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
+[1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}
+["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
+[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
 
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}

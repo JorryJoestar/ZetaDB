@@ -17,7 +17,8 @@ enum {
     DEFAULT         = 229,
 
 //condition
-
+    AND             = 243,
+    OR              = 244,
 
 //predicate
     LIKE            = 258,
@@ -43,6 +44,23 @@ enum {
 //attriNameOptionTableName
     DOT               = 241,  //.
 
+//domain
+    CHAR            = 224,
+    VARCHAR         = 210,  //VARCHAR(n)
+    BIT             = 211,  //BIT(n)
+    BITVARYING      = 212,  //BITVARYING(n)
+    BOOLEAN         = 213,
+    INT             = 214,
+    INTEGER         = 215,
+    SHORTINT        = 216,
+    FLOAT           = 217,
+    REAL            = 218,
+    DOUBLEPRECISION = 219,
+    DECIMAL         = 220,  //DECIMAL(n,d)
+    NUMERIC         = 221,  //NUMERIC(n,d)
+    DATE            = 222,
+    TIME            = 223,
+
 //public
     NULLMARK        = 257,  //NULL
     LPAREN            = 200,  //(
@@ -58,29 +76,10 @@ enum {
 
 
     
-
-    VARCHAR         = 210,  //VARCHAR(n)
-    BIT             = 211,  //BIT(n)
-    BITVARYING      = 212,  //BITVARYING(n)
-    BOOLEAN         = 213,
-    INT             = 214,
-    INTEGER         = 215,
-    SHORTINT        = 216,
-    FLOAT           = 217,
-    REAL            = 218,
-    DOUBLEPRECISION = 219,
-    DECIMAL         = 220,  //DECIMAL(n,d)
-    NUMERIC         = 221,  //NUMERIC(n,d)
-    DATE            = 222,
-    TIME            = 223,
-    CHAR            = 224,
-
     TABLE           = 225,
     DROP            = 226,
     ALTER           = 227,
     ADD             = 228,
-
-
 
     CREATE          = 232,
 
@@ -95,15 +94,7 @@ enum {
 
 
     AS              = 242,
-    AND             = 243,
-    OR              = 244,
     STAR            = 245,  //*
-
-
-
-
-
-
     AVG             = 259,
     MIN             = 260,
     MAX             = 261,
@@ -138,13 +129,6 @@ enum {
     TRANSACTION     = 285,
     COMMIT          = 286,
     ROLLBACK        = 287,
-
-
-
-
-
-
-
 
     ASSERTION       = 301, 
     TRIGGER         = 302,
@@ -199,8 +183,5 @@ enum {
     THEN            = 575,
     ELSE            = 576,
     ELSEIF          = 577
-
-
-
 
 };

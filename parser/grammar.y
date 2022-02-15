@@ -51,7 +51,9 @@ const (
 /* elementaryValue */
     ELEMENTARY_VALUE_NODE           NodeEnum = 24
 
+/* domain */
     DOMAIN_NODE                     NodeEnum = 21
+
     CONDITION_NODE                  NodeEnum = 25
     PREDICATE_NODE                  NodeEnum = 26
     EXPRESSION_NODE                 NodeEnum = 27
@@ -116,8 +118,11 @@ type Node struct {
 /* elementaryValue */
     ElementaryValue          *ElementaryValueNode
 
-/* public */
+/* domain */
     Domain                   *DomainNode
+
+/* public */
+
     Expression               *ExpressionNode
     ExpressionEntry          *ExpressionEntryNode
     Aggregation              *AggregationNode
@@ -182,6 +187,11 @@ type List struct {
 %type <NodePt> compareMark
 %token NOTEQUAL LESS GREATER LESSEQUAL GREATEREQUAL EQUAL
 
+// domain
+%type <NodePt> domain
+%token CHAR VARCHAR BIT BITVARYING BOOLEAN INT INTEGER SHORTINT 
+%token FLOAT REAL DOUBLEPRECISION DECIMAL NUMERIC DATE TIME
+
 // attriNameOptionTableName
 %type <NodePt> attriNameOptionTableName
 %token DOT
@@ -217,7 +227,7 @@ type List struct {
 
 ast
     :constraintAfterAttributeList {
-        fmt.Println("157: constraintAfterAttributeList")
+        fmt.Println("229: constraintAfterAttributeList")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -227,7 +237,7 @@ ast
 	        Dql: nil}
     }
     |constraintList {
-        fmt.Println("178: constraintList")
+        fmt.Println("239: constraintList")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -235,6 +245,16 @@ ast
 	        Dml: nil,
 	        Dcl: nil,
 	        Dql: nil}
+    }
+    |domain {
+        fmt.Println("249: domain")
+
+        GetInstance().AST = &ASTNode{
+            Type: AST_DQL,
+	        Ddl: nil,
+	        Dml: nil,
+	        Dcl: nil,
+	        Dql: nil}        
     }
     ;
 
@@ -1290,6 +1310,143 @@ compareMark
     ;
 
 /*  --------------------------------------------------------------------------------
+    |                                     domain                                   |
+    --------------------------------------------------------------------------------
+
+        domain
+            CHAR
+            VARCHAR LPAREN INTVALUE RPAREN
+            BIT LPAREN INTVALUE RPAREN
+            BITVARYING LPAREN INTVALUE RPAREN
+            BOOLEAN
+            INT
+            INTEGER
+            SHORTINT
+            FLOAT
+            REAL
+            DOUBLEPRECISION
+            DECIMAL LPAREN INTVALUE COMMA INTVALUE RPAREN
+            NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN
+            DATE
+            TIME
+
+    -------------------------------------------------------------------------------- */
+domain
+    :CHAR {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_CHAR
+    }
+    |VARCHAR LPAREN INTVALUE RPAREN {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_VARCHAR
+        $$.Domain.N = $3
+    }
+    |BIT LPAREN INTVALUE RPAREN {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_BIT
+        $$.Domain.N = $3
+    }
+    |BITVARYING LPAREN INTVALUE RPAREN {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_BITVARYING
+        $$.Domain.N = $3
+    }
+    |BOOLEAN {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_BOOLEAN
+    }
+    |INT {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_INT
+    }
+    |INTEGER {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_INTEGER
+    }
+    |SHORTINT {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_SHORTINT
+    }
+    |FLOAT {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_FLOAT
+    }
+    |REAL {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_REAL
+    }
+    |DOUBLEPRECISION {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_DOUBLEPRECISION
+    }
+    |DECIMAL LPAREN INTVALUE COMMA INTVALUE RPAREN {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_DECIMAL
+        $$.Domain.N = $3
+        $$.Domain.D = $5
+    }
+    |NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_NUMERIC
+        $$.Domain.N = $3
+        $$.Domain.D = $5
+    }
+    DATE {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_DATE
+    }
+    |TIME {
+        $$ = &Node{}
+        $$.Type = DOMAIN_NODE
+
+        $$.Domain = &DomainNode{}
+        $$.Domain.Type = DOMAIN_TIME
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
     |                            attriNameOptionTableName                          |
     --------------------------------------------------------------------------------
 
@@ -1323,6 +1480,7 @@ attriNameOptionTableName
         subQuery
 
    -------------------------------------------------------------------------------- */
+// TODO
 subQuery
     :DOT {
         $$ = &Node{}

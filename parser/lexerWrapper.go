@@ -120,6 +120,38 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.EQUAL:
 		return EQUAL
 
+	//domain
+	case C.CHAR:
+		return CHAR
+	case C.VARCHAR:
+		return VARCHAR
+	case C.BIT:
+		return BIT
+	case C.BITVARYING:
+		return BITVARYING
+	case C.BOOLEAN:
+		return BOOLEAN
+	case C.INT:
+		return INT
+	case C.INTEGER:
+		return INTEGER
+	case C.SHORTINT:
+		return SHORTINT
+	case C.FLOAT:
+		return FLOAT
+	case C.REAL:
+		return REAL
+	case C.DOUBLEPRECISION:
+		return DOUBLEPRECISION
+	case C.DECIMAL:
+		return DECIMAL
+	case C.NUMERIC:
+		return NUMERIC
+	case C.DATE:
+		return DATE
+	case C.TIME:
+		return TIME
+
 	//attriNameOptionTableName
 	case C.DOT:
 		return DOT
