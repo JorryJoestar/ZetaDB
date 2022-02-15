@@ -256,8 +256,8 @@ ast
     constraintList
         constraintWithName
         constraint
-        constraintList constraintWithName
-        constraintList constraint
+        constraintList COMMA constraintWithName
+        constraintList COMMA constraint
 
     constraintWithName
         CONSTRAINT ID constraint
@@ -361,13 +361,13 @@ constraintList
         $$.Type = CONSTRAINT_LIST
         $$.ConstraintList = append($$.ConstraintList,$1.Constraint)
     }
-    |constraintList constraintWithName {
+    |constraintList COMMA constraintWithName {
         $$ = $1
-        $$.ConstraintList = append($$.ConstraintList,$2.Constraint)
+        $$.ConstraintList = append($$.ConstraintList,$3.Constraint)
     }
-    |constraintList constraint {
+    |constraintList COMMA constraint {
         $$ = $1
-        $$.ConstraintList = append($$.ConstraintList,$2.Constraint)
+        $$.ConstraintList = append($$.ConstraintList,$3.Constraint)
     }
     ;
 

@@ -14,9 +14,13 @@ enum {
     DELETE_NULL      = 297,  //ON DELETE SET NULL
     DELETE_CASCADE   = 298,  //ON DELETE SET CASCADE
     CONSTRAINT      = 288,
+    DEFAULT         = 229,
 
-
-
+//elementary value
+    INTVALUE          = 204,  //int value
+    FLOATVALUE        = 205,  //float value
+    STRINGVALUE       = 206,  //string surrounded by single or double quotation marks
+    BOOLVALUE         = 551,  //BOOLVALUE true/false
 
 //public
     LPAREN            = 200,  //(
@@ -27,10 +31,7 @@ enum {
     PASSWORD          = 208,
     TABLEDOTATTRIBUTE = 209, //tableName.attributeName
 
-    INTVALUE          = 204,  //int value
-    FLOATVALUE        = 205,  //float value
-    STRINGVALUE       = 206,  //string surrounded by single or double quotation marks
-    BOOLVALUE         = 551,  //BOOLVALUE true/false
+
 
 
 
@@ -66,7 +67,7 @@ enum {
     DROP            = 226,
     ALTER           = 227,
     ADD             = 228,
-    DEFAULT         = 229,
+
 
 
     CREATE          = 232,

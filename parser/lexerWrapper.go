@@ -67,6 +67,8 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return DELETE_CASCADE
 	case C.CONSTRAINT:
 		return CONSTRAINT
+	case C.DEFAULT:
+		return DEFAULT
 
 	//elemtary value
 	case C.INTVALUE:
@@ -91,6 +93,8 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return LPAREN
 	case C.RPAREN:
 		return RPAREN
+	case C.COMMA:
+		return COMMA
 	case C.NOT:
 		return NOT
 	case C.NULLMARK:

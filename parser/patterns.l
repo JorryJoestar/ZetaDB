@@ -19,6 +19,7 @@
 [Oo][Nn][ ][Dd][Ee][Ll][Ee][Tt][Ee][ ][Ss][Ee][Tt][ ][Nn][Uu][Ll][Ll] {return DELETE_NULL;}
 [Oo][Nn][ ][Dd][Ee][Ll][Ee][Tt][Ee][ ][Ss][Ee][Tt][ ][Cc][Aa][Ss][Cc][Aa][Dd][Ee] {return DELETE_CASCADE;}
 [Cc][Oo][Nn][Ss][Tt][Rr][Aa][Ii][Nn][Tt]                        {return CONSTRAINT;}
+[Dd][Ee][Ff][Aa][Uu][Ll][Tt]                                    {return DEFAULT;}
 
 [1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
 [1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}
@@ -27,6 +28,7 @@
 
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}
+[,]                                                             {return COMMA;}
 [Nn][Oo][Tt]                                                    {return NOT;}
 [Nn][Uu][Ll][Ll]                                                {return NULLMARK;}
 [a-z_A-Z][a-z_A-Z0-9]*                                          {return ID;}
