@@ -34,15 +34,22 @@ const (
     INSERT_NODE                     NodeEnum = 19
     DELETE_NODE                     NodeEnum = 20
 
+    CONSTRAINT_NODE                 NodeEnum = 23
+    CONSTRAINT_DEFERRABLE_ENUM      NodeEnum = 30
+    CONSTRAINT_UPDATE_SET_ENUM      NodeEnum = 31
+    CONSTRAINT_DELETE_SET_ENUM      NodeEnum = 32
+
     DOMAIN_NODE                     NodeEnum = 21
     ATTRINAME_OPTION_TABLENAME_NODE NodeEnum = 22
-    CONSTRAINT_NODE                 NodeEnum = 23
+
     ELEMENTARY_VALUE_NODE           NodeEnum = 24
     CONDITION_NODE                  NodeEnum = 25
     PREDICATE_NODE                  NodeEnum = 26
     EXPRESSION_NODE                 NodeEnum = 27
     EXPRESSION_ENTRY                NodeEnum = 28
     AGGREGATION_NODE                NodeEnum = 29
+// NodeEnum = 33
+
 )
 
 type Node struct {
@@ -76,10 +83,15 @@ type Node struct {
     Insert          *InsertNode
     DeleteNode      *DeleteNode
 
+/* constraint */
+    ConstraintDeferrable ConstraintDeferrableEnum
+    ConstraintUpdateSet  ConstraintUpdateSetEnum
+    ConstraintDeleteSet  ConstraintDeleteSetEnum
+    Constraint           *ConstraintNode
+
 /* public */
     Domain                   *DomainNode
     AttriNameOptionTableName *AttriNameOptionTableNameNode
-    Constraint               *ConstraintNode
     ElementaryValue          *ElementaryValueNode
     Condition                *ConditionNode
     Predicate                *PredicateNode
@@ -108,7 +120,6 @@ type List struct {
     NodePt     *Node
     List       List
     Int        int
-    Unit8      uint8
     Float      float64
     String     string
     StringList []string
@@ -126,9 +137,9 @@ type List struct {
 %type <NodePt> constraint
 %type <NodePt> constraintWithName
 %type <StringList> attriNameList
-%type <Unit8> setDeferrable
-%type <Unit8> onUpdateSet
-%type <Unit8> onDeleteSet
+%type <NodePt> setDeferrable
+%type <NodePt> onUpdateSet
+%type <NodePt> onDeleteSet
 
 %token DEFAULT UNIQUE PRIMARYKEY CHECK FOREIGNKEY REFERENCES
 %token NOT_DEFERRABLE DEFERED_DEFERRABLE IMMEDIATE_DEFERRABLE
@@ -419,7 +430,7 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $10
+        $$.Constraint.Deferrable = $10.ConstraintDeferrable
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet {
         $$ = &Node{}
@@ -431,7 +442,7 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.UpdateSet = $10
+        $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet {
         $$ = &Node{}
@@ -443,7 +454,7 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.DeleteSet = $10
+        $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -455,8 +466,8 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $10
-        $$.Constraint.UpdateSet = $11
+        $$.Constraint.Deferrable = $10.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -468,8 +479,8 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $10
-        $$.Constraint.DeleteSet = $11
+        $$.Constraint.Deferrable = $10.ConstraintDeferrable
+        $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -481,8 +492,8 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $11
-        $$.Constraint.UpdateSet = $10
+        $$.Constraint.Deferrable = $11.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -494,8 +505,8 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.UpdateSet = $10
-        $$.Constraint.DeleteSet = $11
+        $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -507,8 +518,8 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $11
-        $$.Constraint.DeleteSet = $10
+        $$.Constraint.Deferrable = $11.ConstraintDeferrable
+        $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -520,8 +531,8 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.UpdateSet = $11
-        $$.Constraint.DeleteSet = $10
+        $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -533,9 +544,9 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $10
-        $$.Constraint.UpdateSet = $11
-        $$.Constraint.DeleteSet = $12
+        $$.Constraint.Deferrable = $10.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $12.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -547,9 +558,9 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $10
-        $$.Constraint.UpdateSet = $12
-        $$.Constraint.DeleteSet = $11
+        $$.Constraint.Deferrable = $10.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $12.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -561,9 +572,9 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $11
-        $$.Constraint.UpdateSet = $10
-        $$.Constraint.DeleteSet = $12
+        $$.Constraint.Deferrable = $11.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $12.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -575,9 +586,9 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $12
-        $$.Constraint.UpdateSet = $10
-        $$.Constraint.DeleteSet = $11
+        $$.Constraint.Deferrable = $12.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -589,9 +600,9 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $11
-        $$.Constraint.UpdateSet = $12
-        $$.Constraint.DeleteSet = $10
+        $$.Constraint.Deferrable = $11.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $12.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -603,9 +614,9 @@ constraint
         $$.Constraint.AttributeNameLocal = $3
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
-        $$.Constraint.Deferrable = $12
-        $$.Constraint.UpdateSet = $11
-        $$.Constraint.DeleteSet = $10
+        $$.Constraint.Deferrable = $12.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
     }
     ;
 
@@ -659,7 +670,7 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
     }
@@ -669,10 +680,10 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.Deferrable = $6
+        $$.Constraint.Deferrable = $6.ConstraintDeferrable
     }
     |REFERENCES ID LPAREN ID RPAREN onUpdateSet {
         $$ = &Node{}
@@ -680,10 +691,10 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.UpdateSet = $6
+        $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
     }
     |REFERENCES ID LPAREN ID RPAREN onDeleteSet {
         $$ = &Node{}
@@ -691,10 +702,10 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.DeleteSet = $6
+        $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
     }
     |REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -702,11 +713,11 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.Deferrable = $6
-        $$.Constraint.UpdateSet = $7
+        $$.Constraint.Deferrable = $6.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
     }
     |REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -714,11 +725,11 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.Deferrable = $6
-        $$.Constraint.DeleteSet = $7
+        $$.Constraint.Deferrable = $6.ConstraintDeferrable
+        $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -726,11 +737,11 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.UpdateSet = $6
-        $$.Constraint.Deferrable = $7
+        $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
+        $$.Constraint.Deferrable = $7.ConstraintDeferrable
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -738,11 +749,11 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.UpdateSet = $6
-        $$.Constraint.DeleteSet = $7
+        $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -750,11 +761,11 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.DeleteSet = $6
-        $$.Constraint.Deferrable = $7
+        $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
+        $$.Constraint.Deferrable = $7.ConstraintDeferrable
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -762,11 +773,11 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.DeleteSet = $6
-        $$.Constraint.UpdateSet = $7
+        $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
+        $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
     }
 	|REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -774,12 +785,12 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.Deferrable = $6
-        $$.Constraint.UpdateSet = $7
-        $$.Constraint.DeleteSet = $8
+        $$.Constraint.Deferrable = $6.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $8.ConstraintDeleteSet
     }
 	|REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -787,12 +798,12 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.Deferrable = $6
-        $$.Constraint.DeleteSet = $7
-        $$.Constraint.UpdateSet = $8
+        $$.Constraint.Deferrable = $6.ConstraintDeferrable
+        $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
+        $$.Constraint.UpdateSet = $8.ConstraintUpdateSet
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -800,12 +811,12 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.UpdateSet = $6
-        $$.Constraint.Deferrable = $7
-        $$.Constraint.DeleteSet = $8
+        $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
+        $$.Constraint.Deferrable = $7.ConstraintDeferrable
+        $$.Constraint.DeleteSet = $8.ConstraintDeleteSet
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -813,12 +824,12 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.UpdateSet = $6
-        $$.Constraint.DeleteSet = $7
-        $$.Constraint.Deferrable = $8
+        $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
+        $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
+        $$.Constraint.Deferrable = $8.ConstraintDeferrable
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -826,12 +837,12 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.DeleteSet = $6
-        $$.Constraint.Deferrable = $7
-        $$.Constraint.UpdateSet = $8
+        $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
+        $$.Constraint.Deferrable = $7.ConstraintDeferrable
+        $$.Constraint.UpdateSet = $8.ConstraintUpdateSet
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -839,12 +850,12 @@ constraintAfterAttribute
         $$.Constraint = &ConstraintNode{}
         $$.Constraint.ConstraintNameValid = false
 
-        $$.Constraint.Type = CONSTRAINT_CONSTRAINT_FOREIGN_KEY
+        $$.Constraint.Type = CONSTRAINT_FOREIGN_KEY
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
-        $$.Constraint.DeleteSet = $6
-        $$.Constraint.UpdateSet = $7
-        $$.Constraint.Deferrable = $8
+        $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
+        $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
+        $$.Constraint.Deferrable = $8.ConstraintDeferrable
     }
     ;
 
@@ -861,33 +872,47 @@ constraintAfterAttribute
 /*  ------------------------------- setDeferrable ---------------------------------- */
     setDeferrable
 	    :NOT_DEFERRABLE {
-            $$ = CONSTRAINT_NOT_DEFERRABLE
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_DEFERRABLE_ENUM
+            $$.ConstraintDeferrable = CONSTRAINT_NOT_DEFERRABLE
         }
 	    |DEFERED_DEFERRABLE {
-            $$ = CONSTRAINT_INITIALLY_DEFERRED
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_DEFERRABLE_ENUM
+            $$.ConstraintDeferrable = CONSTRAINT_INITIALLY_DEFERRED
         }
 	    |IMMEDIATE_DEFERRABLE {
-            $$ = CONSTRAINT_INITIALLY_IMMEDIATE
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_DEFERRABLE_ENUM
+            $$.ConstraintDeferrable = CONSTRAINT_INITIALLY_IMMEDIATE
         }
         ;
 
 /*  ------------------------------- onUpdateSet ------------------------------------ */
     onUpdateSet
 	    :UPDATE_NULL {
-            $$ = CONSTRAINT_UPDATE_SET_NULL
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_UPDATE_SET_ENUM
+            $$.ConstraintUpdateSet = CONSTRAINT_UPDATE_SET_NULL
         }
 	    |UPDATE_CASCADE {
-            $$ = CONSTRAINT_UPDATE_SET_CASCADE
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_UPDATE_SET_ENUM
+            $$.ConstraintUpdateSet = CONSTRAINT_UPDATE_SET_CASCADE
         }
         ;
 
 /*  ------------------------------- onDeleteSet ------------------------------------ */
     onDeleteSet
 	    :DELETE_NULL {
-            $$ = CONSTRAINT_DELETE_SET_NULL
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_DELETE_SET_ENUM
+            $$.ConstraintDeleteSet = CONSTRAINT_DELETE_SET_NULL
         }
 	    |DELETE_CASCADE {
-            $$ = CONSTRAINT_DELETE_SET_CASCADE
+            $$ = &Node{}
+            $$.Type = CONSTRAINT_DELETE_SET_ENUM
+            $$.ConstraintDeleteSet = CONSTRAINT_DELETE_SET_CASCADE
         }
         ;
 

@@ -25,4 +25,10 @@
 ["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
 [Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
 
+[(]                                                             {return LPAREN;}
+[)]                                                             {return RPAREN;}
+[Nn][Oo][Tt]                                                    {return NOT;}
+[Nn][Uu][Ll][Ll]                                                {return NULLMARK;}
+[a-z_A-Z][a-z_A-Z0-9]*                                          {return ID;}
+[ \t]                                                           {/*ignore space*/}
 %%

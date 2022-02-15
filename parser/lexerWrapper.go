@@ -68,7 +68,7 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.CONSTRAINT:
 		return CONSTRAINT
 
-	//public
+	//elemtary value
 	case C.INTVALUE:
 		yylval.Int, _ = strconv.Atoi(p.yytext)
 		return INTVALUE
@@ -85,6 +85,19 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 			yylval.Boolean = false
 		}
 		return BOOLVALUE
+
+	//public
+	case C.LPAREN:
+		return LPAREN
+	case C.RPAREN:
+		return RPAREN
+	case C.NOT:
+		return NOT
+	case C.NULLMARK:
+		return NULLMARK
+	case C.ID:
+		yylval.String = p.yytext
+		return ID
 	}
 	return 0 //end of statement
 }

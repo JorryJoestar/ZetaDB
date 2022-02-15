@@ -8,5 +8,10 @@ import (
 type Tester struct{}
 
 func (tester *Tester) PrintAST(ast *parser.ASTNode) {
-	fmt.Printf("AST TYPE: %v", ast.Type)
+	if ast == nil {
+		fmt.Println("ast nil")
+	} else {
+		fmt.Printf("AST TYPE: %v", ast.Type)
+	}
+
 }
