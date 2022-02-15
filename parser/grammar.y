@@ -217,11 +217,11 @@ type List struct {
     |                                      AST                                     |
     --------------------------------------------------------------------------------
     
-    ast
-        ddl
-        dml
-        dcl
-        dql
+        ast
+            ddl
+            dml
+            dcl
+            dql
 
     -------------------------------------------------------------------------------- */
 
@@ -262,26 +262,21 @@ ast
     |                                     DDL                                      |
     --------------------------------------------------------------------------------
 
-    ddl
-        createTableStmt
-        dropTableStmt
-        alterTableAddStmt
-        alterTableDropStmt
-
-        createAssertStmt
-        dropAssertStmt
-        
-        createViewStmt
-        dropViewStmt
-
-        createIndexStmt
-        dropIndexStmt
-
-        createTriggerStmt
-        dropTriggerStmt
-
-        createPsmStmt
-        dropPsmStmt
+        ddl
+            createTableStmt
+            dropTableStmt
+            alterTableAddStmt
+            alterTableDropStmt
+            createAssertStmt
+            dropAssertStmt
+            createViewStmt
+            dropViewStmt
+            createIndexStmt
+            dropIndexStmt
+            createTriggerStmt
+            dropTriggerStmt
+            createPsmStmt
+            dropPsmStmt
     
     -------------------------------- createTableStmt -------------------------------
 
@@ -308,79 +303,79 @@ ast
     |                                   constraint                                 |
     --------------------------------------------------------------------------------
 
-    constraintAfterAttributeList
-        constraintAfterAttributeWithName
-        constraintAfterAttribute
-        constraintAfterAttributeList constraintAfterAttributeWithName
-        constraintAfterAttributeList constraintAfterAttribute
+        constraintAfterAttributeList
+            constraintAfterAttributeWithName
+            constraintAfterAttribute
+            constraintAfterAttributeList constraintAfterAttributeWithName
+            constraintAfterAttributeList constraintAfterAttribute
 
-    constraintList
+        constraintList
+            constraintWithName
+            constraint
+            constraintList COMMA constraintWithName
+            constraintList COMMA constraint
+
         constraintWithName
+            CONSTRAINT ID constraint
+        
         constraint
-        constraintList COMMA constraintWithName
-        constraintList COMMA constraint
+            UNIQUE LPAREN attriNameList RPAREN
+            PRIMARYKEY LPAREN attriNameList RPAREN
+            CHECK LPAREN condition RPAREN
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+            FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
 
-    constraintWithName
-        CONSTRAINT ID constraint
-    
-    constraint
-        UNIQUE LPAREN attriNameList RPAREN
-		PRIMARYKEY LPAREN attriNameList RPAREN
-		CHECK LPAREN condition RPAREN
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+        constraintAfterAttributeWithName
+            CONSTRAINT ID constraintAfterAttribute
 
-    constraintAfterAttributeWithName
-        CONSTRAINT ID constraintAfterAttribute
+        constraintAfterAttribute
+            DEFAULT elementaryValue
+            UNIQUE
+            PRIMARYKEY
+            NOT NULLMARK
+            REFERENCES ID LPAREN ID RPAREN
+            REFERENCES ID LPAREN ID RPAREN setDeferrable
+            REFERENCES ID LPAREN ID RPAREN onUpdateSet
+            REFERENCES ID LPAREN ID RPAREN onDeleteSet
+            REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+            REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+            REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+            REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+            REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+            REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+            REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+            REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+            REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+            REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+            REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+            REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
 
-    constraintAfterAttribute
-        DEFAULT elementaryValue
-		UNIQUE
-		PRIMARYKEY
-		NOT NULLMARK
-		REFERENCES ID LPAREN ID RPAREN
-		REFERENCES ID LPAREN ID RPAREN setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+        setDeferrable
+            NOT_DEFERRABLE
+            DEFERED_DEFERRABLE
+            IMMEDIATE_DEFERRABLE
 
-    setDeferrable
-	    NOT_DEFERRABLE
-	    DEFERED_DEFERRABLE
-	    IMMEDIATE_DEFERRABLE
+        onUpdateSet
+            UPDATE_NULL
+            UPDATE_CASCADE
 
-    onUpdateSet
-	    UPDATE_NULL
-	    UPDATE_CASCADE
-
-    onDeleteSet
-	    DELETE_NULL
-	    DELETE_CASCADE
+        onDeleteSet
+            DELETE_NULL
+            DELETE_CASCADE
 
     --------------------------------------------------------------------------------
 
