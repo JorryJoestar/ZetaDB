@@ -40,6 +40,9 @@
 [<][=]                                                          {return LESSEQUAL;}
 [>][=]                                                          {return GREATEREQUAL;}
 
+[Aa][Nn][Dd]                                                    {return AND;}
+[Oo][Rr]                                                        {return OR;}
+
 [.]                                                             {return DOT;}
 
 [(]                                                             {return LPAREN;}

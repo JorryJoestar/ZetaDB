@@ -88,6 +88,12 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		}
 		return BOOLVALUE
 
+	//condition
+	case C.AND:
+		return AND
+	case C.OR:
+		return OR
+
 	//prdicate
 	case C.LIKE:
 		return LIKE

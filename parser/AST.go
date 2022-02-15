@@ -76,7 +76,7 @@ type AssertNode struct {
 //view
 type ViewNode struct {
 	ViewName               string
-	Query                  QueryNode
+	Query                  *QueryNode
 	AttributeNameList      []string
 	AttributeNameListValid bool
 }
@@ -440,37 +440,38 @@ type PredicateEnum uint8
 
 const (
 	PREDICATE_COMPARE_ELEMENTARY_VALUE PredicateEnum = 1  //AttriNameWithTableNameL, ElementaryValue, CompareMark
-	PREDICATE_COMPARE_ATTRIBUTE_NAME   PredicateEnum = 2  //AttriNameWithTableNameL, AttriNameWithTableNameR, CompareMark
-	PREDICATE_LIKE_STRING_VALUE        PredicateEnum = 3  //AttriNameWithTableNameL, ElementaryValue(string)
-	PREDICATE_IN_SUBQUERY              PredicateEnum = 4  //AttriNameWithTableNameL, Subquery
-	PREDICATE_NOT_IN_SUBQUERY          PredicateEnum = 5  //AttriNameWithTableNameL, Subquery
-	PREDICATE_IN_TABLE                 PredicateEnum = 6  //AttriNameWithTableNameL, TableName
-	PREDICATE_NOT_IN_TABLE             PredicateEnum = 7  //AttriNameWithTableNameL, TableName
-	PREDICATE_COMPARE_ALL_SUBQUERY     PredicateEnum = 8  //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_NOT_ALL_SUBQUERY PredicateEnum = 9  //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_ANY_SUBQUERY     PredicateEnum = 10 //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_NOT_ANY_SUBQUERY PredicateEnum = 11 //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_ALL_TABLE        PredicateEnum = 12 //AttriNameWithTableNameL, TableName, CompareMark
-	PREDICATE_COMPARE_NOT_ALL_TABLE    PredicateEnum = 13 //AttriNameWithTableNameL, TableName, CompareMark
-	PREDICATE_COMPARE_ANY_TABLE        PredicateEnum = 14 //AttriNameWithTableNameL, TableName, CompareMark
-	PREDICATE_COMPARE_NOT_ANY_TABLE    PredicateEnum = 15 //AttriNameWithTableNameL, TableName, CompareMark
-	PREDICATE_IS_NULL                  PredicateEnum = 16 //AttriNameWithTableNameL
-	PREDICATE_IS_NOT_NULL              PredicateEnum = 17 //AttriNameWithTableNameL
-	PREDICATE_TUPLE_IN_SUBQUERY        PredicateEnum = 18 //AttributeTuple, Subquery
-	PREDICATE_TUPLE_NOT_IN_SUBQUERY    PredicateEnum = 19 //AttributeTuple, Subquery
-	PREDICATE_TUPLE_IN_TABLE           PredicateEnum = 20 //AttributeTuple, TableName
-	PREDICATE_TUPLE_NOT_IN_TABLE       PredicateEnum = 21 //AttributeTuple, TableName
+	PREDICATE_LIKE_STRING_VALUE        PredicateEnum = 2  //AttriNameWithTableNameL, ElementaryValue(string)
+	PREDICATE_IN_SUBQUERY              PredicateEnum = 3  //AttriNameWithTableNameL, Subquery
+	PREDICATE_NOT_IN_SUBQUERY          PredicateEnum = 4  //AttriNameWithTableNameL, Subquery
+	PREDICATE_IN_TABLE                 PredicateEnum = 5  //AttriNameWithTableNameL, TableName
+	PREDICATE_NOT_IN_TABLE             PredicateEnum = 6  //AttriNameWithTableNameL, TableName
+	PREDICATE_COMPARE_ALL_SUBQUERY     PredicateEnum = 7  //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_NOT_ALL_SUBQUERY PredicateEnum = 8  //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_ANY_SUBQUERY     PredicateEnum = 9  //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_NOT_ANY_SUBQUERY PredicateEnum = 10 //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_ALL_TABLE        PredicateEnum = 11 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_COMPARE_NOT_ALL_TABLE    PredicateEnum = 12 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_COMPARE_ANY_TABLE        PredicateEnum = 13 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_COMPARE_NOT_ANY_TABLE    PredicateEnum = 14 //AttriNameWithTableNameL, TableName, CompareMark
+	PREDICATE_IS_NULL                  PredicateEnum = 15 //AttriNameWithTableNameL
+	PREDICATE_IS_NOT_NULL              PredicateEnum = 16 //AttriNameWithTableNameL
+	PREDICATE_TUPLE_IN_SUBQUERY        PredicateEnum = 17 //AttriNameOptionTableNameList, Subquery
+	PREDICATE_TUPLE_NOT_IN_SUBQUERY    PredicateEnum = 18 //AttriNameOptionTableNameList, Subquery
+	PREDICATE_TUPLE_IN_TABLE           PredicateEnum = 19 //AttriNameOptionTableNameList, TableName
+	PREDICATE_TUPLE_NOT_IN_TABLE       PredicateEnum = 20 //AttriNameOptionTableNameList, TableName
+	PREDICATE_SUBQUERY_EXISTS          PredicateEnum = 21 //Subquery
+	PREDICATE_SUBQUERY_NOT_EXISTS      PredicateEnum = 22 //Subquery
 )
 
 type PredicateNode struct {
-	Type                    PredicateEnum
-	CompareMark             CompareMarkEnum
-	ElementaryValue         *ElementaryValueNode
-	AttriNameWithTableNameL *AttriNameOptionTableNameNode
-	AttriNameWithTableNameR *AttriNameOptionTableNameNode
-	AttributeTuple          []*AttriNameOptionTableNameNode
-	Subquery                *QueryNode
-	TableName               string
+	Type                         PredicateEnum
+	CompareMark                  CompareMarkEnum
+	ElementaryValue              *ElementaryValueNode
+	AttriNameWithTableNameL      *AttriNameOptionTableNameNode
+	AttriNameWithTableNameR      *AttriNameOptionTableNameNode
+	AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
+	Subquery                     *QueryNode
+	TableName                    string
 }
 
 //expression

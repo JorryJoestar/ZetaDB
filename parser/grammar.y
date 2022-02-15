@@ -60,7 +60,9 @@ const (
 
 /* predicate */
     COMPAREMARK_ENUM                NodeEnum = 34
-    
+
+/* subquery */
+    SUBQUERY_NODE                   NodeEnum = 35
 
 )
 
@@ -119,6 +121,7 @@ type Node struct {
     Expression               *ExpressionNode
     ExpressionEntry          *ExpressionEntryNode
     Aggregation              *AggregationNode
+    Subquery                 *QueryNode
 }
 
 // List
@@ -170,8 +173,11 @@ type List struct {
 
 // condition
 %type <NodePt> condition
+%token AND OR
+%left AND OR
 
 // predicate
+%type <NodePt> predicate
 %token LIKE IN ALL ANY IS EXISTS
 %type <NodePt> compareMark
 %token NOTEQUAL LESS GREATER LESSEQUAL GREATEREQUAL EQUAL
@@ -229,16 +235,6 @@ ast
 	        Dml: nil,
 	        Dcl: nil,
 	        Dql: nil}
-    }
-    |predicate {
-       fmt.Println("251: predicate")
-
-        GetInstance().AST = &ASTNode{
-            Type: AST_DQL,
-	        Ddl: nil,
-	        Dml: nil,
-	        Dcl: nil,
-	        Dql: nil}           
     }
     ;
 
@@ -959,8 +955,34 @@ constraintAfterAttribute
 
     -------------------------------------------------------------------------------- */
 condition
-    :ID {
+    :predicate {
         $$ = &Node{}
+        $$.Type = CONDITION_NODE
+
+        $$.Condition = &ConditionNode{}
+        $$.Condition.Type = CONDITION_PREDICATE
+        $$.Condition.Predicate = $1.Predicate
+    }
+	|LPAREN condition RPAREN {
+        $$ = $2
+    }
+	|condition AND condition {
+        $$ = &Node{}
+        $$.Type = CONDITION_NODE
+
+        $$.Condition = &ConditionNode{}
+        $$.Condition.Type = CONDITION_AND
+        $$.Condition.ConditionL = $1.Condition
+        $$.Condition.ConditionR = $3.Condition
+    }
+	|condition OR condition {
+        $$ = &Node{}
+        $$.Type = CONDITION_NODE
+
+        $$.Condition = &ConditionNode{}
+        $$.Condition.Type = CONDITION_OR
+        $$.Condition.ConditionL = $1.Condition
+        $$.Condition.ConditionR = $3.Condition
     }
     ;
 
@@ -1005,70 +1027,231 @@ condition
 /*  ----------------------------------- predicate ---------------------------------- */
 predicate
 	:attriNameOptionTableName compareMark elementaryValue {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
         
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_ELEMENTARY_VALUE
+
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $2.CompareMark
+        $$.Predicate.ElementaryValue = $3.ElementaryValue
     }
 	|attriNameOptionTableName LIKE STRINGVALUE {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_LIKE_STRING_VALUE
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.ElementaryValue = &ElementaryValueNode{}
+        $$.Predicate.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
+        $$.Predicate.ElementaryValue.StringValue = $3
     }
 	|attriNameOptionTableName IN subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_IN_SUBQUERY
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.Subquery = $3.Subquery
     }
 	|attriNameOptionTableName NOT IN subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_NOT_IN_SUBQUERY
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.Subquery = $4.Subquery
     }
 	|attriNameOptionTableName IN ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_IN_TABLE
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.TableName = $3
     }
 	|attriNameOptionTableName NOT IN ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_NOT_IN_TABLE
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.TableName = $4
     }
 	|attriNameOptionTableName compareMark ALL subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_ALL_SUBQUERY
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $2.CompareMark
+        $$.Predicate.Subquery = $4.Subquery
     }
 	|NOT attriNameOptionTableName compareMark ALL subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_NOT_ALL_SUBQUERY
 
+        $$.Predicate.AttriNameWithTableNameL = $2.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $3.CompareMark
+        $$.Predicate.Subquery = $5.Subquery
     }
 	|attriNameOptionTableName compareMark ANY subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_ANY_SUBQUERY
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $2.CompareMark
+        $$.Predicate.Subquery = $4.Subquery
     }
 	|NOT attriNameOptionTableName compareMark ANY subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_NOT_ANY_SUBQUERY
 
+        $$.Predicate.AttriNameWithTableNameL = $2.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $3.CompareMark
+        $$.Predicate.Subquery = $5.Subquery
     }
 	|attriNameOptionTableName compareMark ALL ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_ALL_TABLE
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $2.CompareMark
+        $$.Predicate.TableName = $4
     }
 	|NOT attriNameOptionTableName compareMark ALL ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_NOT_ALL_TABLE
 
+        $$.Predicate.AttriNameWithTableNameL = $2.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $3.CompareMark
+        $$.Predicate.TableName = $5
     }
 	|attriNameOptionTableName compareMark ANY ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_ANY_TABLE
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $2.CompareMark
+        $$.Predicate.TableName = $4
     }
 	|NOT attriNameOptionTableName compareMark ANY ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_COMPARE_NOT_ANY_TABLE
 
+        $$.Predicate.AttriNameWithTableNameL = $2.AttriNameOptionTableName
+        $$.Predicate.CompareMark = $3.CompareMark
+        $$.Predicate.TableName = $5
     }
 	|attriNameOptionTableName IS NULLMARK {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_IS_NULL
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
     }
 	|attriNameOptionTableName IS NOT NULLMARK {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_IS_NOT_NULL
 
+        $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
     }
 	|LPAREN attriNameOptionTableNameList RPAREN IN subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_TUPLE_IN_SUBQUERY
 
+        $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
+        $$.Predicate.Subquery = $5.Subquery
     }
 	|LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_TUPLE_NOT_IN_SUBQUERY
 
+        $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
+        $$.Predicate.Subquery = $6.Subquery
     }
 	|LPAREN attriNameOptionTableNameList RPAREN IN ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_TUPLE_IN_TABLE
 
+        $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
+        $$.Predicate.TableName = $5
     }
 	|LPAREN attriNameOptionTableNameList RPAREN NOT IN ID {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_TUPLE_NOT_IN_TABLE
 
+        $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
+        $$.Predicate.TableName = $6
     }
 	|EXISTS subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_SUBQUERY_EXISTS
 
+        $$.Predicate.Subquery = $2.Subquery
     }
 	|NOT EXISTS subQuery {
+        $$ = &Node{}
+        $$.Type = PREDICATE_NODE
+        
+        $$.Predicate = &PredicateNode{}
+        $$.Predicate.Type = PREDICATE_SUBQUERY_NOT_EXISTS
 
+        $$.Predicate.Subquery = $3.Subquery
     }
     ;
 
@@ -1143,6 +1326,8 @@ attriNameOptionTableName
 subQuery
     :DOT {
         $$ = &Node{}
+        $$.Type = SUBQUERY_NODE
+        $$.Subquery = &QueryNode{}
     }
     ;
 
