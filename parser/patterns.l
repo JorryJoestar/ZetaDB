@@ -26,6 +26,22 @@
 ["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
 [Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
 
+[Ll][Ii][Kk][Ee]                                                {return LIKE;}
+[Ii][Nn]                                                        {return IN;}
+[Aa][Ll][Ll]                                                    {return ALL;}
+[Aa][Nn][Yy]                                                    {return ANY;}
+[Ii][Ss]                                                        {return IS;}
+[Ee][Xx][Ii][Ss][Tt][Ss]                                        {return EXISTS;}
+
+[=]                                                             {return EQUAL;}
+[<][>]                                                          {return NOTEQUAL;}
+[<]                                                             {return LESS;}
+[>]                                                             {return GREATER;}
+[<][=]                                                          {return LESSEQUAL;}
+[>][=]                                                          {return GREATEREQUAL;}
+
+[.]                                                             {return DOT;}
+
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}
 [,]                                                             {return COMMA;}

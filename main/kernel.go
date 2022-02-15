@@ -24,7 +24,7 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("unique")
+	ast := kernel.parser.ParseSql(">")
 
 	tester := Tester{}
 	tester.PrintAST(ast)

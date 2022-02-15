@@ -9,8 +9,10 @@ import (
 type NodeEnum uint8
 
 const (
+/* ast */
     AST_NODE                        NodeEnum = 1
 
+/* ddl */
     DDL_NODE                        NodeEnum = 2
     TABLE_NODE                      NodeEnum = 3
     ASSERT_NODE                     NodeEnum = 4
@@ -19,6 +21,7 @@ const (
     TRIGGER_NODE                    NodeEnum = 7
     PSM_NODE                        NodeEnum = 8
 
+/* dql */
     DQL_NODE                        NodeEnum = 9
     QUERY_NODE                      NodeEnum = 10
     SELECT_LIST_ENTRY               NodeEnum = 11
@@ -26,29 +29,38 @@ const (
     ON_LIST_ENTRY                   NodeEnum = 13
     ORDERBY_LIST_ENTRY              NodeEnum = 14
 
+/* dcl */
     DCL_NODE                        NodeEnum = 15
 
+/* dml */
     DML_NODE                        NodeEnum = 16
     UPDATE_NODE                     NodeEnum = 17
     UPDATE_LIST_ENTRY               NodeEnum = 18
     INSERT_NODE                     NodeEnum = 19
     DELETE_NODE                     NodeEnum = 20
 
+/* constraint */
     CONSTRAINT_NODE                 NodeEnum = 23
     CONSTRAINT_DEFERRABLE_ENUM      NodeEnum = 30
     CONSTRAINT_UPDATE_SET_ENUM      NodeEnum = 31
     CONSTRAINT_DELETE_SET_ENUM      NodeEnum = 32
 
-    DOMAIN_NODE                     NodeEnum = 21
-    ATTRINAME_OPTION_TABLENAME_NODE NodeEnum = 22
+/* AttriNameOptionTableName */
+    ATTRINAME_OPTION_TABLENAME_NODE NodeEnum = 33
 
+/* elementaryValue */
     ELEMENTARY_VALUE_NODE           NodeEnum = 24
+
+    DOMAIN_NODE                     NodeEnum = 21
     CONDITION_NODE                  NodeEnum = 25
     PREDICATE_NODE                  NodeEnum = 26
     EXPRESSION_NODE                 NodeEnum = 27
     EXPRESSION_ENTRY                NodeEnum = 28
     AGGREGATION_NODE                NodeEnum = 29
-// NodeEnum = 33
+
+/* predicate */
+    COMPAREMARK_ENUM                NodeEnum = 34
+    
 
 )
 
@@ -89,12 +101,21 @@ type Node struct {
     ConstraintDeleteSet  ConstraintDeleteSetEnum
     Constraint           *ConstraintNode
 
+/* condition */
+    Condition                *ConditionNode
+
+/* predicate */
+    Predicate                *PredicateNode
+    CompareMark              CompareMarkEnum
+
+/* attriNameOptionTableName */
+    AttriNameOptionTableName *AttriNameOptionTableNameNode
+
+/* elementaryValue */
+    ElementaryValue          *ElementaryValueNode
+
 /* public */
     Domain                   *DomainNode
-    AttriNameOptionTableName *AttriNameOptionTableNameNode
-    ElementaryValue          *ElementaryValueNode
-    Condition                *ConditionNode
-    Predicate                *PredicateNode
     Expression               *ExpressionNode
     ExpressionEntry          *ExpressionEntryNode
     Aggregation              *AggregationNode
@@ -136,11 +157,9 @@ type List struct {
 %type <List> constraintList
 %type <NodePt> constraint
 %type <NodePt> constraintWithName
-%type <StringList> attriNameList
 %type <NodePt> setDeferrable
 %type <NodePt> onUpdateSet
 %type <NodePt> onDeleteSet
-
 %token DEFAULT UNIQUE PRIMARYKEY CHECK FOREIGNKEY REFERENCES
 %token NOT_DEFERRABLE DEFERED_DEFERRABLE IMMEDIATE_DEFERRABLE
 %token UPDATE_NULL UPDATE_CASCADE
@@ -150,6 +169,18 @@ type List struct {
 // condition
 %type <NodePt> condition
 
+// predicate
+%token LIKE IN ALL ANY IS EXISTS
+%type <NodePt> compareMark
+%token NOTEQUAL LESS GREATER LESSEQUAL GREATEREQUAL EQUAL
+
+// attriNameOptionTableName
+%type <NodePt> attriNameOptionTableName
+%token DOT
+
+// subQuery
+%type <NodePt> subQuery
+
 // elementaryValue
 %type <NodePt> elementaryValue
 %token <Int> INTVALUE 
@@ -158,6 +189,7 @@ type List struct {
 %token <Boolean> BOOLVALUE
 
 // public
+%type <StringList> attriNameList
 %token LPAREN RPAREN NOT NULLMARK COMMA
 %token <String> ID
 %%
@@ -194,6 +226,16 @@ ast
 	        Dml: nil,
 	        Dcl: nil,
 	        Dql: nil}
+    }
+    |predicate {
+       fmt.Println("251: predicate")
+
+        GetInstance().AST = &ASTNode{
+            Type: AST_DQL,
+	        Ddl: nil,
+	        Dml: nil,
+	        Dcl: nil,
+	        Dql: nil}           
     }
     ;
 
@@ -307,10 +349,6 @@ ast
 		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
 		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
 		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
-
-    attriNameList
-        attriNameList COMMA ID
-        ID
 
     setDeferrable
 	    NOT_DEFERRABLE
@@ -859,16 +897,6 @@ constraintAfterAttribute
     }
     ;
 
-/*  -------------------------------- attriNameList --------------------------------- */
-    attriNameList
-        :attriNameList COMMA ID {
-            $$ = append($1,$3)
-        }
-        |ID {
-            $$ = append($$,$1)
-        }
-        ;
-
 /*  ------------------------------- setDeferrable ---------------------------------- */
     setDeferrable
 	    :NOT_DEFERRABLE {
@@ -933,8 +961,6 @@ condition
     }
     ;
 
-
-
 /*  --------------------------------------------------------------------------------
     |                                   predicate                                  |
     --------------------------------------------------------------------------------
@@ -956,10 +982,10 @@ condition
 			NOT attriNameOptionTableName compareMark ANY ID
 			attriNameOptionTableName IS NULLMARK
 			attriNameOptionTableName IS NOT NULLMARK
-			attributeNameTuple IN subQuery
-			attributeNameTuple NOT IN subQuery
-			attributeNameTuple IN ID
-			attributeNameTuple NOT IN ID
+			LPAREN attriNameList RPAREN IN subQuery
+			LPAREN attriNameList RPAREN NOT IN subQuery
+			LPAREN attriNameList RPAREN IN ID
+			LPAREN attriNameList RPAREN NOT IN ID
 			EXISTS subQuery
 			NOT EXISTS subQuery
 
@@ -971,14 +997,138 @@ condition
     		LESSEQUAL
     		GREATEREQUAL
 
-        attributeNameTuple
-            LPAREN attributeNameTupleList RPAREN
-
-        attributeNameTupleList
-            attributeNameTuple
-            attributeNameTupleList COMMA attributeNameTuple
-            
     -------------------------------------------------------------------------------- */
+
+/*  ----------------------------------- predicate ---------------------------------- */
+predicate
+	:attriNameOptionTableName compareMark elementaryValue {
+
+    }
+	|attriNameOptionTableName LIKE STRINGVALUE {
+
+    }
+	|attriNameOptionTableName IN subQuery {
+
+    }
+	|attriNameOptionTableName NOT IN subQuery {
+
+    }
+	|attriNameOptionTableName IN ID {
+
+    }
+	|attriNameOptionTableName NOT IN ID {
+
+    }
+	|attriNameOptionTableName compareMark ALL subQuery {
+
+    }
+	|NOT attriNameOptionTableName compareMark ALL subQuery {
+
+    }
+	|attriNameOptionTableName compareMark ANY subQuery {
+
+    }
+	|NOT attriNameOptionTableName compareMark ANY subQuery {
+
+    }
+	|attriNameOptionTableName compareMark ALL ID {
+
+    }
+	|NOT attriNameOptionTableName compareMark ALL ID {
+
+    }
+	|attriNameOptionTableName compareMark ANY ID {
+
+    }
+	|NOT attriNameOptionTableName compareMark ANY ID {
+
+    }
+	|attriNameOptionTableName IS NULLMARK {
+
+    }
+	|attriNameOptionTableName IS NOT NULLMARK {
+
+    }
+	|LPAREN attriNameList RPAREN IN subQuery {
+
+    }
+	|LPAREN attriNameList RPAREN NOT IN subQuery {
+
+    }
+	|LPAREN attriNameList RPAREN IN ID {
+
+    }
+	|LPAREN attriNameList RPAREN NOT IN ID {
+
+    }
+	|EXISTS subQuery {
+
+    }
+	|NOT EXISTS subQuery {
+
+    }
+    ;
+
+/*  --------------------------------- compareMark ---------------------------------- */
+compareMark
+    :EQUAL {
+        $$ = &Node{}
+        $$.Type = COMPAREMARK_ENUM
+        $$.CompareMark = COMPAREMARK_EQUAL
+    }
+    |NOTEQUAL {
+        $$ = &Node{}
+        $$.Type = COMPAREMARK_ENUM
+        $$.CompareMark = COMPAREMARK_NOTEQUAL
+    }
+    |LESS {
+        $$ = &Node{}
+        $$.Type = COMPAREMARK_ENUM
+        $$.CompareMark = COMPAREMARK_LESS
+    }
+    |GREATER {
+        $$ = &Node{}
+        $$.Type = COMPAREMARK_ENUM
+        $$.CompareMark = COMPAREMARK_GREATER
+    }
+    |LESSEQUAL {
+        $$ = &Node{}
+        $$.Type = COMPAREMARK_ENUM
+        $$.CompareMark = COMPAREMARK_LESSEQUAL
+    }
+    |GREATEREQUAL {
+        $$ = &Node{}
+        $$.Type = COMPAREMARK_ENUM
+        $$.CompareMark = COMPAREMARK_GREATEREQUAL
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                            attriNameOptionTableName                          |
+    --------------------------------------------------------------------------------
+
+        attriNameOptionTableName
+            ID
+            ID DOT ID
+
+   -------------------------------------------------------------------------------- */
+attriNameOptionTableName
+    :ID {
+        $$ = &Node{}
+        $$.Type = ATTRINAME_OPTION_TABLENAME_NODE
+        $$.AttriNameOptionTableName = &AttriNameOptionTableNameNode{}
+        $$.AttriNameOptionTableName.TableNameValid = false
+        $$.AttriNameOptionTableName.AttributeName = $1
+    }
+    |ID DOT ID {
+        $$ = &Node{}
+        $$.Type = ATTRINAME_OPTION_TABLENAME_NODE
+        $$.AttriNameOptionTableName = &AttriNameOptionTableNameNode{}
+        $$.AttriNameOptionTableName.TableNameValid = true
+        $$.AttriNameOptionTableName.TableName = $1
+        $$.AttriNameOptionTableName.AttributeName = $3
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                    subQuery                                  |
@@ -987,8 +1137,11 @@ condition
         subQuery
 
    -------------------------------------------------------------------------------- */
-// TODO
-
+subQuery
+    :ID {
+        $$ = &Node{}
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                elementaryValue                               |
@@ -1032,5 +1185,25 @@ elementaryValue
         $$.ElementaryValue.BooleanValue = $1
     }
     ;
+
+/*  --------------------------------------------------------------------------------
+    |                                     public                                   |
+    --------------------------------------------------------------------------------
+    
+    attriNameList
+        attriNameList COMMA ID
+        ID
+    
+    -------------------------------------------------------------------------------- */
+
+/*  -------------------------------- attriNameList --------------------------------- */
+    attriNameList
+        :attriNameList COMMA ID {
+            $$ = append($1,$3)
+        }
+        |ID {
+            $$ = append($$,$1)
+        }
+        ;
 
 %%

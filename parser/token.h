@@ -17,7 +17,22 @@ enum {
     DEFAULT         = 229,
 
 //condition
-    
+
+
+//predicate
+    LIKE            = 258,
+    NOT             = 252,
+    IN              = 253,
+    ALL             = 254,
+    ANY             = 255,
+    IS              = 256,
+
+    NOTEQUAL        = 246,  // <>
+    LESS            = 247,  // <
+    GREATER         = 248,  // >
+    LESSEQUAL       = 249,  // <=
+    GREATEREQUAL    = 250,  // >=
+    EQUAL           = 251,  // =
 
 //elementary value
     INTVALUE          = 204,  //int value
@@ -25,7 +40,11 @@ enum {
     STRINGVALUE       = 206,  //string surrounded by single or double quotation marks
     BOOLVALUE         = 551,  //BOOLVALUE true/false
 
+//attriNameOptionTableName
+    DOT               = 241,  //.
+
 //public
+    NULLMARK        = 257,  //NULL
     LPAREN            = 200,  //(
     RPAREN            = 201,  //)
     SEMICOLON         = 202,  //;
@@ -38,17 +57,7 @@ enum {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+    
 
     VARCHAR         = 210,  //VARCHAR(n)
     BIT             = 211,  //BIT(n)
@@ -84,26 +93,16 @@ enum {
     DISTINCT        = 239,
     SELECT          = 240,
 
-    DOT             = 241,  //.
+
     AS              = 242,
     AND             = 243,
     OR              = 244,
     STAR            = 245,  //*
 
-    NOTEQUAL        = 246,  // <>
-    LESS            = 247,  // <
-    GREATER         = 248,  // >
-    LESSEQUAL       = 249,  // <=
-    GREATEREQUAL    = 250,  // >=
-    EQUAL           = 251,  // =
 
-    NOT             = 252,
-    IN              = 253,
-    ALL             = 254,
-    ANY             = 255,
-    IS              = 256,
-    NULLMARK        = 257,  //NULL
-    LIKE            = 258,
+
+
+
 
     AVG             = 259,
     MIN             = 260,

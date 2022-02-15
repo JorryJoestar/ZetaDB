@@ -88,6 +88,37 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		}
 		return BOOLVALUE
 
+	//prdicate
+	case C.LIKE:
+		return LIKE
+	case C.IN:
+		return IN
+	case C.ALL:
+		return ALL
+	case C.ANY:
+		return ANY
+	case C.IS:
+		return IS
+	case C.EXISTS:
+		return EXISTS
+
+	case C.NOTEQUAL:
+		return NOTEQUAL
+	case C.LESS:
+		return LESS
+	case C.GREATER:
+		return GREATER
+	case C.LESSEQUAL:
+		return LESSEQUAL
+	case C.GREATEREQUAL:
+		return GREATEREQUAL
+	case C.EQUAL:
+		return EQUAL
+
+	//attriNameOptionTableName
+	case C.DOT:
+		return DOT
+
 	//public
 	case C.LPAREN:
 		return LPAREN

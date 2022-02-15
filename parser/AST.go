@@ -334,7 +334,7 @@ type DomainNode struct {
 	D    int
 }
 
-//(TableName.)AttributeName
+//attriNameOptionTableName
 type AttriNameOptionTableNameNode struct {
 	TableNameValid bool
 	AttributeName  string
