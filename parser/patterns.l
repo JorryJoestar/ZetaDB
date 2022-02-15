@@ -18,8 +18,6 @@
 [Oo][Nn][ ][Uu][Pp][Dd][Aa][Tt][Ee][ ][Ss][Ee][Tt][ ][Cc][Aa][Ss][Cc][Aa][Dd][Ee] {return UPDATE_CASCADE;}
 [Oo][Nn][ ][Dd][Ee][Ll][Ee][Tt][Ee][ ][Ss][Ee][Tt][ ][Nn][Uu][Ll][Ll] {return DELETE_NULL;}
 [Oo][Nn][ ][Dd][Ee][Ll][Ee][Tt][Ee][ ][Ss][Ee][Tt][ ][Cc][Aa][Ss][Cc][Aa][Dd][Ee] {return DELETE_CASCADE;}
-[Dd][Ee][Ff][Ee][Rr][Rr][Ee][Dd]                                {return DEFERRED;}
-[Ii][Mm][Mm][Ee][Dd][Ii][Aa][Tt][Ee]                            {return IMMEDIATE;}
 [Cc][Oo][Nn][Ss][Tt][Rr][Aa][Ii][Nn][Tt]                        {return CONSTRAINT;}
 
 [1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}

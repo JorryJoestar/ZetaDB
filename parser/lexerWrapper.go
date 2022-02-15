@@ -3,7 +3,6 @@ package parser
 //#include "token.h"
 //#include "calc.lexer.h"
 import "C"
-
 import (
 	"errors"
 	"log"
@@ -66,10 +65,6 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return DELETE_NULL
 	case C.DELETE_CASCADE:
 		return DELETE_CASCADE
-	case C.DEFERRED:
-		return DEFERRED
-	case C.IMMEDIATE:
-		return IMMEDIATE
 	case C.CONSTRAINT:
 		return CONSTRAINT
 

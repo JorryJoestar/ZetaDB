@@ -5,7 +5,9 @@ state 0
 	DEFAULT  shift 9
 	UNIQUE  shift 10
 	PRIMARYKEY  shift 11
-	CHECK  shift 13
+	CHECK  shift 14
+	FOREIGNKEY  shift 15
+	REFERENCES  shift 13
 	CONSTRAINT  shift 8
 	NOT  shift 12
 	.  error
@@ -31,52 +33,53 @@ state 2
 	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttribute 
 
 	DEFAULT  shift 9
-	UNIQUE  shift 17
-	PRIMARYKEY  shift 18
-	CHECK  shift 19
-	CONSTRAINT  shift 16
+	UNIQUE  shift 19
+	PRIMARYKEY  shift 20
+	REFERENCES  shift 13
+	CONSTRAINT  shift 18
 	NOT  shift 12
 	.  reduce 1 (src line 166)
 
-	constraintAfterAttribute  goto 15
-	constraintAfterAttributeWithName  goto 14
+	constraintAfterAttribute  goto 17
+	constraintAfterAttributeWithName  goto 16
 
 state 3
 	ast:  constraintList.    (2)
 	constraintList:  constraintList.constraintWithName 
 	constraintList:  constraintList.constraint 
 
-	UNIQUE  shift 23
-	PRIMARYKEY  shift 24
-	CHECK  shift 25
-	CONSTRAINT  shift 22
+	UNIQUE  shift 24
+	PRIMARYKEY  shift 25
+	CHECK  shift 14
+	FOREIGNKEY  shift 15
+	CONSTRAINT  shift 23
 	.  reduce 2 (src line 177)
 
-	constraint  goto 21
-	constraintWithName  goto 20
+	constraint  goto 22
+	constraintWithName  goto 21
 
 state 4
 	constraintAfterAttributeList:  constraintAfterAttributeWithName.    (3)
 
-	.  reduce 3 (src line 321)
+	.  reduce 3 (src line 320)
 
 
 state 5
 	constraintAfterAttributeList:  constraintAfterAttribute.    (4)
 
-	.  reduce 4 (src line 327)
+	.  reduce 4 (src line 326)
 
 
 state 6
 	constraintList:  constraintWithName.    (7)
 
-	.  reduce 7 (src line 343)
+	.  reduce 7 (src line 342)
 
 
 state 7
 	constraintList:  constraint.    (8)
 
-	.  reduce 8 (src line 349)
+	.  reduce 8 (src line 348)
 
 
 state 8
@@ -100,18 +103,18 @@ state 9
 
 state 10
 	constraint:  UNIQUE.LPAREN attriNameList RPAREN 
-	constraintAfterAttribute:  UNIQUE.    (17)
+	constraintAfterAttribute:  UNIQUE.    (33)
 
 	LPAREN  shift 32
-	.  reduce 17 (src line 633)
+	.  reduce 33 (src line 632)
 
 
 state 11
 	constraint:  PRIMARYKEY.LPAREN attriNameList RPAREN 
-	constraintAfterAttribute:  PRIMARYKEY.    (18)
+	constraintAfterAttribute:  PRIMARYKEY.    (34)
 
 	LPAREN  shift 33
-	.  reduce 18 (src line 641)
+	.  reduce 34 (src line 640)
 
 
 state 12
@@ -122,88 +125,117 @@ state 12
 
 
 state 13
-	constraint:  CHECK.LPAREN condition RPAREN 
-	constraintAfterAttribute:  CHECK.LPAREN condition RPAREN 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN setDeferrable 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onUpdateSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	LPAREN  shift 35
+	ID  shift 35
 	.  error
 
 
 state 14
-	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (5)
+	constraint:  CHECK.LPAREN condition RPAREN 
 
-	.  reduce 5 (src line 332)
-
-
-state 15
-	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (6)
-
-	.  reduce 6 (src line 336)
-
-
-state 16
-	constraintAfterAttributeWithName:  CONSTRAINT.ID constraintAfterAttribute 
-
-	ID  shift 36
+	LPAREN  shift 36
 	.  error
 
 
-state 17
-	constraintAfterAttribute:  UNIQUE.    (17)
-
-	.  reduce 17 (src line 633)
-
-
-state 18
-	constraintAfterAttribute:  PRIMARYKEY.    (18)
-
-	.  reduce 18 (src line 641)
-
-
-state 19
-	constraintAfterAttribute:  CHECK.LPAREN condition RPAREN 
+state 15
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
 	LPAREN  shift 37
 	.  error
 
 
-state 20
-	constraintList:  constraintList constraintWithName.    (9)
+state 16
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (5)
 
-	.  reduce 9 (src line 354)
-
-
-state 21
-	constraintList:  constraintList constraint.    (10)
-
-	.  reduce 10 (src line 358)
+	.  reduce 5 (src line 331)
 
 
-state 22
-	constraintWithName:  CONSTRAINT.ID constraint 
+state 17
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (6)
+
+	.  reduce 6 (src line 335)
+
+
+state 18
+	constraintAfterAttributeWithName:  CONSTRAINT.ID constraintAfterAttribute 
 
 	ID  shift 38
 	.  error
 
 
+state 19
+	constraintAfterAttribute:  UNIQUE.    (33)
+
+	.  reduce 33 (src line 632)
+
+
+state 20
+	constraintAfterAttribute:  PRIMARYKEY.    (34)
+
+	.  reduce 34 (src line 640)
+
+
+state 21
+	constraintList:  constraintList constraintWithName.    (9)
+
+	.  reduce 9 (src line 353)
+
+
+state 22
+	constraintList:  constraintList constraint.    (10)
+
+	.  reduce 10 (src line 357)
+
+
 state 23
+	constraintWithName:  CONSTRAINT.ID constraint 
+
+	ID  shift 39
+	.  error
+
+
+state 24
 	constraint:  UNIQUE.LPAREN attriNameList RPAREN 
 
 	LPAREN  shift 32
 	.  error
 
 
-state 24
+state 25
 	constraint:  PRIMARYKEY.LPAREN attriNameList RPAREN 
 
 	LPAREN  shift 33
-	.  error
-
-
-state 25
-	constraint:  CHECK.LPAREN condition RPAREN 
-
-	LPAREN  shift 39
 	.  error
 
 
@@ -214,7 +246,9 @@ state 26
 	DEFAULT  shift 9
 	UNIQUE  shift 10
 	PRIMARYKEY  shift 11
-	CHECK  shift 13
+	CHECK  shift 14
+	FOREIGNKEY  shift 15
+	REFERENCES  shift 13
 	NOT  shift 12
 	.  error
 
@@ -222,33 +256,33 @@ state 26
 	constraint  goto 40
 
 state 27
-	constraintAfterAttribute:  DEFAULT elementaryValue.    (16)
+	constraintAfterAttribute:  DEFAULT elementaryValue.    (32)
 
-	.  reduce 16 (src line 623)
+	.  reduce 32 (src line 622)
 
 
 state 28
-	elementaryValue:  INTVALUE.    (31)
+	elementaryValue:  INTVALUE.    (62)
 
-	.  reduce 31 (src line 925)
+	.  reduce 62 (src line 915)
 
 
 state 29
-	elementaryValue:  FLOATVALUE.    (32)
+	elementaryValue:  FLOATVALUE.    (63)
 
-	.  reduce 32 (src line 933)
+	.  reduce 63 (src line 923)
 
 
 state 30
-	elementaryValue:  STRINGVALUE.    (33)
+	elementaryValue:  STRINGVALUE.    (64)
 
-	.  reduce 33 (src line 940)
+	.  reduce 64 (src line 930)
 
 
 state 31
-	elementaryValue:  BOOLVALUE.    (34)
+	elementaryValue:  BOOLVALUE.    (65)
 
-	.  reduce 34 (src line 947)
+	.  reduce 65 (src line 937)
 
 
 state 32
@@ -268,68 +302,96 @@ state 33
 	attriNameList  goto 44
 
 state 34
-	constraintAfterAttribute:  NOT NULLMARK.    (19)
+	constraintAfterAttribute:  NOT NULLMARK.    (35)
 
-	.  reduce 19 (src line 649)
+	.  reduce 35 (src line 648)
 
 
 state 35
-	constraint:  CHECK LPAREN.condition RPAREN 
-	constraintAfterAttribute:  CHECK LPAREN.condition RPAREN 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	ID  shift 46
+	LPAREN  shift 45
 	.  error
 
-	condition  goto 45
 
 state 36
+	constraint:  CHECK LPAREN.condition RPAREN 
+
+	ID  shift 47
+	.  error
+
+	condition  goto 46
+
+state 37
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
+
+	ID  shift 48
+	.  error
+
+
+state 38
 	constraintAfterAttributeWithName:  CONSTRAINT ID.constraintAfterAttribute 
 
 	DEFAULT  shift 9
-	UNIQUE  shift 17
-	PRIMARYKEY  shift 18
-	CHECK  shift 19
+	UNIQUE  shift 19
+	PRIMARYKEY  shift 20
+	REFERENCES  shift 13
 	NOT  shift 12
 	.  error
 
 	constraintAfterAttribute  goto 41
 
-state 37
-	constraintAfterAttribute:  CHECK LPAREN.condition RPAREN 
-
-	ID  shift 46
-	.  error
-
-	condition  goto 47
-
-state 38
+state 39
 	constraintWithName:  CONSTRAINT ID.constraint 
 
-	UNIQUE  shift 23
-	PRIMARYKEY  shift 24
-	CHECK  shift 25
+	UNIQUE  shift 24
+	PRIMARYKEY  shift 25
+	CHECK  shift 14
+	FOREIGNKEY  shift 15
 	.  error
 
 	constraint  goto 40
 
-state 39
-	constraint:  CHECK LPAREN.condition RPAREN 
-
-	ID  shift 46
-	.  error
-
-	condition  goto 48
-
 state 40
 	constraintWithName:  CONSTRAINT ID constraint.    (11)
 
-	.  reduce 11 (src line 365)
+	.  reduce 11 (src line 364)
 
 
 state 41
-	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (15)
+	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (31)
 
-	.  reduce 15 (src line 614)
+	.  reduce 31 (src line 613)
 
 
 state 42
@@ -342,9 +404,9 @@ state 42
 
 
 state 43
-	attriNameList:  ID.    (22)
+	attriNameList:  ID.    (53)
 
-	.  reduce 22 (src line 866)
+	.  reduce 53 (src line 856)
 
 
 state 44
@@ -357,28 +419,57 @@ state 44
 
 
 state 45
-	constraint:  CHECK LPAREN condition.RPAREN 
-	constraintAfterAttribute:  CHECK LPAREN condition.RPAREN 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onUpdateSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	RPAREN  shift 52
+	ID  shift 52
 	.  error
 
 
 state 46
-	condition:  ID.    (30)
-
-	.  reduce 30 (src line 907)
-
-
-state 47
-	constraintAfterAttribute:  CHECK LPAREN condition.RPAREN 
+	constraint:  CHECK LPAREN condition.RPAREN 
 
 	RPAREN  shift 53
 	.  error
 
 
+state 47
+	condition:  ID.    (61)
+
+	.  reduce 61 (src line 897)
+
+
 state 48
-	constraint:  CHECK LPAREN condition.RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
 	RPAREN  shift 54
 	.  error
@@ -387,7 +478,7 @@ state 48
 state 49
 	constraint:  UNIQUE LPAREN attriNameList RPAREN.    (12)
 
-	.  reduce 12 (src line 374)
+	.  reduce 12 (src line 373)
 
 
 state 50
@@ -400,57 +491,562 @@ state 50
 state 51
 	constraint:  PRIMARYKEY LPAREN attriNameList RPAREN.    (13)
 
-	.  reduce 13 (src line 384)
+	.  reduce 13 (src line 383)
 
 
- 52: reduce/reduce conflict  (red'ns 14 and 20) on $end
- 52: reduce/reduce conflict  (red'ns 14 and 20) on UNIQUE
- 52: reduce/reduce conflict  (red'ns 14 and 20) on PRIMARYKEY
- 52: reduce/reduce conflict  (red'ns 14 and 20) on CHECK
- 52: reduce/reduce conflict  (red'ns 14 and 20) on CONSTRAINT
 state 52
-	constraint:  CHECK LPAREN condition RPAREN.    (14)
-	constraintAfterAttribute:  CHECK LPAREN condition RPAREN.    (20)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onUpdateSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	DEFAULT  reduce 20 (src line 657)
-	NOT  reduce 20 (src line 657)
-	.  reduce 14 (src line 393)
+	RPAREN  shift 56
+	.  error
 
 
 state 53
-	constraintAfterAttribute:  CHECK LPAREN condition RPAREN.    (20)
+	constraint:  CHECK LPAREN condition RPAREN.    (14)
 
-	.  reduce 20 (src line 657)
+	.  reduce 14 (src line 392)
 
 
 state 54
-	constraint:  CHECK LPAREN condition RPAREN.    (14)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	.  reduce 14 (src line 393)
+	REFERENCES  shift 57
+	.  error
 
 
 state 55
-	attriNameList:  attriNameList COMMA ID.    (21)
+	attriNameList:  attriNameList COMMA ID.    (52)
 
-	.  reduce 21 (src line 862)
+	.  reduce 52 (src line 852)
 
-Rule not reduced: setDeferrable:  NOT_DEFERRABLE 
-Rule not reduced: setDeferrable:  DEFERED_DEFERRABLE 
-Rule not reduced: setDeferrable:  IMMEDIATE_DEFERRABLE 
-Rule not reduced: onUpdateSet:  UPDATE_NULL 
-Rule not reduced: onUpdateSet:  UPDATE_CASCADE 
-Rule not reduced: onDeleteSet:  DELETE_NULL 
-Rule not reduced: onDeleteSet:  DELETE_CASCADE 
+
+state 56
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.    (36)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onUpdateSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.setDeferrable onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.setDeferrable onDeleteSet onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onUpdateSet setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onUpdateSet onDeleteSet setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet onUpdateSet setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 36 (src line 656)
+
+	setDeferrable  goto 58
+	onUpdateSet  goto 59
+	onDeleteSet  goto 60
+
+state 57
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
+
+	ID  shift 68
+	.  error
+
+
+state 58
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.    (37)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet onUpdateSet 
+
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 37 (src line 666)
+
+	onUpdateSet  goto 69
+	onDeleteSet  goto 70
+
+state 59
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.    (38)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable onDeleteSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 38 (src line 677)
+
+	setDeferrable  goto 71
+	onDeleteSet  goto 72
+
+state 60
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.    (39)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable onUpdateSet 
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	.  reduce 39 (src line 688)
+
+	setDeferrable  goto 73
+	onUpdateSet  goto 74
+
+state 61
+	setDeferrable:  NOT_DEFERRABLE.    (54)
+
+	.  reduce 54 (src line 862)
+
+
+state 62
+	setDeferrable:  DEFERED_DEFERRABLE.    (55)
+
+	.  reduce 55 (src line 866)
+
+
+state 63
+	setDeferrable:  IMMEDIATE_DEFERRABLE.    (56)
+
+	.  reduce 56 (src line 869)
+
+
+state 64
+	onUpdateSet:  UPDATE_NULL.    (57)
+
+	.  reduce 57 (src line 875)
+
+
+state 65
+	onUpdateSet:  UPDATE_CASCADE.    (58)
+
+	.  reduce 58 (src line 879)
+
+
+state 66
+	onDeleteSet:  DELETE_NULL.    (59)
+
+	.  reduce 59 (src line 885)
+
+
+state 67
+	onDeleteSet:  DELETE_CASCADE.    (60)
+
+	.  reduce 60 (src line 889)
+
+
+state 68
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
+
+	LPAREN  shift 75
+	.  error
+
+
+state 69
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.    (40)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.onDeleteSet 
+
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 40 (src line 699)
+
+	onDeleteSet  goto 76
+
+state 70
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.    (41)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.onUpdateSet 
+
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	.  reduce 41 (src line 711)
+
+	onUpdateSet  goto 77
+
+state 71
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.    (42)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.onDeleteSet 
+
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 42 (src line 723)
+
+	onDeleteSet  goto 78
+
+state 72
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.    (43)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	.  reduce 43 (src line 735)
+
+	setDeferrable  goto 79
+
+state 73
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.    (44)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.onUpdateSet 
+
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	.  reduce 44 (src line 747)
+
+	onUpdateSet  goto 80
+
+state 74
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.    (45)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	.  reduce 45 (src line 759)
+
+	setDeferrable  goto 81
+
+state 75
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet onUpdateSet setDeferrable 
+
+	ID  shift 82
+	.  error
+
+
+state 76
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet.    (46)
+
+	.  reduce 46 (src line 771)
+
+
+state 77
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet.    (47)
+
+	.  reduce 47 (src line 784)
+
+
+state 78
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet.    (48)
+
+	.  reduce 48 (src line 797)
+
+
+state 79
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable.    (49)
+
+	.  reduce 49 (src line 810)
+
+
+state 80
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet.    (50)
+
+	.  reduce 50 (src line 823)
+
+
+state 81
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable.    (51)
+
+	.  reduce 51 (src line 836)
+
+
+state 82
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet onUpdateSet setDeferrable 
+
+	RPAREN  shift 83
+	.  error
+
+
+state 83
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.    (15)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onUpdateSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.setDeferrable onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.setDeferrable onDeleteSet onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onUpdateSet setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onUpdateSet onDeleteSet setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet onUpdateSet setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 15 (src line 401)
+
+	setDeferrable  goto 84
+	onUpdateSet  goto 85
+	onDeleteSet  goto 86
+
+state 84
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.    (16)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet onUpdateSet 
+
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 16 (src line 412)
+
+	onUpdateSet  goto 87
+	onDeleteSet  goto 88
+
+state 85
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.    (17)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable onDeleteSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 17 (src line 424)
+
+	setDeferrable  goto 89
+	onDeleteSet  goto 90
+
+state 86
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.    (18)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable onUpdateSet 
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	.  reduce 18 (src line 436)
+
+	setDeferrable  goto 91
+	onUpdateSet  goto 92
+
+state 87
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.    (19)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.onDeleteSet 
+
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 19 (src line 448)
+
+	onDeleteSet  goto 93
+
+state 88
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.    (20)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.onUpdateSet 
+
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	.  reduce 20 (src line 461)
+
+	onUpdateSet  goto 94
+
+state 89
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.    (21)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.onDeleteSet 
+
+	DELETE_NULL  shift 66
+	DELETE_CASCADE  shift 67
+	.  reduce 21 (src line 474)
+
+	onDeleteSet  goto 95
+
+state 90
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.    (22)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	.  reduce 22 (src line 487)
+
+	setDeferrable  goto 96
+
+state 91
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.    (23)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.onUpdateSet 
+
+	UPDATE_NULL  shift 64
+	UPDATE_CASCADE  shift 65
+	.  reduce 23 (src line 500)
+
+	onUpdateSet  goto 97
+
+state 92
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.    (24)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 61
+	DEFERED_DEFERRABLE  shift 62
+	IMMEDIATE_DEFERRABLE  shift 63
+	.  reduce 24 (src line 513)
+
+	setDeferrable  goto 98
+
+state 93
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet.    (25)
+
+	.  reduce 25 (src line 526)
+
+
+state 94
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet.    (26)
+
+	.  reduce 26 (src line 540)
+
+
+state 95
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet.    (27)
+
+	.  reduce 27 (src line 554)
+
+
+state 96
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable.    (28)
+
+	.  reduce 28 (src line 568)
+
+
+state 97
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet.    (29)
+
+	.  reduce 29 (src line 582)
+
+
+state 98
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable.    (30)
+
+	.  reduce 30 (src line 596)
+
 
 29 terminals, 14 nonterminals
-35 grammar rules, 56/16000 states
-0 shift/reduce, 5 reduce/reduce conflicts reported
+66 grammar rules, 99/16000 states
+0 shift/reduce, 0 reduce/reduce conflicts reported
 63 working sets used
-memory: parser 18/240000
-0 extra closures
-57 shift entries, 3 exceptions
-22 goto entries
--1 entries saved by goto default
-Optimizer space used: output 71/240000
-71 table entries, 0 zero
-maximum spread: 29, maximum offset: 39
+memory: parser 46/240000
+7 extra closures
+139 shift entries, 1 exceptions
+47 goto entries
+2 entries saved by goto default
+Optimizer space used: output 148/240000
+148 table entries, 7 zero
+maximum spread: 29, maximum offset: 92

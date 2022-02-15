@@ -175,7 +175,7 @@ ast
 	        Dql: nil}
     }
     |constraintList {
-        fmt.Println("167: constraintList")
+        fmt.Println("178: constraintList")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -280,7 +280,6 @@ ast
 		UNIQUE
 		PRIMARYKEY
 		NOT NULLMARK
-		CHECK LPAREN condition RPAREN
 		REFERENCES ID LPAREN ID RPAREN
 		REFERENCES ID LPAREN ID RPAREN setDeferrable
 		REFERENCES ID LPAREN ID RPAREN onUpdateSet
@@ -653,15 +652,6 @@ constraintAfterAttribute
         $$.Constraint.ConstraintNameValid = false
 
         $$.Constraint.Type = CONSTRAINT_NOT_NULL
-    }
-    |CHECK LPAREN condition RPAREN {
-        $$ = &Node{}
-        $$.Type = CONSTRAINT_NODE
-        $$.Constraint = &ConstraintNode{}
-        $$.Constraint.ConstraintNameValid = false
-
-        $$.Constraint.Type = CONSTRAINT_CHECK
-        $$.Constraint.Condition = $3.Condition
     }
     |REFERENCES ID LPAREN ID RPAREN {
         $$ = &Node{}
