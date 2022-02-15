@@ -2,14 +2,21 @@
 state 0
 	$accept: .ast $end 
 
-	INTVALUE  shift 3
-	FLOATVALUE  shift 4
-	STRINGVALUE  shift 5
-	BOOLVALUE  shift 6
+	DEFAULT  shift 9
+	UNIQUE  shift 10
+	PRIMARYKEY  shift 11
+	CHECK  shift 13
+	CONSTRAINT  shift 8
+	NOT  shift 12
 	.  error
 
 	ast  goto 1
-	elementaryValue  goto 2
+	constraintAfterAttributeList  goto 2
+	constraintAfterAttribute  goto 5
+	constraintAfterAttributeWithName  goto 4
+	constraintList  goto 3
+	constraint  goto 7
+	constraintWithName  goto 6
 
 state 1
 	$accept:  ast.$end 
@@ -19,44 +26,431 @@ state 1
 
 
 state 2
-	ast:  elementaryValue.    (1)
+	ast:  constraintAfterAttributeList.    (1)
+	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttributeWithName 
+	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttribute 
 
-	.  reduce 1 (src line 146)
+	DEFAULT  shift 9
+	UNIQUE  shift 17
+	PRIMARYKEY  shift 18
+	CHECK  shift 19
+	CONSTRAINT  shift 16
+	NOT  shift 12
+	.  reduce 1 (src line 166)
 
+	constraintAfterAttribute  goto 15
+	constraintAfterAttributeWithName  goto 14
 
 state 3
-	elementaryValue:  INTVALUE.    (2)
+	ast:  constraintList.    (2)
+	constraintList:  constraintList.constraintWithName 
+	constraintList:  constraintList.constraint 
 
-	.  reduce 2 (src line 322)
+	UNIQUE  shift 23
+	PRIMARYKEY  shift 24
+	CHECK  shift 25
+	CONSTRAINT  shift 22
+	.  reduce 2 (src line 177)
 
+	constraint  goto 21
+	constraintWithName  goto 20
 
 state 4
-	elementaryValue:  FLOATVALUE.    (3)
+	constraintAfterAttributeList:  constraintAfterAttributeWithName.    (3)
 
-	.  reduce 3 (src line 330)
+	.  reduce 3 (src line 321)
 
 
 state 5
-	elementaryValue:  STRINGVALUE.    (4)
+	constraintAfterAttributeList:  constraintAfterAttribute.    (4)
 
-	.  reduce 4 (src line 337)
+	.  reduce 4 (src line 327)
 
 
 state 6
-	elementaryValue:  BOOLVALUE.    (5)
+	constraintList:  constraintWithName.    (7)
 
-	.  reduce 5 (src line 344)
+	.  reduce 7 (src line 343)
 
 
-22 terminals, 3 nonterminals
-6 grammar rules, 7/16000 states
-0 shift/reduce, 0 reduce/reduce conflicts reported
-52 working sets used
-memory: parser 1/240000
+state 7
+	constraintList:  constraint.    (8)
+
+	.  reduce 8 (src line 349)
+
+
+state 8
+	constraintWithName:  CONSTRAINT.ID constraint 
+	constraintAfterAttributeWithName:  CONSTRAINT.ID constraintAfterAttribute 
+
+	ID  shift 26
+	.  error
+
+
+state 9
+	constraintAfterAttribute:  DEFAULT.elementaryValue 
+
+	INTVALUE  shift 28
+	FLOATVALUE  shift 29
+	STRINGVALUE  shift 30
+	BOOLVALUE  shift 31
+	.  error
+
+	elementaryValue  goto 27
+
+state 10
+	constraint:  UNIQUE.LPAREN attriNameList RPAREN 
+	constraintAfterAttribute:  UNIQUE.    (17)
+
+	LPAREN  shift 32
+	.  reduce 17 (src line 633)
+
+
+state 11
+	constraint:  PRIMARYKEY.LPAREN attriNameList RPAREN 
+	constraintAfterAttribute:  PRIMARYKEY.    (18)
+
+	LPAREN  shift 33
+	.  reduce 18 (src line 641)
+
+
+state 12
+	constraintAfterAttribute:  NOT.NULLMARK 
+
+	NULLMARK  shift 34
+	.  error
+
+
+state 13
+	constraint:  CHECK.LPAREN condition RPAREN 
+	constraintAfterAttribute:  CHECK.LPAREN condition RPAREN 
+
+	LPAREN  shift 35
+	.  error
+
+
+state 14
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (5)
+
+	.  reduce 5 (src line 332)
+
+
+state 15
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (6)
+
+	.  reduce 6 (src line 336)
+
+
+state 16
+	constraintAfterAttributeWithName:  CONSTRAINT.ID constraintAfterAttribute 
+
+	ID  shift 36
+	.  error
+
+
+state 17
+	constraintAfterAttribute:  UNIQUE.    (17)
+
+	.  reduce 17 (src line 633)
+
+
+state 18
+	constraintAfterAttribute:  PRIMARYKEY.    (18)
+
+	.  reduce 18 (src line 641)
+
+
+state 19
+	constraintAfterAttribute:  CHECK.LPAREN condition RPAREN 
+
+	LPAREN  shift 37
+	.  error
+
+
+state 20
+	constraintList:  constraintList constraintWithName.    (9)
+
+	.  reduce 9 (src line 354)
+
+
+state 21
+	constraintList:  constraintList constraint.    (10)
+
+	.  reduce 10 (src line 358)
+
+
+state 22
+	constraintWithName:  CONSTRAINT.ID constraint 
+
+	ID  shift 38
+	.  error
+
+
+state 23
+	constraint:  UNIQUE.LPAREN attriNameList RPAREN 
+
+	LPAREN  shift 32
+	.  error
+
+
+state 24
+	constraint:  PRIMARYKEY.LPAREN attriNameList RPAREN 
+
+	LPAREN  shift 33
+	.  error
+
+
+state 25
+	constraint:  CHECK.LPAREN condition RPAREN 
+
+	LPAREN  shift 39
+	.  error
+
+
+state 26
+	constraintWithName:  CONSTRAINT ID.constraint 
+	constraintAfterAttributeWithName:  CONSTRAINT ID.constraintAfterAttribute 
+
+	DEFAULT  shift 9
+	UNIQUE  shift 10
+	PRIMARYKEY  shift 11
+	CHECK  shift 13
+	NOT  shift 12
+	.  error
+
+	constraintAfterAttribute  goto 41
+	constraint  goto 40
+
+state 27
+	constraintAfterAttribute:  DEFAULT elementaryValue.    (16)
+
+	.  reduce 16 (src line 623)
+
+
+state 28
+	elementaryValue:  INTVALUE.    (31)
+
+	.  reduce 31 (src line 925)
+
+
+state 29
+	elementaryValue:  FLOATVALUE.    (32)
+
+	.  reduce 32 (src line 933)
+
+
+state 30
+	elementaryValue:  STRINGVALUE.    (33)
+
+	.  reduce 33 (src line 940)
+
+
+state 31
+	elementaryValue:  BOOLVALUE.    (34)
+
+	.  reduce 34 (src line 947)
+
+
+state 32
+	constraint:  UNIQUE LPAREN.attriNameList RPAREN 
+
+	ID  shift 43
+	.  error
+
+	attriNameList  goto 42
+
+state 33
+	constraint:  PRIMARYKEY LPAREN.attriNameList RPAREN 
+
+	ID  shift 43
+	.  error
+
+	attriNameList  goto 44
+
+state 34
+	constraintAfterAttribute:  NOT NULLMARK.    (19)
+
+	.  reduce 19 (src line 649)
+
+
+state 35
+	constraint:  CHECK LPAREN.condition RPAREN 
+	constraintAfterAttribute:  CHECK LPAREN.condition RPAREN 
+
+	ID  shift 46
+	.  error
+
+	condition  goto 45
+
+state 36
+	constraintAfterAttributeWithName:  CONSTRAINT ID.constraintAfterAttribute 
+
+	DEFAULT  shift 9
+	UNIQUE  shift 17
+	PRIMARYKEY  shift 18
+	CHECK  shift 19
+	NOT  shift 12
+	.  error
+
+	constraintAfterAttribute  goto 41
+
+state 37
+	constraintAfterAttribute:  CHECK LPAREN.condition RPAREN 
+
+	ID  shift 46
+	.  error
+
+	condition  goto 47
+
+state 38
+	constraintWithName:  CONSTRAINT ID.constraint 
+
+	UNIQUE  shift 23
+	PRIMARYKEY  shift 24
+	CHECK  shift 25
+	.  error
+
+	constraint  goto 40
+
+state 39
+	constraint:  CHECK LPAREN.condition RPAREN 
+
+	ID  shift 46
+	.  error
+
+	condition  goto 48
+
+state 40
+	constraintWithName:  CONSTRAINT ID constraint.    (11)
+
+	.  reduce 11 (src line 365)
+
+
+state 41
+	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (15)
+
+	.  reduce 15 (src line 614)
+
+
+state 42
+	constraint:  UNIQUE LPAREN attriNameList.RPAREN 
+	attriNameList:  attriNameList.COMMA ID 
+
+	RPAREN  shift 49
+	COMMA  shift 50
+	.  error
+
+
+state 43
+	attriNameList:  ID.    (22)
+
+	.  reduce 22 (src line 866)
+
+
+state 44
+	constraint:  PRIMARYKEY LPAREN attriNameList.RPAREN 
+	attriNameList:  attriNameList.COMMA ID 
+
+	RPAREN  shift 51
+	COMMA  shift 50
+	.  error
+
+
+state 45
+	constraint:  CHECK LPAREN condition.RPAREN 
+	constraintAfterAttribute:  CHECK LPAREN condition.RPAREN 
+
+	RPAREN  shift 52
+	.  error
+
+
+state 46
+	condition:  ID.    (30)
+
+	.  reduce 30 (src line 907)
+
+
+state 47
+	constraintAfterAttribute:  CHECK LPAREN condition.RPAREN 
+
+	RPAREN  shift 53
+	.  error
+
+
+state 48
+	constraint:  CHECK LPAREN condition.RPAREN 
+
+	RPAREN  shift 54
+	.  error
+
+
+state 49
+	constraint:  UNIQUE LPAREN attriNameList RPAREN.    (12)
+
+	.  reduce 12 (src line 374)
+
+
+state 50
+	attriNameList:  attriNameList COMMA.ID 
+
+	ID  shift 55
+	.  error
+
+
+state 51
+	constraint:  PRIMARYKEY LPAREN attriNameList RPAREN.    (13)
+
+	.  reduce 13 (src line 384)
+
+
+ 52: reduce/reduce conflict  (red'ns 14 and 20) on $end
+ 52: reduce/reduce conflict  (red'ns 14 and 20) on UNIQUE
+ 52: reduce/reduce conflict  (red'ns 14 and 20) on PRIMARYKEY
+ 52: reduce/reduce conflict  (red'ns 14 and 20) on CHECK
+ 52: reduce/reduce conflict  (red'ns 14 and 20) on CONSTRAINT
+state 52
+	constraint:  CHECK LPAREN condition RPAREN.    (14)
+	constraintAfterAttribute:  CHECK LPAREN condition RPAREN.    (20)
+
+	DEFAULT  reduce 20 (src line 657)
+	NOT  reduce 20 (src line 657)
+	.  reduce 14 (src line 393)
+
+
+state 53
+	constraintAfterAttribute:  CHECK LPAREN condition RPAREN.    (20)
+
+	.  reduce 20 (src line 657)
+
+
+state 54
+	constraint:  CHECK LPAREN condition RPAREN.    (14)
+
+	.  reduce 14 (src line 393)
+
+
+state 55
+	attriNameList:  attriNameList COMMA ID.    (21)
+
+	.  reduce 21 (src line 862)
+
+Rule not reduced: setDeferrable:  NOT_DEFERRABLE 
+Rule not reduced: setDeferrable:  DEFERED_DEFERRABLE 
+Rule not reduced: setDeferrable:  IMMEDIATE_DEFERRABLE 
+Rule not reduced: onUpdateSet:  UPDATE_NULL 
+Rule not reduced: onUpdateSet:  UPDATE_CASCADE 
+Rule not reduced: onDeleteSet:  DELETE_NULL 
+Rule not reduced: onDeleteSet:  DELETE_CASCADE 
+
+29 terminals, 14 nonterminals
+35 grammar rules, 56/16000 states
+0 shift/reduce, 5 reduce/reduce conflicts reported
+63 working sets used
+memory: parser 18/240000
 0 extra closures
-4 shift entries, 1 exceptions
-2 goto entries
-0 entries saved by goto default
-Optimizer space used: output 6/240000
-6 table entries, 0 zero
-maximum spread: 22, maximum offset: 19
+57 shift entries, 3 exceptions
+22 goto entries
+-1 entries saved by goto default
+Optimizer space used: output 71/240000
+71 table entries, 0 zero
+maximum spread: 29, maximum offset: 39

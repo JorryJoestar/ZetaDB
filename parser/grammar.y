@@ -105,33 +105,50 @@ type List struct {
 %}
 
 %union {
-    NodePt  *Node
-    Int     int
-    Float   float64
-    String  string
-    Boolean bool
+    NodePt     *Node
+    List       List
+    Int        int
+    Unit8      uint8
+    Float      float64
+    String     string
+    StringList []string
+    Boolean    bool
 }
 
+// ast
 %type <NodePt> ast
 
-// %type <NodePt> ddl
-// %type <NodePt> createTableStmt
-
+// constraint
+%type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
+%type <NodePt> constraintAfterAttributeWithName
+%type <List> constraintList
+%type <NodePt> constraint
+%type <NodePt> constraintWithName
+%type <StringList> attriNameList
+%type <Unit8> setDeferrable
+%type <Unit8> onUpdateSet
+%type <Unit8> onDeleteSet
 
-%type <NodePt> elementaryValue
-
-%token UNIQUE PRIMARYKEY CHECK FOREIGNKEY REFERENCES
+%token DEFAULT UNIQUE PRIMARYKEY CHECK FOREIGNKEY REFERENCES
 %token NOT_DEFERRABLE DEFERED_DEFERRABLE IMMEDIATE_DEFERRABLE
 %token UPDATE_NULL UPDATE_CASCADE
 %token DELETE_NULL DELETE_CASCADE
 %token DEFERRED IMMEDIATE CONSTRAINT
 
+// condition
+%type <NodePt> condition
+
+// elementaryValue
+%type <NodePt> elementaryValue
 %token <Int> INTVALUE 
 %token <Float> FLOATVALUE 
 %token <String> STRINGVALUE 
 %token <Boolean> BOOLVALUE
 
+// public
+%token LPAREN RPAREN NOT NULLMARK COMMA
+%token <String> ID
 %%
 
 /*  --------------------------------------------------------------------------------
@@ -147,10 +164,8 @@ type List struct {
     -------------------------------------------------------------------------------- */
 
 ast
-    :elementaryValue {
-        fmt.Println("k")
-        fmt.Println($1.ElementaryValue.IntValue)
-
+    :constraintAfterAttributeList {
+        fmt.Println("157: constraintAfterAttributeList")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -159,12 +174,22 @@ ast
 	        Dcl: nil,
 	        Dql: nil}
     }
+    |constraintList {
+        fmt.Println("167: constraintList")
+
+        GetInstance().AST = &ASTNode{
+            Type: AST_DQL,
+	        Ddl: nil,
+	        Dml: nil,
+	        Dcl: nil,
+	        Dql: nil}
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                     DDL                                      |
     --------------------------------------------------------------------------------
 
-    ------------------------------------- DDL --------------------------------------
     ddl
         createTableStmt
         dropTableStmt
@@ -211,50 +236,132 @@ ast
     |                                   constraint                                 |
     --------------------------------------------------------------------------------
 
-/*  ----------------------- constraintAfterAttributeList ---------------------------
-
     constraintAfterAttributeList
+        constraintAfterAttributeWithName
         constraintAfterAttribute
+        constraintAfterAttributeList constraintAfterAttributeWithName
         constraintAfterAttributeList constraintAfterAttribute
 
-    -------------------------------------------------------------------------------- */
+    constraintList
+        constraintWithName
+        constraint
+        constraintList constraintWithName
+        constraintList constraint
+
+    constraintWithName
+        CONSTRAINT ID constraint
+    
+    constraint
+        UNIQUE LPAREN attriNameList RPAREN
+		PRIMARYKEY LPAREN attriNameList RPAREN
+		CHECK LPAREN condition RPAREN
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+
+    constraintAfterAttributeWithName
+        CONSTRAINT ID constraintAfterAttribute
+
+    constraintAfterAttribute
+        DEFAULT elementaryValue
+		UNIQUE
+		PRIMARYKEY
+		NOT NULLMARK
+		CHECK LPAREN condition RPAREN
+		REFERENCES ID LPAREN ID RPAREN
+		REFERENCES ID LPAREN ID RPAREN setDeferrable
+		REFERENCES ID LPAREN ID RPAREN onUpdateSet
+		REFERENCES ID LPAREN ID RPAREN onDeleteSet
+		REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
+		REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
+		REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
+		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
+		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
+		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
+		REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
+		REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
+		REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
+		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
+		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
+		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
+
+    attriNameList
+        attriNameList COMMA ID
+        ID
+
+    setDeferrable
+	    NOT_DEFERRABLE
+	    DEFERED_DEFERRABLE
+	    IMMEDIATE_DEFERRABLE
+
+    onUpdateSet
+	    UPDATE_NULL
+	    UPDATE_CASCADE
+
+    onDeleteSet
+	    DELETE_NULL
+	    DELETE_CASCADE
+
+    --------------------------------------------------------------------------------
+
+/*  ----------------------- constraintAfterAttributeList --------------------------- */
 constraintAfterAttributeList
-    :constraintAfterAttribute {
-        $$ = &List{}
+    :constraintAfterAttributeWithName {
+        $$ = List{}
+        $$.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
+        $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$1.Constraint)        
+    }
+    |constraintAfterAttribute {
+        $$ = List{}
         $$.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
         $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$1.Constraint)
     }
+    |constraintAfterAttributeList constraintAfterAttributeWithName {
+        $$ = $1
+        $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$2.Constraint)
+    }
     |constraintAfterAttributeList constraintAfterAttribute {
         $$ = $1
-        $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$1.Constraint)        
+        $$.ConstraintAfterAttributeList = append($$.ConstraintAfterAttributeList,$2.Constraint)        
     }
     ;
 
-/*  ------------------------------ constraintList ----------------------------------
-
-    constraintList
-        constraint
-        constraintList constraint
-
-    -------------------------------------------------------------------------------- */
+/*  ------------------------------ constraintList ---------------------------------- */
 constraintList
-    :constraint {
+    :constraintWithName {
         $$ = List{}
         $$.Type = CONSTRAINT_LIST
         $$.ConstraintList = append($$.ConstraintList,$1.Constraint)
     }
+    |constraint {
+        $$ = List{}
+        $$.Type = CONSTRAINT_LIST
+        $$.ConstraintList = append($$.ConstraintList,$1.Constraint)
+    }
+    |constraintList constraintWithName {
+        $$ = $1
+        $$.ConstraintList = append($$.ConstraintList,$2.Constraint)
+    }
     |constraintList constraint {
         $$ = $1
-        $$.ConstraintList = append($$.ConstraintList,$1.Constraint)
+        $$.ConstraintList = append($$.ConstraintList,$2.Constraint)
     }
     ;
 
-/*  ------------------------------- constraintWithName -----------------------------
-    
-    constraintWithName
-        CONSTRAINT ID constraint
-
-    -------------------------------------------------------------------------------- */
+/*  ------------------------------- constraintWithName ----------------------------- */
 constraintWithName
     :CONSTRAINT ID constraint {
         $$ = $3
@@ -263,34 +370,7 @@ constraintWithName
     }
     ;
 
-/*  ---------------------------------- constraint ----------------------------------
-    
-    constraint
-        UNIQUE LPAREN attriNameList RPAREN
-		PRIMARYKEY LPAREN attriNameList RPAREN
-		CHECK LPAREN condition RPAREN
-
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN
-
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet
-
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
-
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
-		FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
-
-    -------------------------------------------------------------------------------- */
+/*  ---------------------------------- constraint ---------------------------------- */
 constraint
     :UNIQUE LPAREN attriNameList RPAREN {
         $$ = &Node{}
@@ -530,12 +610,7 @@ constraint
     }
     ;
 
-/*  ---------------------- constraintAfterAttributeWithName ------------------------
-    
-    constraintAfterAttributeWithName
-        CONSTRAINT ID constraintAfterAttribute
-
-    -------------------------------------------------------------------------------- */
+/*  ---------------------- constraintAfterAttributeWithName ------------------------ */
 constraintAfterAttributeWithName
     :CONSTRAINT ID constraintAfterAttribute {
         $$ = $3
@@ -544,38 +619,7 @@ constraintAfterAttributeWithName
     }
     ;
 
-/*  -------------------------- constraintAfterAttribute ----------------------------
-    
-    constraintAfterAttribute
-        DEFAULT elementaryValue
-
-		UNIQUE
-		PRIMARYKEY
-		NOT NULLMARK
-
-		CHECK LPAREN condition RPAREN
-
-		REFERENCES ID LPAREN ID RPAREN
-
-		REFERENCES ID LPAREN ID RPAREN setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet
-
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet
-
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet
-		REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet
-		REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable
-
-    -------------------------------------------------------------------------------- */
+/*  -------------------------- constraintAfterAttribute ---------------------------- */
 constraintAfterAttribute
     :DEFAULT elementaryValue {
         $$ = &Node{}
@@ -814,12 +858,62 @@ constraintAfterAttribute
     }
     ;
 
+/*  -------------------------------- attriNameList --------------------------------- */
+    attriNameList
+        :attriNameList COMMA ID {
+            $$ = append($1,$3)
+        }
+        |ID {
+            $$ = append($$,$1)
+        }
+        ;
+
+/*  ------------------------------- setDeferrable ---------------------------------- */
+    setDeferrable
+	    :NOT_DEFERRABLE {
+            $$ = CONSTRAINT_NOT_DEFERRABLE
+        }
+	    |DEFERED_DEFERRABLE {
+            $$ = CONSTRAINT_INITIALLY_DEFERRED
+        }
+	    |IMMEDIATE_DEFERRABLE {
+            $$ = CONSTRAINT_INITIALLY_IMMEDIATE
+        }
+        ;
+
+/*  ------------------------------- onUpdateSet ------------------------------------ */
+    onUpdateSet
+	    :UPDATE_NULL {
+            $$ = CONSTRAINT_UPDATE_SET_NULL
+        }
+	    |UPDATE_CASCADE {
+            $$ = CONSTRAINT_UPDATE_SET_CASCADE
+        }
+        ;
+
+/*  ------------------------------- onDeleteSet ------------------------------------ */
+    onDeleteSet
+	    :DELETE_NULL {
+            $$ = CONSTRAINT_DELETE_SET_NULL
+        }
+	    |DELETE_CASCADE {
+            $$ = CONSTRAINT_DELETE_SET_CASCADE
+        }
+        ;
+
 /*  --------------------------------------------------------------------------------
-    |                                    public                                    |
+    |                                   condition                                  |
+    -------------------------------------------------------------------------------- */
+condition
+    :ID {
+        $$ = &Node{}
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                elementaryValue                               |
     --------------------------------------------------------------------------------
 
-/* --------------------------------- elementaryValue -----------------------------
-    
     elementaryValue
         INTVALUE
         FLOATVALUE
