@@ -1,4 +1,7 @@
 enum {
+//createTableStmt
+    CREATE          = 232,
+    TABLE           = 225,
 
 //constraint
     UNIQUE            = 231,
@@ -76,12 +79,12 @@ enum {
 
 
     
-    TABLE           = 225,
+
     DROP            = 226,
     ALTER           = 227,
     ADD             = 228,
 
-    CREATE          = 232,
+
 
     FROM            = 233,
     ON              = 234,

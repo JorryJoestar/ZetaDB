@@ -142,6 +142,7 @@ const (
     CONSTRAINT_AFTER_ATTRIBUTE_LIST ListEnum = 1
     CONSTRAINT_LIST                 ListEnum = 2
     ATTRINAME_OPTION_TABLENAME_LIST ListEnum = 3
+    ATTRIBUTE_DECLARATION_LIST      ListEnum = 4
 )
 
 type List struct {
@@ -149,6 +150,7 @@ type List struct {
     ConstraintAfterAttributeList []*ConstraintNode
     ConstraintList               []*ConstraintNode
     AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
+    AttributeDeclarationList     []*AttributeDeclarationNode
 }
 
 // -------------------- temporary struct --------------------
@@ -161,8 +163,6 @@ type AttributeDeclarationNode struct {
     ConstraintAfterAttributeListValid bool
     ConstraintAfterAttributeList      []*ConstraintNode
 }
-
-
 
 %}
 
@@ -180,7 +180,10 @@ type AttributeDeclarationNode struct {
 %type <NodePt> ast
 
 // createTable
+%type <NodePt> createTableStmt
+%type <List> attributeDeclarationList
 %type <NodePt> attributeDeclaration
+%token CREATE TABLE SEMICOLON
 
 // constraint
 %type <List> constraintAfterAttributeList
@@ -248,18 +251,8 @@ type AttributeDeclarationNode struct {
     -------------------------------------------------------------------------------- */
 
 ast
-    :constraintList {
-        fmt.Println("252: constraintList")
-
-        GetInstance().AST = &ASTNode{
-            Type: AST_DQL,
-	        Ddl: nil,
-	        Dml: nil,
-	        Dcl: nil,
-	        Dql: nil}
-    }
-    |attributeDeclaration {
-        fmt.Println("262: attributeDeclaration")
+    :createTableStmt {
+        fmt.Println("255: createTableStmt")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -293,23 +286,106 @@ ast
     -------------------------------------------------------------------------------- */
 
 
+
+
 /*  --------------------------------------------------------------------------------
     |                                 createTableStmt                              |
     --------------------------------------------------------------------------------
 
     createTableStmt
         CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON
-		CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintPhraseList LPAREN SEMICOLON
+		CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON
 
     attributeDeclarationList
         attributeDeclaration
-        attributeDeclarationList
+        attributeDeclarationList COMMA attributeDeclaration
 
     attributeDeclaration
         ID domain
         ID domain constraintAfterAttributeList
 
     -------------------------------------------------------------------------------- */
+
+/*  -------------------------------- createTableStmt ------------------------------- */
+createTableStmt
+    :CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+        $$.Table = &TableNode{}
+        
+        $$.Table.TableName = $3
+        for _,v := range $5.AttributeDeclarationList {
+            $$.Table.AttributeNameList = append($$.Table.AttributeNameList,v.AttributeName)
+            $$.Table.DomainList = append($$.Table.DomainList,v.Domain)
+            if v.ConstraintAfterAttributeListValid {
+                $$.Table.ConstraintListValid = true
+                for _,vConstraint := range v.ConstraintAfterAttributeList {
+                    switch vConstraint.Type {
+                        case CONSTRAINT_UNIQUE:
+                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
+                        case CONSTRAINT_PRIMARY_KEY:
+                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
+                        case CONSTRAINT_FOREIGN_KEY:
+                            vConstraint.AttributeNameLocal = v.AttributeName
+                        case CONSTRAINT_NOT_NULL:
+                            vConstraint.AttributeNameLocal = v.AttributeName
+                        case CONSTRAINT_DEFAULT:
+                            vConstraint.AttributeNameLocal = v.AttributeName
+                        default:
+                    }
+                    $$.Table.ConstraintList = append($$.Table.ConstraintList,vConstraint)
+                }
+            }
+        }
+    }
+	|CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+        $$.Table = &TableNode{}
+        
+        $$.Table.TableName = $3
+        for _,v := range $5.AttributeDeclarationList {
+            $$.Table.AttributeNameList = append($$.Table.AttributeNameList,v.AttributeName)
+            $$.Table.DomainList = append($$.Table.DomainList,v.Domain)
+            if v.ConstraintAfterAttributeListValid {
+                $$.Table.ConstraintListValid = true
+                for _,vConstraint := range v.ConstraintAfterAttributeList {
+                    switch vConstraint.Type {
+                        case CONSTRAINT_UNIQUE:
+                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
+                        case CONSTRAINT_PRIMARY_KEY:
+                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
+                        case CONSTRAINT_FOREIGN_KEY:
+                            vConstraint.AttributeNameLocal = v.AttributeName
+                        case CONSTRAINT_NOT_NULL:
+                            vConstraint.AttributeNameLocal = v.AttributeName
+                        case CONSTRAINT_DEFAULT:
+                            vConstraint.AttributeNameLocal = v.AttributeName
+                        default:
+                    }
+                    $$.Table.ConstraintList = append($$.Table.ConstraintList,vConstraint)
+                }
+            }
+        }
+
+        $$.Table.ConstraintList = append($$.Table.ConstraintList,$7.ConstraintList...)
+    }
+    ;
+
+/*  ----------------------------- attributeDeclarationList ------------------------- */
+attributeDeclarationList
+    :attributeDeclaration {
+        $$ = List{}
+        $$.Type = ATTRIBUTE_DECLARATION_LIST
+        $$.AttributeDeclarationList = append($$.AttributeDeclarationList,$1.AttributeDeclaration)
+    }
+    |attributeDeclarationList COMMA attributeDeclaration {
+        $$ = $1
+        $$.AttributeDeclarationList = append($$.AttributeDeclarationList,$3.AttributeDeclaration)
+    }
+    ;
+
+/*  ------------------------------- attributeDeclaration --------------------------- */    
 attributeDeclaration
     :ID domain {
         $$ = &Node{}

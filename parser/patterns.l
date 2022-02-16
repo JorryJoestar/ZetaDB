@@ -5,6 +5,8 @@
 %}
 
 %%
+[Cc][Rr][Ee][Aa][Tt][Ee]                                        {return CREATE;}
+[Tt][Aa][Bb][Ll][Ee]                                            {return TABLE;}
 
 [Uu][Nn][Ii][Qq][Uu][Ee]                                        {return UNIQUE;}
 [Pp][Rr][Ii][Mm][Aa][Rr][Yy][ ][Kk][Ee][Yy]                     {return PRIMARYKEY;}
@@ -61,6 +63,7 @@
 ["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
 [Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
 
+[;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}
 [,]                                                             {return COMMA;}

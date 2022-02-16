@@ -39,6 +39,11 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	p.yylineno = int(C.yylineno)
 	p.yytext = C.GoString(C.yytext)
 	switch tok {
+	//createTable
+	case C.CREATE:
+		return CREATE
+	case C.TABLE:
+		return TABLE
 
 	//constraint
 	case C.UNIQUE:
@@ -170,6 +175,8 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.ID:
 		yylval.String = p.yytext
 		return ID
+	case C.SEMICOLON:
+		return SEMICOLON
 	}
 	return 0 //end of statement
 }
