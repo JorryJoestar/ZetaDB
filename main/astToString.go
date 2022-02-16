@@ -460,6 +460,251 @@ func ConditionToString(condition *parser.ConditionNode, tabs string) string {
 func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 	//TODO
 	s := ""
+	s += tabs
+	s += "PredicateNode\n"
 
+	s += tabs
+	s += "Type: "
+	switch predicate.Type {
+	case parser.PREDICATE_COMPARE_ELEMENTARY_VALUE:
+		s += "PREDICATE_COMPARE_ELEMENTARY_VALUE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "ElementaryValue:\n"
+		s += ElementaryValueToString(predicate.ElementaryValue, tabs+"\t")
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_LIKE_STRING_VALUE:
+		s += "PREDICATE_LIKE_STRING_VALUE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "ElementaryValue:\n"
+		s += ElementaryValueToString(predicate.ElementaryValue, tabs+"\t")
+	case parser.PREDICATE_IN_SUBQUERY:
+		s += "PREDICATE_IN_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+	case parser.PREDICATE_NOT_IN_SUBQUERY:
+		s += "PREDICATE_NOT_IN_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+	case parser.PREDICATE_IN_TABLE:
+		s += "PREDICATE_IN_TABLE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+	case parser.PREDICATE_NOT_IN_TABLE:
+		s += "PREDICATE_NOT_IN_TABLE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+	case parser.PREDICATE_COMPARE_ALL_SUBQUERY:
+		s += "PREDICATE_COMPARE_ALL_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_NOT_ALL_SUBQUERY:
+		s += "PREDICATE_COMPARE_NOT_ALL_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_ANY_SUBQUERY:
+		s += "PREDICATE_COMPARE_ANY_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_NOT_ANY_SUBQUERY:
+		s += "PREDICATE_COMPARE_NOT_ANY_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_ALL_TABLE:
+		s += "PREDICATE_COMPARE_ALL_TABLE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_NOT_ALL_TABLE:
+		s += "PREDICATE_COMPARE_NOT_ALL_TABLE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_ANY_TABLE:
+		s += "PREDICATE_COMPARE_ANY_TABLE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_COMPARE_NOT_ANY_TABLE:
+		s += "PREDICATE_COMPARE_NOT_ANY_TABLE\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+		s += tabs
+		s += "CompareMark: "
+		s += CompareMarkToString(predicate.CompareMark) + "\n"
+	case parser.PREDICATE_IS_NULL:
+		s += "PREDICATE_IS_NULL\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+	case parser.PREDICATE_IS_NOT_NULL:
+		s += "PREDICATE_IS_NOT_NULL\n"
+		s += tabs
+		s += "AttriNameWithTableNameL:\n"
+		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
+	case parser.PREDICATE_TUPLE_IN_SUBQUERY:
+		s += "PREDICATE_TUPLE_IN_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameOptionTableNameList:\n"
+		for _, v := range predicate.AttriNameOptionTableNameList {
+			s += AttriNameOptionTableNameToString(v, tabs+"\t")
+		}
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+	case parser.PREDICATE_TUPLE_NOT_IN_SUBQUERY:
+		s += "PREDICATE_TUPLE_NOT_IN_SUBQUERY\n"
+		s += tabs
+		s += "AttriNameOptionTableNameList:\n"
+		for _, v := range predicate.AttriNameOptionTableNameList {
+			s += AttriNameOptionTableNameToString(v, tabs+"\t")
+		}
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+	case parser.PREDICATE_TUPLE_IN_TABLE:
+		s += "PREDICATE_TUPLE_IN_TABLE\n"
+		s += tabs
+		s += "AttriNameOptionTableNameList:\n"
+		for _, v := range predicate.AttriNameOptionTableNameList {
+			s += AttriNameOptionTableNameToString(v, tabs+"\t")
+		}
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+	case parser.PREDICATE_TUPLE_NOT_IN_TABLE:
+		s += "PREDICATE_TUPLE_NOT_IN_TABLE\n"
+		s += tabs
+		s += "AttriNameOptionTableNameList:\n"
+		for _, v := range predicate.AttriNameOptionTableNameList {
+			s += AttriNameOptionTableNameToString(v, tabs+"\t")
+		}
+		s += tabs
+		s += "TableName: "
+		s += predicate.TableName + "\n"
+	case parser.PREDICATE_SUBQUERY_EXISTS:
+		s += "PREDICATE_SUBQUERY_EXISTS\n"
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+	case parser.PREDICATE_SUBQUERY_NOT_EXISTS:
+		s += "PREDICATE_SUBQUERY_NOT_EXISTS\n"
+		s += tabs
+		s += "Subquery:\n"
+		s += QueryToString(predicate.Subquery, tabs+"\t")
+	}
+
+	return s
+}
+
+func AttriNameOptionTableNameToString(attriNameOpsTableName *parser.AttriNameOptionTableNameNode, tabs string) string {
+	s := tabs
+	s += "AttriNameOptionTableNameNode\n"
+	if attriNameOpsTableName.TableNameValid {
+		s += tabs
+		s += "TableName: "
+		s += attriNameOpsTableName.TableName + "\n"
+	}
+	s += tabs
+	s += "AttributeName: "
+	s += attriNameOpsTableName.AttributeName + "\n"
+	return s
+}
+
+func CompareMarkToString(compareMark parser.CompareMarkEnum) string {
+	switch compareMark {
+	case parser.COMPAREMARK_EQUAL:
+		return "COMPAREMARK_EQUAL"
+	case parser.COMPAREMARK_NOTEQUAL:
+		return "COMPAREMARK_NOTEQUAL"
+	case parser.COMPAREMARK_LESS:
+		return "COMPAREMARK_LESS"
+	case parser.COMPAREMARK_GREATER:
+		return "COMPAREMARK_GREATER"
+	case parser.COMPAREMARK_LESSEQUAL:
+		return "COMPAREMARK_LESSEQUAL"
+	case parser.COMPAREMARK_GREATEREQUAL:
+		return "COMPAREMARK_GREATEREQUAL"
+	}
+	return ""
+}
+
+func QueryToString(query *parser.QueryNode, tabs string) string {
+	//TODO
+	s := tabs
+	s += "QueryToString TODO\n"
 	return s
 }
