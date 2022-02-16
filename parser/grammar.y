@@ -377,6 +377,7 @@ createTableStmt
             }
         }
 
+        $$.Table.ConstraintListValid = true
         $$.Table.ConstraintList = append($$.Table.ConstraintList,$7.ConstraintList...)
     }
     ;
@@ -601,6 +602,7 @@ constraint
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.Deferrable = $10.ConstraintDeferrable
+        $$.Constraint.DeferrableValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet {
         $$ = &Node{}
@@ -613,6 +615,8 @@ constraint
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
+
+        $$.Constraint.UpdateSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet {
         $$ = &Node{}
@@ -625,6 +629,8 @@ constraint
         $$.Constraint.ForeignTableName = $6
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
+
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -638,6 +644,9 @@ constraint
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.Deferrable = $10.ConstraintDeferrable
         $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -651,6 +660,9 @@ constraint
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.Deferrable = $10.ConstraintDeferrable
         $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -664,6 +676,9 @@ constraint
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.Deferrable = $11.ConstraintDeferrable
         $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
+
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -677,6 +692,9 @@ constraint
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
+
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -690,6 +708,9 @@ constraint
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.Deferrable = $11.ConstraintDeferrable
         $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -703,6 +724,9 @@ constraint
         $$.Constraint.AttributeNameForeign = $8
         $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
+
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -717,6 +741,10 @@ constraint
         $$.Constraint.Deferrable = $10.ConstraintDeferrable
         $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $12.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -731,6 +759,10 @@ constraint
         $$.Constraint.Deferrable = $10.ConstraintDeferrable
         $$.Constraint.UpdateSet = $12.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -745,6 +777,10 @@ constraint
         $$.Constraint.Deferrable = $11.ConstraintDeferrable
         $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $12.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -759,6 +795,10 @@ constraint
         $$.Constraint.Deferrable = $12.ConstraintDeferrable
         $$.Constraint.UpdateSet = $10.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $11.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -773,6 +813,10 @@ constraint
         $$.Constraint.Deferrable = $11.ConstraintDeferrable
         $$.Constraint.UpdateSet = $12.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -787,6 +831,10 @@ constraint
         $$.Constraint.Deferrable = $12.ConstraintDeferrable
         $$.Constraint.UpdateSet = $11.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $10.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
     ;
 
@@ -854,6 +902,8 @@ constraintAfterAttribute
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.Deferrable = $6.ConstraintDeferrable
+
+        $$.Constraint.DeferrableValid = true
     }
     |REFERENCES ID LPAREN ID RPAREN onUpdateSet {
         $$ = &Node{}
@@ -865,6 +915,8 @@ constraintAfterAttribute
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
+
+        $$.Constraint.UpdateSetValid = true
     }
     |REFERENCES ID LPAREN ID RPAREN onDeleteSet {
         $$ = &Node{}
@@ -876,6 +928,8 @@ constraintAfterAttribute
         $$.Constraint.ForeignTableName = $2
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
+
+        $$.Constraint.DeleteSetValid = true
     }
     |REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -888,6 +942,9 @@ constraintAfterAttribute
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.Deferrable = $6.ConstraintDeferrable
         $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
     }
     |REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -900,6 +957,9 @@ constraintAfterAttribute
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.Deferrable = $6.ConstraintDeferrable
         $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -912,6 +972,9 @@ constraintAfterAttribute
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
         $$.Constraint.Deferrable = $7.ConstraintDeferrable
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -924,6 +987,9 @@ constraintAfterAttribute
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
+
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -936,6 +1002,9 @@ constraintAfterAttribute
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
         $$.Constraint.Deferrable = $7.ConstraintDeferrable
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -948,6 +1017,9 @@ constraintAfterAttribute
         $$.Constraint.AttributeNameForeign = $4
         $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
         $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
+
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet {
         $$ = &Node{}
@@ -961,6 +1033,10 @@ constraintAfterAttribute
         $$.Constraint.Deferrable = $6.ConstraintDeferrable
         $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $8.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet {
         $$ = &Node{}
@@ -974,6 +1050,10 @@ constraintAfterAttribute
         $$.Constraint.Deferrable = $6.ConstraintDeferrable
         $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
         $$.Constraint.UpdateSet = $8.ConstraintUpdateSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet {
         $$ = &Node{}
@@ -987,6 +1067,10 @@ constraintAfterAttribute
         $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
         $$.Constraint.Deferrable = $7.ConstraintDeferrable
         $$.Constraint.DeleteSet = $8.ConstraintDeleteSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable {
         $$ = &Node{}
@@ -1000,6 +1084,10 @@ constraintAfterAttribute
         $$.Constraint.UpdateSet = $6.ConstraintUpdateSet
         $$.Constraint.DeleteSet = $7.ConstraintDeleteSet
         $$.Constraint.Deferrable = $8.ConstraintDeferrable
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet {
         $$ = &Node{}
@@ -1013,6 +1101,10 @@ constraintAfterAttribute
         $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
         $$.Constraint.Deferrable = $7.ConstraintDeferrable
         $$.Constraint.UpdateSet = $8.ConstraintUpdateSet
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
 	|REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable {
         $$ = &Node{}
@@ -1026,6 +1118,10 @@ constraintAfterAttribute
         $$.Constraint.DeleteSet = $6.ConstraintDeleteSet
         $$.Constraint.UpdateSet = $7.ConstraintUpdateSet
         $$.Constraint.Deferrable = $8.ConstraintDeferrable
+
+        $$.Constraint.DeferrableValid = true
+        $$.Constraint.UpdateSetValid = true
+        $$.Constraint.DeleteSetValid = true
     }
     ;
 

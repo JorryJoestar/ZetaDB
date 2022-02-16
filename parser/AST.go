@@ -47,7 +47,7 @@ type DDLNode struct {
 	Assert  *AssertNode
 	View    *ViewNode
 	Index   *IndexNode
-	Trigger *TableNode
+	Trigger *TriggerNode
 	PSM     *PsmNode
 }
 
@@ -378,13 +378,16 @@ type ConstraintNode struct {
 	ConstraintNameValid  bool
 	ConstraintName       string
 	AttriNameList        []string                 //CONSTRAINT_UNIQUE,CONSTRAINT_PRIMARY_KEY
-	ElementaryValue      *ElementaryValueNode     //DEFAULT
+	ElementaryValue      *ElementaryValueNode     //CONSTRAINT_DEFAULT
 	Condition            *ConditionNode           //CONSTRAINT_CHECK
 	AttributeNameLocal   string                   //CONSTRAINT_FOREIGN_KEY, CONSTRAINT_NOT_NULL,CONSTRAINT_DEFAULT
 	AttributeNameForeign string                   //CONSTRAINT_FOREIGN_KEY
 	ForeignTableName     string                   //CONSTRAINT_FOREIGN_KEY
+	DeferrableValid      bool                     //CONSTRAINT_FOREIGN_KEY
 	Deferrable           ConstraintDeferrableEnum //CONSTRAINT_FOREIGN_KEY
+	UpdateSetValid       bool                     //CONSTRAINT_FOREIGN_KEY
 	UpdateSet            ConstraintUpdateSetEnum  //CONSTRAINT_FOREIGN_KEY
+	DeleteSetValid       bool                     //CONSTRAINT_FOREIGN_KEY
 	DeleteSet            ConstraintDeleteSetEnum  //CONSTRAINT_FOREIGN_KEY
 }
 

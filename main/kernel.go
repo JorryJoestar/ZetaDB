@@ -2,6 +2,7 @@ package main
 
 import (
 	"ZetaDB/parser"
+	"fmt"
 	"sync"
 )
 
@@ -24,8 +25,6 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("create table x (y int,s char);")
-
-	tester := Tester{}
-	tester.PrintAST(ast)
+	ast := kernel.parser.ParseSql("create table student (name char, check(x>12 and x <12));")
+	fmt.Println(ASTToString(ast))
 }
