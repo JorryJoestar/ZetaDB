@@ -2,7 +2,6 @@
 package parser
 
 import (
-    "fmt"
 )
 
 // -------------------- Node --------------------
@@ -179,6 +178,9 @@ type AttributeDeclarationNode struct {
 // ast
 %type <NodePt> ast
 
+// ddl
+%type <NodePt> ddl
+
 // createTable
 %type <NodePt> createTableStmt
 %type <List> attributeDeclarationList
@@ -251,15 +253,15 @@ type AttributeDeclarationNode struct {
     -------------------------------------------------------------------------------- */
 
 ast
-    :createTableStmt {
-        fmt.Println("255: createTableStmt")
+    :ddl {
+        $$ = &Node{}
+        $$.Type = AST_NODE
 
-        GetInstance().AST = &ASTNode{
-            Type: AST_DQL,
-	        Ddl: nil,
-	        Dml: nil,
-	        Dcl: nil,
-	        Dql: nil}
+        $$.Ast = &ASTNode{}
+        $$.Ast.Type = AST_DDL
+        $$.Ast.Ddl = $1.Ddl
+
+        GetInstance().AST = $$.Ast
     }
     ;
 
@@ -284,9 +286,16 @@ ast
             dropPsmStmt
     
     -------------------------------------------------------------------------------- */
-
-
-
+ddl
+    :createTableStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+        
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_TABLE_CREATE
+        $$.Ddl.Table = $1.Table
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                 createTableStmt                              |

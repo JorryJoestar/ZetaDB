@@ -42,7 +42,7 @@ const (
 //CREATE, ALTER, DROP
 //table, view, PSM, trigger, constraint, assert, index
 type DDLNode struct {
-	DdlType DDLEnum
+	Type    DDLEnum
 	Table   *TableNode
 	Assert  *AssertNode
 	View    *ViewNode

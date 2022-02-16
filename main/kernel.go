@@ -24,7 +24,7 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("create table x (y int,s cha);")
+	ast := kernel.parser.ParseSql("create table x (y int,s char);")
 
 	tester := Tester{}
 	tester.PrintAST(ast)
