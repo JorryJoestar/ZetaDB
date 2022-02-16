@@ -5,7 +5,7 @@ import (
     "fmt"
 )
 
-// Node
+// -------------------- Node --------------------
 type NodeEnum uint8
 
 const (
@@ -66,6 +66,9 @@ const (
 /* subquery */
     SUBQUERY_NODE                   NodeEnum = 35
 
+/* createTable */
+    ATTRIBUTE_DECLARATION_NODE      NodeEnum = 36
+
 )
 
 type Node struct {
@@ -99,6 +102,9 @@ type Node struct {
     Insert          *InsertNode
     DeleteNode      *DeleteNode
 
+/* createTable */
+    AttributeDeclaration *AttributeDeclarationNode
+
 /* constraint */
     ConstraintDeferrable ConstraintDeferrableEnum
     ConstraintUpdateSet  ConstraintUpdateSetEnum
@@ -129,7 +135,7 @@ type Node struct {
     Subquery                 *QueryNode
 }
 
-// List
+// -------------------- List --------------------
 type ListEnum uint8
 
 const (
@@ -145,6 +151,19 @@ type List struct {
     AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
 }
 
+// -------------------- temporary struct --------------------
+// temporary struct, not included in AST, assistant grammar.y to generate AST
+
+// attributeDeclaration
+type AttributeDeclarationNode struct {
+    AttributeName                     string
+    Domain                            *DomainNode
+    ConstraintAfterAttributeListValid bool
+    ConstraintAfterAttributeList      []*ConstraintNode
+}
+
+
+
 %}
 
 %union {
@@ -159,6 +178,9 @@ type List struct {
 
 // ast
 %type <NodePt> ast
+
+// createTable
+%type <NodePt> attributeDeclaration
 
 // constraint
 %type <List> constraintAfterAttributeList
@@ -226,8 +248,8 @@ type List struct {
     -------------------------------------------------------------------------------- */
 
 ast
-    :constraintAfterAttributeList {
-        fmt.Println("229: constraintAfterAttributeList")
+    :constraintList {
+        fmt.Println("252: constraintList")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -236,8 +258,8 @@ ast
 	        Dcl: nil,
 	        Dql: nil}
     }
-    |constraintList {
-        fmt.Println("239: constraintList")
+    |attributeDeclaration {
+        fmt.Println("262: attributeDeclaration")
 
         GetInstance().AST = &ASTNode{
             Type: AST_DQL,
@@ -245,16 +267,6 @@ ast
 	        Dml: nil,
 	        Dcl: nil,
 	        Dql: nil}
-    }
-    |domain {
-        fmt.Println("249: domain")
-
-        GetInstance().AST = &ASTNode{
-            Type: AST_DQL,
-	        Ddl: nil,
-	        Dml: nil,
-	        Dcl: nil,
-	        Dql: nil}        
     }
     ;
 
@@ -278,7 +290,12 @@ ast
             createPsmStmt
             dropPsmStmt
     
-    -------------------------------- createTableStmt -------------------------------
+    -------------------------------------------------------------------------------- */
+
+
+/*  --------------------------------------------------------------------------------
+    |                                 createTableStmt                              |
+    --------------------------------------------------------------------------------
 
     createTableStmt
         CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON
@@ -292,12 +309,28 @@ ast
         ID domain
         ID domain constraintAfterAttributeList
 
-    --------------------------------------------------------------------------------
-
-
-
-
     -------------------------------------------------------------------------------- */
+attributeDeclaration
+    :ID domain {
+        $$ = &Node{}
+        $$.Type = ATTRIBUTE_DECLARATION_NODE
+
+        $$.AttributeDeclaration = &AttributeDeclarationNode{}
+        $$.AttributeDeclaration.AttributeName = $1
+        $$.AttributeDeclaration.Domain = $2.Domain
+        $$.AttributeDeclaration.ConstraintAfterAttributeListValid = false
+    }
+    |ID domain constraintAfterAttributeList {
+        $$ = &Node{}
+        $$.Type = ATTRIBUTE_DECLARATION_NODE
+
+        $$.AttributeDeclaration = &AttributeDeclarationNode{}
+        $$.AttributeDeclaration.AttributeName = $1
+        $$.AttributeDeclaration.Domain = $2.Domain
+        $$.AttributeDeclaration.ConstraintAfterAttributeListValid = true
+        $$.AttributeDeclaration.ConstraintAfterAttributeList = $3.ConstraintAfterAttributeList
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                   constraint                                 |

@@ -305,8 +305,6 @@ type DeleteNode struct {
 	Condition *ConditionNode
 }
 
-//---------------------------------------- public ----------------------------------------
-
 //domain
 type DomainEnum uint8
 
