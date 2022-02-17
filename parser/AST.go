@@ -53,18 +53,11 @@ type DDLNode struct {
 
 //table
 type TableNode struct {
-	TableName     string //used by create, drop, alter
-	AttributeName string // used by alter add, alter drop
-
-	//create table
+	TableName           string
 	AttributeNameList   []string
 	DomainList          []*DomainNode
 	ConstraintList      []*ConstraintNode
 	ConstraintListValid bool
-
-	//alter table add
-	Domain     *DomainNode
-	Constraint *ConstraintNode
 }
 
 //assert

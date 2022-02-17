@@ -10,6 +10,9 @@
 
 [Dd][Rr][Oo][Pp]                                                {return DROP;}
 
+[Aa][Ll][Tt][Ee][Rr]                                            {return ALTER;}
+[Aa][Dd][Dd]                                                    {return ADD;}
+
 [Uu][Nn][Ii][Qq][Uu][Ee]                                        {return UNIQUE;}
 [Pp][Rr][Ii][Mm][Aa][Rr][Yy][ ][Kk][Ee][Yy]                     {return PRIMARYKEY;}
 [Cc][Hh][Ee][Cc][Kk]                                            {return CHECK;}

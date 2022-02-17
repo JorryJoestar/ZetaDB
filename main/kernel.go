@@ -25,6 +25,6 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("drop table aaa;")
+	ast := kernel.parser.ParseSql("alter table x add constraint n unique(a,b);")
 	fmt.Println(ASTToString(ast))
 }

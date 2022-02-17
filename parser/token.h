@@ -5,6 +5,11 @@ enum {
 
 //dropTableStmt
     DROP            = 226,
+
+//alterTableStmt
+    ALTER           = 227,
+    ADD             = 228,
+
 //constraint
     UNIQUE            = 231,
     PRIMARYKEY        = 230,  //PRIMARY KEY
@@ -83,8 +88,7 @@ enum {
     
 
 
-    ALTER           = 227,
-    ADD             = 228,
+
 
 
 

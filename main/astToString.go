@@ -156,7 +156,26 @@ func TableDropToString(table *parser.TableNode, tabs string) string {
 
 func TableAlterAddToString(table *parser.TableNode, tabs string) string {
 	//TODO
-	s := ""
+	s := tabs + "TableNode\n"
+	s += tabs + "TableName: " + table.TableName + "\n"
+	if len(table.AttributeNameList) != 0 {
+		s += tabs + "AttributeNameList:\n"
+		for _, v := range table.AttributeNameList {
+			s += tabs + "\t" + v + "\n"
+		}
+	}
+	if len(table.DomainList) != 0 {
+		s += tabs + "DomainList:\n"
+		for _, v := range table.DomainList {
+			s += DomainToString(v, tabs+"\t")
+		}
+	}
+	if table.ConstraintListValid {
+		s += tabs + "ConstraintList:\n"
+		for _, v := range table.ConstraintList {
+			s += ConstraintToString(v, tabs+"\t")
+		}
+	}
 	return s
 }
 

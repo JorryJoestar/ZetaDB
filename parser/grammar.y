@@ -191,6 +191,10 @@ type AttributeDeclarationNode struct {
 %type <NodePt> dropTableStmt
 %token DROP
 
+// alterTable
+%type <NodePt> alterTableAddStmt
+%token ALTER ADD
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -307,6 +311,14 @@ ddl
         $$.Ddl.Type = DDL_TABLE_DROP
         $$.Ddl.Table = $1.Table
     }
+    |alterTableAddStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_TABLE_ALTER_ADD
+        $$.Ddl.Table = $1.Table
+    }
     ;
 
 /*  --------------------------------------------------------------------------------
@@ -340,22 +352,7 @@ createTableStmt
             $$.Table.DomainList = append($$.Table.DomainList,v.Domain)
             if v.ConstraintAfterAttributeListValid {
                 $$.Table.ConstraintListValid = true
-                for _,vConstraint := range v.ConstraintAfterAttributeList {
-                    switch vConstraint.Type {
-                        case CONSTRAINT_UNIQUE:
-                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
-                        case CONSTRAINT_PRIMARY_KEY:
-                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
-                        case CONSTRAINT_FOREIGN_KEY:
-                            vConstraint.AttributeNameLocal = v.AttributeName
-                        case CONSTRAINT_NOT_NULL:
-                            vConstraint.AttributeNameLocal = v.AttributeName
-                        case CONSTRAINT_DEFAULT:
-                            vConstraint.AttributeNameLocal = v.AttributeName
-                        default:
-                    }
-                    $$.Table.ConstraintList = append($$.Table.ConstraintList,vConstraint)
-                }
+                $$.Table.ConstraintList = append($$.Table.ConstraintList,v.ConstraintAfterAttributeList...)
             }
         }
     }
@@ -370,22 +367,7 @@ createTableStmt
             $$.Table.DomainList = append($$.Table.DomainList,v.Domain)
             if v.ConstraintAfterAttributeListValid {
                 $$.Table.ConstraintListValid = true
-                for _,vConstraint := range v.ConstraintAfterAttributeList {
-                    switch vConstraint.Type {
-                        case CONSTRAINT_UNIQUE:
-                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
-                        case CONSTRAINT_PRIMARY_KEY:
-                            vConstraint.AttriNameList = append(vConstraint.AttriNameList,v.AttributeName)
-                        case CONSTRAINT_FOREIGN_KEY:
-                            vConstraint.AttributeNameLocal = v.AttributeName
-                        case CONSTRAINT_NOT_NULL:
-                            vConstraint.AttributeNameLocal = v.AttributeName
-                        case CONSTRAINT_DEFAULT:
-                            vConstraint.AttributeNameLocal = v.AttributeName
-                        default:
-                    }
-                    $$.Table.ConstraintList = append($$.Table.ConstraintList,vConstraint)
-                }
+                $$.Table.ConstraintList = append($$.Table.ConstraintList,v.ConstraintAfterAttributeList...)
             }
         }
 
@@ -427,6 +409,22 @@ attributeDeclaration
         $$.AttributeDeclaration.Domain = $2.Domain
         $$.AttributeDeclaration.ConstraintAfterAttributeListValid = true
         $$.AttributeDeclaration.ConstraintAfterAttributeList = $3.ConstraintAfterAttributeList
+
+        for _,v := range $$.AttributeDeclaration.ConstraintAfterAttributeList {
+            switch v.Type {
+                case CONSTRAINT_UNIQUE:
+                    v.AttriNameList = append(v.AttriNameList,$1)
+                case CONSTRAINT_PRIMARY_KEY:
+                    v.AttriNameList = append(v.AttriNameList,$1)
+                case CONSTRAINT_FOREIGN_KEY:
+                    v.AttributeNameLocal = $1
+                case CONSTRAINT_NOT_NULL:
+                    v.AttributeNameLocal = $1
+                case CONSTRAINT_DEFAULT:
+                    v.AttributeNameLocal = $1
+                default:
+            }
+        }
     }
     ;
 
@@ -445,6 +443,43 @@ dropTableStmt
 
         $$.Table = &TableNode{}
         $$.Table.TableName = $3
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                               alterTableAddStmt                              |
+    --------------------------------------------------------------------------------
+		
+        alterTableAddStmt
+			ALTER TABLE ID ADD attributeDeclaration SEMICOLON
+			ALTER TABLE ID ADD constraintWithName SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+alterTableAddStmt
+	:ALTER TABLE ID ADD attributeDeclaration SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+
+        $$.Table = &TableNode{}
+        $$.Table.TableName = $3
+
+        $$.Table.AttributeNameList = append($$.Table.AttributeNameList,$5.AttributeDeclaration.AttributeName)
+        $$.Table.DomainList = append($$.Table.DomainList,$5.AttributeDeclaration.Domain)
+        if $5.AttributeDeclaration.ConstraintAfterAttributeListValid {
+            $$.Table.ConstraintListValid = true
+            $$.Table.ConstraintList = append($$.Table.ConstraintList,$5.AttributeDeclaration.ConstraintAfterAttributeList...)
+        }
+
+    }
+	|ALTER TABLE ID ADD constraintWithName SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+
+        $$.Table = &TableNode{}
+        $$.Table.TableName = $3
+
+        $$.Table.ConstraintListValid = true
+        $$.Table.ConstraintList = append($$.Table.ConstraintList,$5.Constraint)
     }
     ;
 

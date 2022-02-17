@@ -45,8 +45,15 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.TABLE:
 		return TABLE
 
+	//dropTable
 	case C.DROP:
 		return DROP
+
+	//alterTableAdd
+	case C.ALTER:
+		return ALTER
+	case C.ADD:
+		return ADD
 
 	//constraint
 	case C.UNIQUE:
