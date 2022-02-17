@@ -3,6 +3,8 @@ enum {
     CREATE          = 232,
     TABLE           = 225,
 
+//dropTableStmt
+    DROP            = 226,
 //constraint
     UNIQUE            = 231,
     PRIMARYKEY        = 230,  //PRIMARY KEY
@@ -80,7 +82,7 @@ enum {
 
     
 
-    DROP            = 226,
+
     ALTER           = 227,
     ADD             = 228,
 

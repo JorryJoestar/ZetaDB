@@ -8,6 +8,8 @@
 [Cc][Rr][Ee][Aa][Tt][Ee]                                        {return CREATE;}
 [Tt][Aa][Bb][Ll][Ee]                                            {return TABLE;}
 
+[Dd][Rr][Oo][Pp]                                                {return DROP;}
+
 [Uu][Nn][Ii][Qq][Uu][Ee]                                        {return UNIQUE;}
 [Pp][Rr][Ii][Mm][Aa][Rr][Yy][ ][Kk][Ee][Yy]                     {return PRIMARYKEY;}
 [Cc][Hh][Ee][Cc][Kk]                                            {return CHECK;}

@@ -149,8 +149,8 @@ func TableCreateToString(table *parser.TableNode, tabs string) string {
 }
 
 func TableDropToString(table *parser.TableNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "TableNode\n"
+	s += tabs + "TableName: " + table.TableName + "\n"
 	return s
 }
 
@@ -376,7 +376,6 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 		s += "ElementaryValue:\n"
 		s += ElementaryValueToString(constraint.ElementaryValue, tabs+"\t")
 	case parser.CONSTRAINT_CHECK:
-		//TODO
 		s += "CONSTRAINT_CHECK\n"
 		s += ConditionToString(constraint.Condition, tabs+"\t")
 	}

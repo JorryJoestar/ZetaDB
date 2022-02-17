@@ -25,6 +25,6 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("create table class(className varchar(255) default 'ss');")
+	ast := kernel.parser.ParseSql("drop table aaa;")
 	fmt.Println(ASTToString(ast))
 }

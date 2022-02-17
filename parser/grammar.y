@@ -187,6 +187,10 @@ type AttributeDeclarationNode struct {
 %type <NodePt> attributeDeclaration
 %token CREATE TABLE SEMICOLON
 
+// dropTable
+%type <NodePt> dropTableStmt
+%token DROP
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -293,6 +297,14 @@ ddl
         
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_TABLE_CREATE
+        $$.Ddl.Table = $1.Table
+    }
+    |dropTableStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_TABLE_DROP
         $$.Ddl.Table = $1.Table
     }
     ;
@@ -415,6 +427,24 @@ attributeDeclaration
         $$.AttributeDeclaration.Domain = $2.Domain
         $$.AttributeDeclaration.ConstraintAfterAttributeListValid = true
         $$.AttributeDeclaration.ConstraintAfterAttributeList = $3.ConstraintAfterAttributeList
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                 dropTableStmt                                |
+    --------------------------------------------------------------------------------
+        
+        dropTableStmt
+            DROP TABLE ID SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+dropTableStmt
+    :DROP TABLE ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+
+        $$.Table = &TableNode{}
+        $$.Table.TableName = $3
     }
     ;
 
