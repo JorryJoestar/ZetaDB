@@ -2,9 +2,9 @@
 state 0
 	$accept: .ast $end 
 
-	CREATE  shift 6
-	DROP  shift 7
-	ALTER  shift 8
+	CREATE  shift 7
+	DROP  shift 8
+	ALTER  shift 9
 	.  error
 
 	ast  goto 1
@@ -12,6 +12,7 @@ state 0
 	createTableStmt  goto 3
 	dropTableStmt  goto 4
 	alterTableAddStmt  goto 5
+	alterTableDropStmt  goto 6
 
 state 1
 	$accept:  ast.$end 
@@ -23,390 +24,439 @@ state 1
 state 2
 	ast:  ddl.    (1)
 
-	.  reduce 1 (src line 263)
+	.  reduce 1 (src line 264)
 
 
 state 3
 	ddl:  createTableStmt.    (2)
 
-	.  reduce 2 (src line 297)
+	.  reduce 2 (src line 298)
 
 
 state 4
 	ddl:  dropTableStmt.    (3)
 
-	.  reduce 3 (src line 306)
+	.  reduce 3 (src line 307)
 
 
 state 5
 	ddl:  alterTableAddStmt.    (4)
 
-	.  reduce 4 (src line 314)
+	.  reduce 4 (src line 315)
 
 
 state 6
-	createTableStmt:  CREATE.TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON 
-	createTableStmt:  CREATE.TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
+	ddl:  alterTableDropStmt.    (5)
 
-	TABLE  shift 9
-	.  error
+	.  reduce 5 (src line 323)
 
 
 state 7
-	dropTableStmt:  DROP.TABLE ID SEMICOLON 
+	createTableStmt:  CREATE.TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON 
+	createTableStmt:  CREATE.TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
 
 	TABLE  shift 10
 	.  error
 
 
 state 8
-	alterTableAddStmt:  ALTER.TABLE ID ADD attributeDeclaration SEMICOLON 
-	alterTableAddStmt:  ALTER.TABLE ID ADD constraintWithName SEMICOLON 
+	dropTableStmt:  DROP.TABLE ID SEMICOLON 
 
 	TABLE  shift 11
 	.  error
 
 
 state 9
-	createTableStmt:  CREATE TABLE.ID LPAREN attributeDeclarationList RPAREN SEMICOLON 
-	createTableStmt:  CREATE TABLE.ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
+	alterTableAddStmt:  ALTER.TABLE ID ADD attributeDeclaration SEMICOLON 
+	alterTableAddStmt:  ALTER.TABLE ID ADD constraintWithName SEMICOLON 
+	alterTableDropStmt:  ALTER.TABLE ID DROP ID SEMICOLON 
+	alterTableDropStmt:  ALTER.TABLE ID DROP CONSTRAINT ID SEMICOLON 
 
-	ID  shift 12
+	TABLE  shift 12
 	.  error
 
 
 state 10
-	dropTableStmt:  DROP TABLE.ID SEMICOLON 
+	createTableStmt:  CREATE TABLE.ID LPAREN attributeDeclarationList RPAREN SEMICOLON 
+	createTableStmt:  CREATE TABLE.ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
 
 	ID  shift 13
 	.  error
 
 
 state 11
-	alterTableAddStmt:  ALTER TABLE.ID ADD attributeDeclaration SEMICOLON 
-	alterTableAddStmt:  ALTER TABLE.ID ADD constraintWithName SEMICOLON 
+	dropTableStmt:  DROP TABLE.ID SEMICOLON 
 
 	ID  shift 14
 	.  error
 
 
 state 12
-	createTableStmt:  CREATE TABLE ID.LPAREN attributeDeclarationList RPAREN SEMICOLON 
-	createTableStmt:  CREATE TABLE ID.LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
+	alterTableAddStmt:  ALTER TABLE.ID ADD attributeDeclaration SEMICOLON 
+	alterTableAddStmt:  ALTER TABLE.ID ADD constraintWithName SEMICOLON 
+	alterTableDropStmt:  ALTER TABLE.ID DROP ID SEMICOLON 
+	alterTableDropStmt:  ALTER TABLE.ID DROP CONSTRAINT ID SEMICOLON 
 
-	LPAREN  shift 15
+	ID  shift 15
 	.  error
 
 
 state 13
-	dropTableStmt:  DROP TABLE ID.SEMICOLON 
+	createTableStmt:  CREATE TABLE ID.LPAREN attributeDeclarationList RPAREN SEMICOLON 
+	createTableStmt:  CREATE TABLE ID.LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
 
-	SEMICOLON  shift 16
+	LPAREN  shift 16
 	.  error
 
 
 state 14
-	alterTableAddStmt:  ALTER TABLE ID.ADD attributeDeclaration SEMICOLON 
-	alterTableAddStmt:  ALTER TABLE ID.ADD constraintWithName SEMICOLON 
+	dropTableStmt:  DROP TABLE ID.SEMICOLON 
 
-	ADD  shift 17
+	SEMICOLON  shift 17
 	.  error
 
 
 state 15
+	alterTableAddStmt:  ALTER TABLE ID.ADD attributeDeclaration SEMICOLON 
+	alterTableAddStmt:  ALTER TABLE ID.ADD constraintWithName SEMICOLON 
+	alterTableDropStmt:  ALTER TABLE ID.DROP ID SEMICOLON 
+	alterTableDropStmt:  ALTER TABLE ID.DROP CONSTRAINT ID SEMICOLON 
+
+	DROP  shift 19
+	ADD  shift 18
+	.  error
+
+
+state 16
 	createTableStmt:  CREATE TABLE ID LPAREN.attributeDeclarationList RPAREN SEMICOLON 
 	createTableStmt:  CREATE TABLE ID LPAREN.attributeDeclarationList COMMA constraintList RPAREN SEMICOLON 
 
-	ID  shift 20
+	ID  shift 22
 	.  error
 
-	attributeDeclarationList  goto 18
-	attributeDeclaration  goto 19
-
-state 16
-	dropTableStmt:  DROP TABLE ID SEMICOLON.    (11)
-
-	.  reduce 11 (src line 439)
-
+	attributeDeclarationList  goto 20
+	attributeDeclaration  goto 21
 
 state 17
+	dropTableStmt:  DROP TABLE ID SEMICOLON.    (12)
+
+	.  reduce 12 (src line 448)
+
+
+state 18
 	alterTableAddStmt:  ALTER TABLE ID ADD.attributeDeclaration SEMICOLON 
 	alterTableAddStmt:  ALTER TABLE ID ADD.constraintWithName SEMICOLON 
 
-	CONSTRAINT  shift 23
-	ID  shift 20
+	CONSTRAINT  shift 25
+	ID  shift 22
 	.  error
 
-	attributeDeclaration  goto 21
-	constraintWithName  goto 22
+	attributeDeclaration  goto 23
+	constraintWithName  goto 24
 
-state 18
+state 19
+	alterTableDropStmt:  ALTER TABLE ID DROP.ID SEMICOLON 
+	alterTableDropStmt:  ALTER TABLE ID DROP.CONSTRAINT ID SEMICOLON 
+
+	CONSTRAINT  shift 27
+	ID  shift 26
+	.  error
+
+
+state 20
 	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList.RPAREN SEMICOLON 
 	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList.COMMA constraintList RPAREN SEMICOLON 
 	attributeDeclarationList:  attributeDeclarationList.COMMA attributeDeclaration 
 
-	RPAREN  shift 24
-	COMMA  shift 25
+	RPAREN  shift 28
+	COMMA  shift 29
 	.  error
 
-
-state 19
-	attributeDeclarationList:  attributeDeclaration.    (7)
-
-	.  reduce 7 (src line 380)
-
-
-state 20
-	attributeDeclaration:  ID.domain 
-	attributeDeclaration:  ID.domain constraintAfterAttributeList 
-
-	CHAR  shift 27
-	VARCHAR  shift 28
-	BIT  shift 29
-	BITVARYING  shift 30
-	BOOLEAN  shift 31
-	INT  shift 32
-	INTEGER  shift 33
-	SHORTINT  shift 34
-	FLOAT  shift 35
-	REAL  shift 36
-	DOUBLEPRECISION  shift 37
-	DECIMAL  shift 38
-	NUMERIC  shift 39
-	TIME  shift 40
-	.  error
-
-	domain  goto 26
 
 state 21
-	alterTableAddStmt:  ALTER TABLE ID ADD attributeDeclaration.SEMICOLON 
+	attributeDeclarationList:  attributeDeclaration.    (8)
 
-	SEMICOLON  shift 41
-	.  error
+	.  reduce 8 (src line 389)
 
 
 state 22
-	alterTableAddStmt:  ALTER TABLE ID ADD constraintWithName.SEMICOLON 
+	attributeDeclaration:  ID.domain 
+	attributeDeclaration:  ID.domain constraintAfterAttributeList 
 
-	SEMICOLON  shift 42
+	CHAR  shift 31
+	VARCHAR  shift 32
+	BIT  shift 33
+	BITVARYING  shift 34
+	BOOLEAN  shift 35
+	INT  shift 36
+	INTEGER  shift 37
+	SHORTINT  shift 38
+	FLOAT  shift 39
+	REAL  shift 40
+	DOUBLEPRECISION  shift 41
+	DECIMAL  shift 42
+	NUMERIC  shift 43
+	TIME  shift 44
 	.  error
 
+	domain  goto 30
 
 state 23
-	constraintWithName:  CONSTRAINT.ID constraint 
+	alterTableAddStmt:  ALTER TABLE ID ADD attributeDeclaration.SEMICOLON 
 
-	ID  shift 43
+	SEMICOLON  shift 45
 	.  error
 
 
 state 24
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList RPAREN.SEMICOLON 
+	alterTableAddStmt:  ALTER TABLE ID ADD constraintWithName.SEMICOLON 
 
-	SEMICOLON  shift 44
+	SEMICOLON  shift 46
 	.  error
 
 
 state 25
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA.constraintList RPAREN SEMICOLON 
-	attributeDeclarationList:  attributeDeclarationList COMMA.attributeDeclaration 
+	constraintWithName:  CONSTRAINT.ID constraint 
 
-	UNIQUE  shift 49
-	PRIMARYKEY  shift 50
-	CHECK  shift 51
-	FOREIGNKEY  shift 52
-	CONSTRAINT  shift 23
-	ID  shift 20
+	ID  shift 47
 	.  error
 
-	attributeDeclaration  goto 46
-	constraintList  goto 45
-	constraint  goto 48
-	constraintWithName  goto 47
 
 state 26
-	attributeDeclaration:  ID domain.    (9)
-	attributeDeclaration:  ID domain.constraintAfterAttributeList 
+	alterTableDropStmt:  ALTER TABLE ID DROP ID.SEMICOLON 
 
-	DEFAULT  shift 57
-	UNIQUE  shift 58
-	PRIMARYKEY  shift 59
-	REFERENCES  shift 61
-	CONSTRAINT  shift 56
-	NOT  shift 60
-	.  reduce 9 (src line 393)
+	SEMICOLON  shift 48
+	.  error
 
-	constraintAfterAttributeList  goto 53
-	constraintAfterAttribute  goto 55
-	constraintAfterAttributeWithName  goto 54
 
 state 27
-	domain:  CHAR.    (102)
+	alterTableDropStmt:  ALTER TABLE ID DROP CONSTRAINT.ID SEMICOLON 
 
-	.  reduce 102 (src line 1608)
+	ID  shift 49
+	.  error
 
 
 state 28
-	domain:  VARCHAR.LPAREN INTVALUE RPAREN 
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList RPAREN.SEMICOLON 
 
-	LPAREN  shift 62
+	SEMICOLON  shift 50
 	.  error
 
 
 state 29
-	domain:  BIT.LPAREN INTVALUE RPAREN 
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA.constraintList RPAREN SEMICOLON 
+	attributeDeclarationList:  attributeDeclarationList COMMA.attributeDeclaration 
 
-	LPAREN  shift 63
+	UNIQUE  shift 55
+	PRIMARYKEY  shift 56
+	CHECK  shift 57
+	FOREIGNKEY  shift 58
+	CONSTRAINT  shift 25
+	ID  shift 22
 	.  error
 
+	attributeDeclaration  goto 52
+	constraintList  goto 51
+	constraint  goto 54
+	constraintWithName  goto 53
 
 state 30
-	domain:  BITVARYING.LPAREN INTVALUE RPAREN 
+	attributeDeclaration:  ID domain.    (10)
+	attributeDeclaration:  ID domain.constraintAfterAttributeList 
 
-	LPAREN  shift 64
-	.  error
+	DEFAULT  shift 63
+	UNIQUE  shift 64
+	PRIMARYKEY  shift 65
+	REFERENCES  shift 67
+	CONSTRAINT  shift 62
+	NOT  shift 66
+	.  reduce 10 (src line 402)
 
+	constraintAfterAttributeList  goto 59
+	constraintAfterAttribute  goto 61
+	constraintAfterAttributeWithName  goto 60
 
 state 31
-	domain:  BOOLEAN.    (106)
+	domain:  CHAR.    (105)
 
-	.  reduce 106 (src line 1640)
+	.  reduce 105 (src line 1645)
 
 
 state 32
-	domain:  INT.    (107)
+	domain:  VARCHAR.LPAREN INTVALUE RPAREN 
 
-	.  reduce 107 (src line 1647)
+	LPAREN  shift 68
+	.  error
 
 
 state 33
-	domain:  INTEGER.    (108)
+	domain:  BIT.LPAREN INTVALUE RPAREN 
 
-	.  reduce 108 (src line 1654)
+	LPAREN  shift 69
+	.  error
 
 
 state 34
-	domain:  SHORTINT.    (109)
-
-	.  reduce 109 (src line 1661)
-
-
-state 35
-	domain:  FLOAT.    (110)
-
-	.  reduce 110 (src line 1668)
-
-
-state 36
-	domain:  REAL.    (111)
-
-	.  reduce 111 (src line 1675)
-
-
-state 37
-	domain:  DOUBLEPRECISION.    (112)
-
-	.  reduce 112 (src line 1682)
-
-
-state 38
-	domain:  DECIMAL.LPAREN INTVALUE COMMA INTVALUE RPAREN 
-
-	LPAREN  shift 65
-	.  error
-
-
-state 39
-	domain:  NUMERIC.LPAREN INTVALUE COMMA INTVALUE RPAREN $$114 DATE 
-
-	LPAREN  shift 66
-	.  error
-
-
-state 40
-	domain:  TIME.    (116)
-
-	.  reduce 116 (src line 1714)
-
-
-state 41
-	alterTableAddStmt:  ALTER TABLE ID ADD attributeDeclaration SEMICOLON.    (12)
-
-	.  reduce 12 (src line 458)
-
-
-state 42
-	alterTableAddStmt:  ALTER TABLE ID ADD constraintWithName SEMICOLON.    (13)
-
-	.  reduce 13 (src line 474)
-
-
-state 43
-	constraintWithName:  CONSTRAINT ID.constraint 
-
-	UNIQUE  shift 49
-	PRIMARYKEY  shift 50
-	CHECK  shift 51
-	FOREIGNKEY  shift 52
-	.  error
-
-	constraint  goto 67
-
-state 44
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON.    (5)
-
-	.  reduce 5 (src line 343)
-
-
-state 45
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList.RPAREN SEMICOLON 
-	constraintList:  constraintList.COMMA constraintWithName 
-	constraintList:  constraintList.COMMA constraint 
-
-	RPAREN  shift 68
-	COMMA  shift 69
-	.  error
-
-
-state 46
-	attributeDeclarationList:  attributeDeclarationList COMMA attributeDeclaration.    (8)
-
-	.  reduce 8 (src line 386)
-
-
-state 47
-	constraintList:  constraintWithName.    (18)
-
-	.  reduce 18 (src line 589)
-
-
-state 48
-	constraintList:  constraint.    (19)
-
-	.  reduce 19 (src line 595)
-
-
-state 49
-	constraint:  UNIQUE.LPAREN attriNameList RPAREN 
+	domain:  BITVARYING.LPAREN INTVALUE RPAREN 
 
 	LPAREN  shift 70
 	.  error
 
 
-state 50
-	constraint:  PRIMARYKEY.LPAREN attriNameList RPAREN 
+state 35
+	domain:  BOOLEAN.    (109)
+
+	.  reduce 109 (src line 1677)
+
+
+state 36
+	domain:  INT.    (110)
+
+	.  reduce 110 (src line 1684)
+
+
+state 37
+	domain:  INTEGER.    (111)
+
+	.  reduce 111 (src line 1691)
+
+
+state 38
+	domain:  SHORTINT.    (112)
+
+	.  reduce 112 (src line 1698)
+
+
+state 39
+	domain:  FLOAT.    (113)
+
+	.  reduce 113 (src line 1705)
+
+
+state 40
+	domain:  REAL.    (114)
+
+	.  reduce 114 (src line 1712)
+
+
+state 41
+	domain:  DOUBLEPRECISION.    (115)
+
+	.  reduce 115 (src line 1719)
+
+
+state 42
+	domain:  DECIMAL.LPAREN INTVALUE COMMA INTVALUE RPAREN 
 
 	LPAREN  shift 71
 	.  error
 
 
-state 51
-	constraint:  CHECK.LPAREN condition RPAREN 
+state 43
+	domain:  NUMERIC.LPAREN INTVALUE COMMA INTVALUE RPAREN $$117 DATE 
 
 	LPAREN  shift 72
 	.  error
 
 
+state 44
+	domain:  TIME.    (119)
+
+	.  reduce 119 (src line 1751)
+
+
+state 45
+	alterTableAddStmt:  ALTER TABLE ID ADD attributeDeclaration SEMICOLON.    (13)
+
+	.  reduce 13 (src line 467)
+
+
+state 46
+	alterTableAddStmt:  ALTER TABLE ID ADD constraintWithName SEMICOLON.    (14)
+
+	.  reduce 14 (src line 483)
+
+
+state 47
+	constraintWithName:  CONSTRAINT ID.constraint 
+
+	UNIQUE  shift 55
+	PRIMARYKEY  shift 56
+	CHECK  shift 57
+	FOREIGNKEY  shift 58
+	.  error
+
+	constraint  goto 73
+
+state 48
+	alterTableDropStmt:  ALTER TABLE ID DROP ID SEMICOLON.    (15)
+
+	.  reduce 15 (src line 504)
+
+
+state 49
+	alterTableDropStmt:  ALTER TABLE ID DROP CONSTRAINT ID.SEMICOLON 
+
+	SEMICOLON  shift 74
+	.  error
+
+
+state 50
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON.    (6)
+
+	.  reduce 6 (src line 352)
+
+
+state 51
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList.RPAREN SEMICOLON 
+	constraintList:  constraintList.COMMA constraintWithName 
+	constraintList:  constraintList.COMMA constraint 
+
+	RPAREN  shift 75
+	COMMA  shift 76
+	.  error
+
+
 state 52
+	attributeDeclarationList:  attributeDeclarationList COMMA attributeDeclaration.    (9)
+
+	.  reduce 9 (src line 395)
+
+
+state 53
+	constraintList:  constraintWithName.    (21)
+
+	.  reduce 21 (src line 626)
+
+
+state 54
+	constraintList:  constraint.    (22)
+
+	.  reduce 22 (src line 632)
+
+
+state 55
+	constraint:  UNIQUE.LPAREN attriNameList RPAREN 
+
+	LPAREN  shift 77
+	.  error
+
+
+state 56
+	constraint:  PRIMARYKEY.LPAREN attriNameList RPAREN 
+
+	LPAREN  shift 78
+	.  error
+
+
+state 57
+	constraint:  CHECK.LPAREN condition RPAREN 
+
+	LPAREN  shift 79
+	.  error
+
+
+state 58
 	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN 
 	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet 
@@ -424,76 +474,76 @@ state 52
 	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY.LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	LPAREN  shift 73
+	LPAREN  shift 80
 	.  error
-
-
-state 53
-	attributeDeclaration:  ID domain constraintAfterAttributeList.    (10)
-	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttributeWithName 
-	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttribute 
-
-	DEFAULT  shift 57
-	UNIQUE  shift 58
-	PRIMARYKEY  shift 59
-	REFERENCES  shift 61
-	CONSTRAINT  shift 56
-	NOT  shift 60
-	.  reduce 10 (src line 403)
-
-	constraintAfterAttribute  goto 75
-	constraintAfterAttributeWithName  goto 74
-
-state 54
-	constraintAfterAttributeList:  constraintAfterAttributeWithName.    (14)
-
-	.  reduce 14 (src line 567)
-
-
-state 55
-	constraintAfterAttributeList:  constraintAfterAttribute.    (15)
-
-	.  reduce 15 (src line 573)
-
-
-state 56
-	constraintAfterAttributeWithName:  CONSTRAINT.ID constraintAfterAttribute 
-
-	ID  shift 76
-	.  error
-
-
-state 57
-	constraintAfterAttribute:  DEFAULT.elementaryValue 
-
-	INTVALUE  shift 78
-	FLOATVALUE  shift 79
-	STRINGVALUE  shift 80
-	BOOLVALUE  shift 81
-	.  error
-
-	elementaryValue  goto 77
-
-state 58
-	constraintAfterAttribute:  UNIQUE.    (44)
-
-	.  reduce 44 (src line 926)
 
 
 state 59
-	constraintAfterAttribute:  PRIMARYKEY.    (45)
+	attributeDeclaration:  ID domain constraintAfterAttributeList.    (11)
+	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttributeWithName 
+	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttribute 
 
-	.  reduce 45 (src line 934)
+	DEFAULT  shift 63
+	UNIQUE  shift 64
+	PRIMARYKEY  shift 65
+	REFERENCES  shift 67
+	CONSTRAINT  shift 62
+	NOT  shift 66
+	.  reduce 11 (src line 412)
 
+	constraintAfterAttribute  goto 82
+	constraintAfterAttributeWithName  goto 81
 
 state 60
-	constraintAfterAttribute:  NOT.NULLMARK 
+	constraintAfterAttributeList:  constraintAfterAttributeWithName.    (17)
 
-	NULLMARK  shift 82
-	.  error
+	.  reduce 17 (src line 604)
 
 
 state 61
+	constraintAfterAttributeList:  constraintAfterAttribute.    (18)
+
+	.  reduce 18 (src line 610)
+
+
+state 62
+	constraintAfterAttributeWithName:  CONSTRAINT.ID constraintAfterAttribute 
+
+	ID  shift 83
+	.  error
+
+
+state 63
+	constraintAfterAttribute:  DEFAULT.elementaryValue 
+
+	INTVALUE  shift 85
+	FLOATVALUE  shift 86
+	STRINGVALUE  shift 87
+	BOOLVALUE  shift 88
+	.  error
+
+	elementaryValue  goto 84
+
+state 64
+	constraintAfterAttribute:  UNIQUE.    (47)
+
+	.  reduce 47 (src line 963)
+
+
+state 65
+	constraintAfterAttribute:  PRIMARYKEY.    (48)
+
+	.  reduce 48 (src line 971)
+
+
+state 66
+	constraintAfterAttribute:  NOT.NULLMARK 
+
+	NULLMARK  shift 89
+	.  error
+
+
+state 67
 	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN 
 	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN setDeferrable 
 	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onUpdateSet 
@@ -511,102 +561,108 @@ state 61
 	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraintAfterAttribute:  REFERENCES.ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	ID  shift 83
+	ID  shift 90
 	.  error
-
-
-state 62
-	domain:  VARCHAR LPAREN.INTVALUE RPAREN 
-
-	INTVALUE  shift 84
-	.  error
-
-
-state 63
-	domain:  BIT LPAREN.INTVALUE RPAREN 
-
-	INTVALUE  shift 85
-	.  error
-
-
-state 64
-	domain:  BITVARYING LPAREN.INTVALUE RPAREN 
-
-	INTVALUE  shift 86
-	.  error
-
-
-state 65
-	domain:  DECIMAL LPAREN.INTVALUE COMMA INTVALUE RPAREN 
-
-	INTVALUE  shift 87
-	.  error
-
-
-state 66
-	domain:  NUMERIC LPAREN.INTVALUE COMMA INTVALUE RPAREN $$114 DATE 
-
-	INTVALUE  shift 88
-	.  error
-
-
-state 67
-	constraintWithName:  CONSTRAINT ID constraint.    (22)
-
-	.  reduce 22 (src line 611)
 
 
 state 68
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN.SEMICOLON 
+	domain:  VARCHAR LPAREN.INTVALUE RPAREN 
 
-	SEMICOLON  shift 89
+	INTVALUE  shift 91
 	.  error
 
 
 state 69
+	domain:  BIT LPAREN.INTVALUE RPAREN 
+
+	INTVALUE  shift 92
+	.  error
+
+
+state 70
+	domain:  BITVARYING LPAREN.INTVALUE RPAREN 
+
+	INTVALUE  shift 93
+	.  error
+
+
+state 71
+	domain:  DECIMAL LPAREN.INTVALUE COMMA INTVALUE RPAREN 
+
+	INTVALUE  shift 94
+	.  error
+
+
+state 72
+	domain:  NUMERIC LPAREN.INTVALUE COMMA INTVALUE RPAREN $$117 DATE 
+
+	INTVALUE  shift 95
+	.  error
+
+
+state 73
+	constraintWithName:  CONSTRAINT ID constraint.    (25)
+
+	.  reduce 25 (src line 648)
+
+
+state 74
+	alterTableDropStmt:  ALTER TABLE ID DROP CONSTRAINT ID SEMICOLON.    (16)
+
+	.  reduce 16 (src line 513)
+
+
+state 75
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN.SEMICOLON 
+
+	SEMICOLON  shift 96
+	.  error
+
+
+state 76
 	constraintList:  constraintList COMMA.constraintWithName 
 	constraintList:  constraintList COMMA.constraint 
 
-	UNIQUE  shift 49
-	PRIMARYKEY  shift 50
-	CHECK  shift 51
-	FOREIGNKEY  shift 52
-	CONSTRAINT  shift 23
+	UNIQUE  shift 55
+	PRIMARYKEY  shift 56
+	CHECK  shift 57
+	FOREIGNKEY  shift 58
+	CONSTRAINT  shift 25
 	.  error
 
-	constraint  goto 91
-	constraintWithName  goto 90
+	constraint  goto 98
+	constraintWithName  goto 97
 
-state 70
+state 77
 	constraint:  UNIQUE LPAREN.attriNameList RPAREN 
 
-	ID  shift 93
+	ID  shift 100
 	.  error
 
-	attriNameList  goto 92
+	attriNameList  goto 99
 
-state 71
+state 78
 	constraint:  PRIMARYKEY LPAREN.attriNameList RPAREN 
 
-	ID  shift 93
+	ID  shift 100
 	.  error
 
-	attriNameList  goto 94
+	attriNameList  goto 101
 
-state 72
+state 79
 	constraint:  CHECK LPAREN.condition RPAREN 
 
-	EXISTS  shift 100
-	LPAREN  shift 97
-	NOT  shift 99
-	ID  shift 101
+	EXISTS  shift 107
+	LPAREN  shift 104
+	NOT  shift 106
+	ID  shift 108
 	.  error
 
-	condition  goto 95
-	predicate  goto 96
-	attriNameOptionTableName  goto 98
+	condition  goto 102
+	predicate  goto 103
+	attriNameOptionTableName  goto 105
 
-state 73
+state 80
 	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN 
 	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet 
@@ -624,71 +680,71 @@ state 73
 	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN.ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	ID  shift 102
+	ID  shift 109
 	.  error
-
-
-state 74
-	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (16)
-
-	.  reduce 16 (src line 578)
-
-
-state 75
-	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (17)
-
-	.  reduce 17 (src line 582)
-
-
-state 76
-	constraintAfterAttributeWithName:  CONSTRAINT ID.constraintAfterAttribute 
-
-	DEFAULT  shift 57
-	UNIQUE  shift 58
-	PRIMARYKEY  shift 59
-	REFERENCES  shift 61
-	NOT  shift 60
-	.  error
-
-	constraintAfterAttribute  goto 103
-
-state 77
-	constraintAfterAttribute:  DEFAULT elementaryValue.    (43)
-
-	.  reduce 43 (src line 916)
-
-
-state 78
-	elementaryValue:  INTVALUE.    (120)
-
-	.  reduce 120 (src line 1778)
-
-
-state 79
-	elementaryValue:  FLOATVALUE.    (121)
-
-	.  reduce 121 (src line 1786)
-
-
-state 80
-	elementaryValue:  STRINGVALUE.    (122)
-
-	.  reduce 122 (src line 1793)
 
 
 state 81
-	elementaryValue:  BOOLVALUE.    (123)
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (19)
 
-	.  reduce 123 (src line 1800)
+	.  reduce 19 (src line 615)
 
 
 state 82
-	constraintAfterAttribute:  NOT NULLMARK.    (46)
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (20)
 
-	.  reduce 46 (src line 942)
+	.  reduce 20 (src line 619)
 
 
 state 83
+	constraintAfterAttributeWithName:  CONSTRAINT ID.constraintAfterAttribute 
+
+	DEFAULT  shift 63
+	UNIQUE  shift 64
+	PRIMARYKEY  shift 65
+	REFERENCES  shift 67
+	NOT  shift 66
+	.  error
+
+	constraintAfterAttribute  goto 110
+
+state 84
+	constraintAfterAttribute:  DEFAULT elementaryValue.    (46)
+
+	.  reduce 46 (src line 953)
+
+
+state 85
+	elementaryValue:  INTVALUE.    (123)
+
+	.  reduce 123 (src line 1815)
+
+
+state 86
+	elementaryValue:  FLOATVALUE.    (124)
+
+	.  reduce 124 (src line 1823)
+
+
+state 87
+	elementaryValue:  STRINGVALUE.    (125)
+
+	.  reduce 125 (src line 1830)
+
+
+state 88
+	elementaryValue:  BOOLVALUE.    (126)
+
+	.  reduce 126 (src line 1837)
+
+
+state 89
+	constraintAfterAttribute:  NOT NULLMARK.    (49)
+
+	.  reduce 49 (src line 979)
+
+
+state 90
 	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN 
 	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN setDeferrable 
 	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onUpdateSet 
@@ -706,123 +762,123 @@ state 83
 	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID.LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	LPAREN  shift 104
+	LPAREN  shift 111
 	.  error
-
-
-state 84
-	domain:  VARCHAR LPAREN INTVALUE.RPAREN 
-
-	RPAREN  shift 105
-	.  error
-
-
-state 85
-	domain:  BIT LPAREN INTVALUE.RPAREN 
-
-	RPAREN  shift 106
-	.  error
-
-
-state 86
-	domain:  BITVARYING LPAREN INTVALUE.RPAREN 
-
-	RPAREN  shift 107
-	.  error
-
-
-state 87
-	domain:  DECIMAL LPAREN INTVALUE.COMMA INTVALUE RPAREN 
-
-	COMMA  shift 108
-	.  error
-
-
-state 88
-	domain:  NUMERIC LPAREN INTVALUE.COMMA INTVALUE RPAREN $$114 DATE 
-
-	COMMA  shift 109
-	.  error
-
-
-state 89
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON.    (6)
-
-	.  reduce 6 (src line 359)
-
-
-state 90
-	constraintList:  constraintList COMMA constraintWithName.    (20)
-
-	.  reduce 20 (src line 600)
 
 
 state 91
-	constraintList:  constraintList COMMA constraint.    (21)
+	domain:  VARCHAR LPAREN INTVALUE.RPAREN 
 
-	.  reduce 21 (src line 604)
+	RPAREN  shift 112
+	.  error
 
 
 state 92
-	constraint:  UNIQUE LPAREN attriNameList.RPAREN 
-	attriNameList:  attriNameList.COMMA ID 
+	domain:  BIT LPAREN INTVALUE.RPAREN 
 
-	RPAREN  shift 110
-	COMMA  shift 111
-	.  error
-
-
-state 93
-	attriNameList:  ID.    (125)
-
-	.  reduce 125 (src line 1828)
-
-
-state 94
-	constraint:  PRIMARYKEY LPAREN attriNameList.RPAREN 
-	attriNameList:  attriNameList.COMMA ID 
-
-	RPAREN  shift 112
-	COMMA  shift 111
-	.  error
-
-
-state 95
-	constraint:  CHECK LPAREN condition.RPAREN 
-	condition:  condition.AND condition 
-	condition:  condition.OR condition 
-
-	AND  shift 114
-	OR  shift 115
 	RPAREN  shift 113
 	.  error
 
 
-state 96
-	condition:  predicate.    (70)
+state 93
+	domain:  BITVARYING LPAREN INTVALUE.RPAREN 
 
-	.  reduce 70 (src line 1251)
+	RPAREN  shift 114
+	.  error
+
+
+state 94
+	domain:  DECIMAL LPAREN INTVALUE.COMMA INTVALUE RPAREN 
+
+	COMMA  shift 115
+	.  error
+
+
+state 95
+	domain:  NUMERIC LPAREN INTVALUE.COMMA INTVALUE RPAREN $$117 DATE 
+
+	COMMA  shift 116
+	.  error
+
+
+state 96
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON.    (7)
+
+	.  reduce 7 (src line 368)
 
 
 state 97
+	constraintList:  constraintList COMMA constraintWithName.    (23)
+
+	.  reduce 23 (src line 637)
+
+
+state 98
+	constraintList:  constraintList COMMA constraint.    (24)
+
+	.  reduce 24 (src line 641)
+
+
+state 99
+	constraint:  UNIQUE LPAREN attriNameList.RPAREN 
+	attriNameList:  attriNameList.COMMA ID 
+
+	RPAREN  shift 117
+	COMMA  shift 118
+	.  error
+
+
+state 100
+	attriNameList:  ID.    (128)
+
+	.  reduce 128 (src line 1865)
+
+
+state 101
+	constraint:  PRIMARYKEY LPAREN attriNameList.RPAREN 
+	attriNameList:  attriNameList.COMMA ID 
+
+	RPAREN  shift 119
+	COMMA  shift 118
+	.  error
+
+
+state 102
+	constraint:  CHECK LPAREN condition.RPAREN 
+	condition:  condition.AND condition 
+	condition:  condition.OR condition 
+
+	AND  shift 121
+	OR  shift 122
+	RPAREN  shift 120
+	.  error
+
+
+state 103
+	condition:  predicate.    (73)
+
+	.  reduce 73 (src line 1288)
+
+
+state 104
 	condition:  LPAREN.condition RPAREN 
 	predicate:  LPAREN.attriNameOptionTableNameList RPAREN IN subQuery 
 	predicate:  LPAREN.attriNameOptionTableNameList RPAREN NOT IN subQuery 
 	predicate:  LPAREN.attriNameOptionTableNameList RPAREN IN ID 
 	predicate:  LPAREN.attriNameOptionTableNameList RPAREN NOT IN ID 
 
-	EXISTS  shift 100
-	LPAREN  shift 97
-	NOT  shift 99
-	ID  shift 101
+	EXISTS  shift 107
+	LPAREN  shift 104
+	NOT  shift 106
+	ID  shift 108
 	.  error
 
-	condition  goto 116
-	predicate  goto 96
-	attriNameOptionTableName  goto 118
-	attriNameOptionTableNameList  goto 117
+	condition  goto 123
+	predicate  goto 103
+	attriNameOptionTableName  goto 125
+	attriNameOptionTableNameList  goto 124
 
-state 98
+state 105
 	predicate:  attriNameOptionTableName.compareMark elementaryValue 
 	predicate:  attriNameOptionTableName.LIKE STRINGVALUE 
 	predicate:  attriNameOptionTableName.IN subQuery 
@@ -836,50 +892,50 @@ state 98
 	predicate:  attriNameOptionTableName.IS NULLMARK 
 	predicate:  attriNameOptionTableName.IS NOT NULLMARK 
 
-	LIKE  shift 120
-	IN  shift 121
-	IS  shift 123
-	NOTEQUAL  shift 125
-	LESS  shift 126
-	GREATER  shift 127
-	LESSEQUAL  shift 128
-	GREATEREQUAL  shift 129
-	EQUAL  shift 124
-	NOT  shift 122
+	LIKE  shift 127
+	IN  shift 128
+	IS  shift 130
+	NOTEQUAL  shift 132
+	LESS  shift 133
+	GREATER  shift 134
+	LESSEQUAL  shift 135
+	GREATEREQUAL  shift 136
+	EQUAL  shift 131
+	NOT  shift 129
 	.  error
 
-	compareMark  goto 119
+	compareMark  goto 126
 
-state 99
+state 106
 	predicate:  NOT.attriNameOptionTableName compareMark ALL subQuery 
 	predicate:  NOT.attriNameOptionTableName compareMark ANY subQuery 
 	predicate:  NOT.attriNameOptionTableName compareMark ALL ID 
 	predicate:  NOT.attriNameOptionTableName compareMark ANY ID 
 	predicate:  NOT.EXISTS subQuery 
 
-	EXISTS  shift 131
-	ID  shift 101
+	EXISTS  shift 138
+	ID  shift 108
 	.  error
 
-	attriNameOptionTableName  goto 130
+	attriNameOptionTableName  goto 137
 
-state 100
+state 107
 	predicate:  EXISTS.subQuery 
 
-	DOT  shift 133
+	DOT  shift 140
 	.  error
 
-	subQuery  goto 132
+	subQuery  goto 139
 
-state 101
-	attriNameOptionTableName:  ID.    (117)
+state 108
+	attriNameOptionTableName:  ID.    (120)
 	attriNameOptionTableName:  ID.DOT ID 
 
-	DOT  shift 134
-	.  reduce 117 (src line 1732)
+	DOT  shift 141
+	.  reduce 120 (src line 1769)
 
 
-state 102
+state 109
 	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN 
 	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet 
@@ -897,17 +953,17 @@ state 102
 	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID.RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	RPAREN  shift 135
+	RPAREN  shift 142
 	.  error
 
 
-state 103
-	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (42)
+state 110
+	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (45)
 
-	.  reduce 42 (src line 907)
+	.  reduce 45 (src line 944)
 
 
-state 104
+state 111
 	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN 
 	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN setDeferrable 
 	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onUpdateSet 
@@ -925,117 +981,117 @@ state 104
 	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN.ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	ID  shift 136
-	.  error
-
-
-state 105
-	domain:  VARCHAR LPAREN INTVALUE RPAREN.    (103)
-
-	.  reduce 103 (src line 1616)
-
-
-state 106
-	domain:  BIT LPAREN INTVALUE RPAREN.    (104)
-
-	.  reduce 104 (src line 1624)
-
-
-state 107
-	domain:  BITVARYING LPAREN INTVALUE RPAREN.    (105)
-
-	.  reduce 105 (src line 1632)
-
-
-state 108
-	domain:  DECIMAL LPAREN INTVALUE COMMA.INTVALUE RPAREN 
-
-	INTVALUE  shift 137
-	.  error
-
-
-state 109
-	domain:  NUMERIC LPAREN INTVALUE COMMA.INTVALUE RPAREN $$114 DATE 
-
-	INTVALUE  shift 138
-	.  error
-
-
-state 110
-	constraint:  UNIQUE LPAREN attriNameList RPAREN.    (23)
-
-	.  reduce 23 (src line 620)
-
-
-state 111
-	attriNameList:  attriNameList COMMA.ID 
-
-	ID  shift 139
+	ID  shift 143
 	.  error
 
 
 state 112
-	constraint:  PRIMARYKEY LPAREN attriNameList RPAREN.    (24)
+	domain:  VARCHAR LPAREN INTVALUE RPAREN.    (106)
 
-	.  reduce 24 (src line 630)
+	.  reduce 106 (src line 1653)
 
 
 state 113
-	constraint:  CHECK LPAREN condition RPAREN.    (25)
+	domain:  BIT LPAREN INTVALUE RPAREN.    (107)
 
-	.  reduce 25 (src line 639)
+	.  reduce 107 (src line 1661)
 
 
 state 114
-	condition:  condition AND.condition 
+	domain:  BITVARYING LPAREN INTVALUE RPAREN.    (108)
 
-	EXISTS  shift 100
-	LPAREN  shift 97
-	NOT  shift 99
-	ID  shift 101
-	.  error
+	.  reduce 108 (src line 1669)
 
-	condition  goto 140
-	predicate  goto 96
-	attriNameOptionTableName  goto 98
 
 state 115
-	condition:  condition OR.condition 
+	domain:  DECIMAL LPAREN INTVALUE COMMA.INTVALUE RPAREN 
 
-	EXISTS  shift 100
-	LPAREN  shift 97
-	NOT  shift 99
-	ID  shift 101
+	INTVALUE  shift 144
 	.  error
 
-	condition  goto 141
-	predicate  goto 96
-	attriNameOptionTableName  goto 98
 
 state 116
-	condition:  LPAREN condition.RPAREN 
-	condition:  condition.AND condition 
-	condition:  condition.OR condition 
+	domain:  NUMERIC LPAREN INTVALUE COMMA.INTVALUE RPAREN $$117 DATE 
 
-	AND  shift 114
-	OR  shift 115
-	RPAREN  shift 142
+	INTVALUE  shift 145
 	.  error
 
 
 state 117
+	constraint:  UNIQUE LPAREN attriNameList RPAREN.    (26)
+
+	.  reduce 26 (src line 657)
+
+
+state 118
+	attriNameList:  attriNameList COMMA.ID 
+
+	ID  shift 146
+	.  error
+
+
+state 119
+	constraint:  PRIMARYKEY LPAREN attriNameList RPAREN.    (27)
+
+	.  reduce 27 (src line 667)
+
+
+state 120
+	constraint:  CHECK LPAREN condition RPAREN.    (28)
+
+	.  reduce 28 (src line 676)
+
+
+state 121
+	condition:  condition AND.condition 
+
+	EXISTS  shift 107
+	LPAREN  shift 104
+	NOT  shift 106
+	ID  shift 108
+	.  error
+
+	condition  goto 147
+	predicate  goto 103
+	attriNameOptionTableName  goto 105
+
+state 122
+	condition:  condition OR.condition 
+
+	EXISTS  shift 107
+	LPAREN  shift 104
+	NOT  shift 106
+	ID  shift 108
+	.  error
+
+	condition  goto 148
+	predicate  goto 103
+	attriNameOptionTableName  goto 105
+
+state 123
+	condition:  LPAREN condition.RPAREN 
+	condition:  condition.AND condition 
+	condition:  condition.OR condition 
+
+	AND  shift 121
+	OR  shift 122
+	RPAREN  shift 149
+	.  error
+
+
+state 124
 	predicate:  LPAREN attriNameOptionTableNameList.RPAREN IN subQuery 
 	predicate:  LPAREN attriNameOptionTableNameList.RPAREN NOT IN subQuery 
 	predicate:  LPAREN attriNameOptionTableNameList.RPAREN IN ID 
 	predicate:  LPAREN attriNameOptionTableNameList.RPAREN NOT IN ID 
 	attriNameOptionTableNameList:  attriNameOptionTableNameList.COMMA attriNameOptionTableName 
 
-	RPAREN  shift 143
-	COMMA  shift 144
+	RPAREN  shift 150
+	COMMA  shift 151
 	.  error
 
 
-state 118
+state 125
 	predicate:  attriNameOptionTableName.compareMark elementaryValue 
 	predicate:  attriNameOptionTableName.LIKE STRINGVALUE 
 	predicate:  attriNameOptionTableName.IN subQuery 
@@ -1048,153 +1104,153 @@ state 118
 	predicate:  attriNameOptionTableName.compareMark ANY ID 
 	predicate:  attriNameOptionTableName.IS NULLMARK 
 	predicate:  attriNameOptionTableName.IS NOT NULLMARK 
-	attriNameOptionTableNameList:  attriNameOptionTableName.    (127)
+	attriNameOptionTableNameList:  attriNameOptionTableName.    (130)
 
-	LIKE  shift 120
-	IN  shift 121
-	IS  shift 123
-	NOTEQUAL  shift 125
-	LESS  shift 126
-	GREATER  shift 127
-	LESSEQUAL  shift 128
-	GREATEREQUAL  shift 129
-	EQUAL  shift 124
-	NOT  shift 122
-	.  reduce 127 (src line 1839)
+	LIKE  shift 127
+	IN  shift 128
+	IS  shift 130
+	NOTEQUAL  shift 132
+	LESS  shift 133
+	GREATER  shift 134
+	LESSEQUAL  shift 135
+	GREATEREQUAL  shift 136
+	EQUAL  shift 131
+	NOT  shift 129
+	.  reduce 130 (src line 1876)
 
-	compareMark  goto 119
+	compareMark  goto 126
 
-state 119
+state 126
 	predicate:  attriNameOptionTableName compareMark.elementaryValue 
 	predicate:  attriNameOptionTableName compareMark.ALL subQuery 
 	predicate:  attriNameOptionTableName compareMark.ANY subQuery 
 	predicate:  attriNameOptionTableName compareMark.ALL ID 
 	predicate:  attriNameOptionTableName compareMark.ANY ID 
 
-	ALL  shift 146
-	ANY  shift 147
-	INTVALUE  shift 78
-	FLOATVALUE  shift 79
-	STRINGVALUE  shift 80
-	BOOLVALUE  shift 81
+	ALL  shift 153
+	ANY  shift 154
+	INTVALUE  shift 85
+	FLOATVALUE  shift 86
+	STRINGVALUE  shift 87
+	BOOLVALUE  shift 88
 	.  error
 
-	elementaryValue  goto 145
-
-state 120
-	predicate:  attriNameOptionTableName LIKE.STRINGVALUE 
-
-	STRINGVALUE  shift 148
-	.  error
-
-
-state 121
-	predicate:  attriNameOptionTableName IN.subQuery 
-	predicate:  attriNameOptionTableName IN.ID 
-
-	DOT  shift 133
-	ID  shift 150
-	.  error
-
-	subQuery  goto 149
-
-state 122
-	predicate:  attriNameOptionTableName NOT.IN subQuery 
-	predicate:  attriNameOptionTableName NOT.IN ID 
-
-	IN  shift 151
-	.  error
-
-
-state 123
-	predicate:  attriNameOptionTableName IS.NULLMARK 
-	predicate:  attriNameOptionTableName IS.NOT NULLMARK 
-
-	NOT  shift 153
-	NULLMARK  shift 152
-	.  error
-
-
-state 124
-	compareMark:  EQUAL.    (96)
-
-	.  reduce 96 (src line 1553)
-
-
-state 125
-	compareMark:  NOTEQUAL.    (97)
-
-	.  reduce 97 (src line 1559)
-
-
-state 126
-	compareMark:  LESS.    (98)
-
-	.  reduce 98 (src line 1564)
-
+	elementaryValue  goto 152
 
 state 127
-	compareMark:  GREATER.    (99)
+	predicate:  attriNameOptionTableName LIKE.STRINGVALUE 
 
-	.  reduce 99 (src line 1569)
+	STRINGVALUE  shift 155
+	.  error
 
 
 state 128
-	compareMark:  LESSEQUAL.    (100)
+	predicate:  attriNameOptionTableName IN.subQuery 
+	predicate:  attriNameOptionTableName IN.ID 
 
-	.  reduce 100 (src line 1574)
+	DOT  shift 140
+	ID  shift 157
+	.  error
 
+	subQuery  goto 156
 
 state 129
-	compareMark:  GREATEREQUAL.    (101)
+	predicate:  attriNameOptionTableName NOT.IN subQuery 
+	predicate:  attriNameOptionTableName NOT.IN ID 
 
-	.  reduce 101 (src line 1579)
+	IN  shift 158
+	.  error
 
 
 state 130
+	predicate:  attriNameOptionTableName IS.NULLMARK 
+	predicate:  attriNameOptionTableName IS.NOT NULLMARK 
+
+	NOT  shift 160
+	NULLMARK  shift 159
+	.  error
+
+
+state 131
+	compareMark:  EQUAL.    (99)
+
+	.  reduce 99 (src line 1590)
+
+
+state 132
+	compareMark:  NOTEQUAL.    (100)
+
+	.  reduce 100 (src line 1596)
+
+
+state 133
+	compareMark:  LESS.    (101)
+
+	.  reduce 101 (src line 1601)
+
+
+state 134
+	compareMark:  GREATER.    (102)
+
+	.  reduce 102 (src line 1606)
+
+
+state 135
+	compareMark:  LESSEQUAL.    (103)
+
+	.  reduce 103 (src line 1611)
+
+
+state 136
+	compareMark:  GREATEREQUAL.    (104)
+
+	.  reduce 104 (src line 1616)
+
+
+state 137
 	predicate:  NOT attriNameOptionTableName.compareMark ALL subQuery 
 	predicate:  NOT attriNameOptionTableName.compareMark ANY subQuery 
 	predicate:  NOT attriNameOptionTableName.compareMark ALL ID 
 	predicate:  NOT attriNameOptionTableName.compareMark ANY ID 
 
-	NOTEQUAL  shift 125
-	LESS  shift 126
-	GREATER  shift 127
-	LESSEQUAL  shift 128
-	GREATEREQUAL  shift 129
-	EQUAL  shift 124
+	NOTEQUAL  shift 132
+	LESS  shift 133
+	GREATER  shift 134
+	LESSEQUAL  shift 135
+	GREATEREQUAL  shift 136
+	EQUAL  shift 131
 	.  error
 
-	compareMark  goto 154
+	compareMark  goto 161
 
-state 131
+state 138
 	predicate:  NOT EXISTS.subQuery 
 
-	DOT  shift 133
+	DOT  shift 140
 	.  error
 
-	subQuery  goto 155
+	subQuery  goto 162
 
-state 132
-	predicate:  EXISTS subQuery.    (94)
+state 139
+	predicate:  EXISTS subQuery.    (97)
 
-	.  reduce 94 (src line 1532)
-
-
-state 133
-	subQuery:  DOT.    (119)
-
-	.  reduce 119 (src line 1758)
+	.  reduce 97 (src line 1569)
 
 
-state 134
+state 140
+	subQuery:  DOT.    (122)
+
+	.  reduce 122 (src line 1795)
+
+
+state 141
 	attriNameOptionTableName:  ID DOT.ID 
 
-	ID  shift 156
+	ID  shift 163
 	.  error
 
 
-state 135
+state 142
 	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onUpdateSet 
@@ -1212,11 +1268,11 @@ state 135
 	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN.REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	REFERENCES  shift 157
+	REFERENCES  shift 164
 	.  error
 
 
-state 136
+state 143
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN setDeferrable 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onUpdateSet 
@@ -1234,162 +1290,162 @@ state 136
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID.RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	RPAREN  shift 158
+	RPAREN  shift 165
 	.  error
 
 
-state 137
+state 144
 	domain:  DECIMAL LPAREN INTVALUE COMMA INTVALUE.RPAREN 
 
-	RPAREN  shift 159
+	RPAREN  shift 166
 	.  error
 
 
-state 138
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE.RPAREN $$114 DATE 
+state 145
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE.RPAREN $$117 DATE 
 
-	RPAREN  shift 160
+	RPAREN  shift 167
 	.  error
 
 
-state 139
-	attriNameList:  attriNameList COMMA ID.    (124)
+state 146
+	attriNameList:  attriNameList COMMA ID.    (127)
 
-	.  reduce 124 (src line 1824)
+	.  reduce 127 (src line 1861)
 
 
-state 140
+state 147
 	condition:  condition.AND condition 
-	condition:  condition AND condition.    (72)
+	condition:  condition AND condition.    (75)
 	condition:  condition.OR condition 
 
-	.  reduce 72 (src line 1263)
+	.  reduce 75 (src line 1300)
 
 
-state 141
+state 148
 	condition:  condition.AND condition 
 	condition:  condition.OR condition 
-	condition:  condition OR condition.    (73)
+	condition:  condition OR condition.    (76)
 
-	.  reduce 73 (src line 1272)
-
-
-state 142
-	condition:  LPAREN condition RPAREN.    (71)
-
-	.  reduce 71 (src line 1260)
+	.  reduce 76 (src line 1309)
 
 
-state 143
+state 149
+	condition:  LPAREN condition RPAREN.    (74)
+
+	.  reduce 74 (src line 1297)
+
+
+state 150
 	predicate:  LPAREN attriNameOptionTableNameList RPAREN.IN subQuery 
 	predicate:  LPAREN attriNameOptionTableNameList RPAREN.NOT IN subQuery 
 	predicate:  LPAREN attriNameOptionTableNameList RPAREN.IN ID 
 	predicate:  LPAREN attriNameOptionTableNameList RPAREN.NOT IN ID 
 
-	IN  shift 161
-	NOT  shift 162
+	IN  shift 168
+	NOT  shift 169
 	.  error
-
-
-state 144
-	attriNameOptionTableNameList:  attriNameOptionTableNameList COMMA.attriNameOptionTableName 
-
-	ID  shift 101
-	.  error
-
-	attriNameOptionTableName  goto 163
-
-state 145
-	predicate:  attriNameOptionTableName compareMark elementaryValue.    (74)
-
-	.  reduce 74 (src line 1322)
-
-
-state 146
-	predicate:  attriNameOptionTableName compareMark ALL.subQuery 
-	predicate:  attriNameOptionTableName compareMark ALL.ID 
-
-	DOT  shift 133
-	ID  shift 165
-	.  error
-
-	subQuery  goto 164
-
-state 147
-	predicate:  attriNameOptionTableName compareMark ANY.subQuery 
-	predicate:  attriNameOptionTableName compareMark ANY.ID 
-
-	DOT  shift 133
-	ID  shift 167
-	.  error
-
-	subQuery  goto 166
-
-state 148
-	predicate:  attriNameOptionTableName LIKE STRINGVALUE.    (75)
-
-	.  reduce 75 (src line 1334)
-
-
-state 149
-	predicate:  attriNameOptionTableName IN subQuery.    (76)
-
-	.  reduce 76 (src line 1346)
-
-
-state 150
-	predicate:  attriNameOptionTableName IN ID.    (78)
-
-	.  reduce 78 (src line 1366)
 
 
 state 151
-	predicate:  attriNameOptionTableName NOT IN.subQuery 
-	predicate:  attriNameOptionTableName NOT IN.ID 
+	attriNameOptionTableNameList:  attriNameOptionTableNameList COMMA.attriNameOptionTableName 
 
-	DOT  shift 133
-	ID  shift 169
+	ID  shift 108
 	.  error
 
-	subQuery  goto 168
+	attriNameOptionTableName  goto 170
 
 state 152
-	predicate:  attriNameOptionTableName IS NULLMARK.    (88)
+	predicate:  attriNameOptionTableName compareMark elementaryValue.    (77)
 
-	.  reduce 88 (src line 1474)
+	.  reduce 77 (src line 1359)
 
 
 state 153
+	predicate:  attriNameOptionTableName compareMark ALL.subQuery 
+	predicate:  attriNameOptionTableName compareMark ALL.ID 
+
+	DOT  shift 140
+	ID  shift 172
+	.  error
+
+	subQuery  goto 171
+
+state 154
+	predicate:  attriNameOptionTableName compareMark ANY.subQuery 
+	predicate:  attriNameOptionTableName compareMark ANY.ID 
+
+	DOT  shift 140
+	ID  shift 174
+	.  error
+
+	subQuery  goto 173
+
+state 155
+	predicate:  attriNameOptionTableName LIKE STRINGVALUE.    (78)
+
+	.  reduce 78 (src line 1371)
+
+
+state 156
+	predicate:  attriNameOptionTableName IN subQuery.    (79)
+
+	.  reduce 79 (src line 1383)
+
+
+state 157
+	predicate:  attriNameOptionTableName IN ID.    (81)
+
+	.  reduce 81 (src line 1403)
+
+
+state 158
+	predicate:  attriNameOptionTableName NOT IN.subQuery 
+	predicate:  attriNameOptionTableName NOT IN.ID 
+
+	DOT  shift 140
+	ID  shift 176
+	.  error
+
+	subQuery  goto 175
+
+state 159
+	predicate:  attriNameOptionTableName IS NULLMARK.    (91)
+
+	.  reduce 91 (src line 1511)
+
+
+state 160
 	predicate:  attriNameOptionTableName IS NOT.NULLMARK 
 
-	NULLMARK  shift 170
+	NULLMARK  shift 177
 	.  error
 
 
-state 154
+state 161
 	predicate:  NOT attriNameOptionTableName compareMark.ALL subQuery 
 	predicate:  NOT attriNameOptionTableName compareMark.ANY subQuery 
 	predicate:  NOT attriNameOptionTableName compareMark.ALL ID 
 	predicate:  NOT attriNameOptionTableName compareMark.ANY ID 
 
-	ALL  shift 171
-	ANY  shift 172
+	ALL  shift 178
+	ANY  shift 179
 	.  error
 
 
-state 155
-	predicate:  NOT EXISTS subQuery.    (95)
+state 162
+	predicate:  NOT EXISTS subQuery.    (98)
 
-	.  reduce 95 (src line 1541)
-
-
-state 156
-	attriNameOptionTableName:  ID DOT ID.    (118)
-
-	.  reduce 118 (src line 1740)
+	.  reduce 98 (src line 1578)
 
 
-state 157
+state 163
+	attriNameOptionTableName:  ID DOT ID.    (121)
+
+	.  reduce 121 (src line 1777)
+
+
+state 164
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onUpdateSet 
@@ -1407,12 +1463,12 @@ state 157
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES.ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	ID  shift 173
+	ID  shift 180
 	.  error
 
 
-state 158
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.    (47)
+state 165
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.    (50)
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.setDeferrable 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet 
@@ -1429,120 +1485,120 @@ state 158
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet setDeferrable onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.onDeleteSet onUpdateSet setDeferrable 
 
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 47 (src line 950)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 50 (src line 987)
 
-	setDeferrable  goto 174
-	onUpdateSet  goto 175
-	onDeleteSet  goto 176
-
-state 159
-	domain:  DECIMAL LPAREN INTVALUE COMMA INTVALUE RPAREN.    (113)
-
-	.  reduce 113 (src line 1689)
-
-
-state 160
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN.$$114 DATE 
-	$$114: .    (114)
-
-	.  reduce 114 (src line 1698)
-
-	$$114  goto 184
-
-state 161
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN.subQuery 
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN.ID 
-
-	DOT  shift 133
-	ID  shift 186
-	.  error
-
-	subQuery  goto 185
-
-state 162
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT.IN subQuery 
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT.IN ID 
-
-	IN  shift 187
-	.  error
-
-
-state 163
-	attriNameOptionTableNameList:  attriNameOptionTableNameList COMMA attriNameOptionTableName.    (126)
-
-	.  reduce 126 (src line 1834)
-
-
-state 164
-	predicate:  attriNameOptionTableName compareMark ALL subQuery.    (80)
-
-	.  reduce 80 (src line 1386)
-
-
-state 165
-	predicate:  attriNameOptionTableName compareMark ALL ID.    (84)
-
-	.  reduce 84 (src line 1430)
-
+	setDeferrable  goto 181
+	onUpdateSet  goto 182
+	onDeleteSet  goto 183
 
 state 166
-	predicate:  attriNameOptionTableName compareMark ANY subQuery.    (82)
+	domain:  DECIMAL LPAREN INTVALUE COMMA INTVALUE RPAREN.    (116)
 
-	.  reduce 82 (src line 1408)
+	.  reduce 116 (src line 1726)
 
 
 state 167
-	predicate:  attriNameOptionTableName compareMark ANY ID.    (86)
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN.$$117 DATE 
+	$$117: .    (117)
 
-	.  reduce 86 (src line 1452)
+	.  reduce 117 (src line 1735)
 
+	$$117  goto 191
 
 state 168
-	predicate:  attriNameOptionTableName NOT IN subQuery.    (77)
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN.subQuery 
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN.ID 
 
-	.  reduce 77 (src line 1356)
+	DOT  shift 140
+	ID  shift 193
+	.  error
 
+	subQuery  goto 192
 
 state 169
-	predicate:  attriNameOptionTableName NOT IN ID.    (79)
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT.IN subQuery 
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT.IN ID 
 
-	.  reduce 79 (src line 1376)
+	IN  shift 194
+	.  error
 
 
 state 170
-	predicate:  attriNameOptionTableName IS NOT NULLMARK.    (89)
+	attriNameOptionTableNameList:  attriNameOptionTableNameList COMMA attriNameOptionTableName.    (129)
 
-	.  reduce 89 (src line 1483)
+	.  reduce 129 (src line 1871)
 
 
 state 171
+	predicate:  attriNameOptionTableName compareMark ALL subQuery.    (83)
+
+	.  reduce 83 (src line 1423)
+
+
+state 172
+	predicate:  attriNameOptionTableName compareMark ALL ID.    (87)
+
+	.  reduce 87 (src line 1467)
+
+
+state 173
+	predicate:  attriNameOptionTableName compareMark ANY subQuery.    (85)
+
+	.  reduce 85 (src line 1445)
+
+
+state 174
+	predicate:  attriNameOptionTableName compareMark ANY ID.    (89)
+
+	.  reduce 89 (src line 1489)
+
+
+state 175
+	predicate:  attriNameOptionTableName NOT IN subQuery.    (80)
+
+	.  reduce 80 (src line 1393)
+
+
+state 176
+	predicate:  attriNameOptionTableName NOT IN ID.    (82)
+
+	.  reduce 82 (src line 1413)
+
+
+state 177
+	predicate:  attriNameOptionTableName IS NOT NULLMARK.    (92)
+
+	.  reduce 92 (src line 1520)
+
+
+state 178
 	predicate:  NOT attriNameOptionTableName compareMark ALL.subQuery 
 	predicate:  NOT attriNameOptionTableName compareMark ALL.ID 
 
-	DOT  shift 133
-	ID  shift 189
+	DOT  shift 140
+	ID  shift 196
 	.  error
 
-	subQuery  goto 188
+	subQuery  goto 195
 
-state 172
+state 179
 	predicate:  NOT attriNameOptionTableName compareMark ANY.subQuery 
 	predicate:  NOT attriNameOptionTableName compareMark ANY.ID 
 
-	DOT  shift 133
-	ID  shift 191
+	DOT  shift 140
+	ID  shift 198
 	.  error
 
-	subQuery  goto 190
+	subQuery  goto 197
 
-state 173
+state 180
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onUpdateSet 
@@ -1560,156 +1616,156 @@ state 173
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID.LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	LPAREN  shift 192
+	LPAREN  shift 199
 	.  error
 
 
-state 174
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.    (48)
+state 181
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.    (51)
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet onDeleteSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet onUpdateSet 
 
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 48 (src line 960)
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 51 (src line 997)
 
-	onUpdateSet  goto 193
-	onDeleteSet  goto 194
+	onUpdateSet  goto 200
+	onDeleteSet  goto 201
 
-state 175
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.    (49)
+state 182
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.    (52)
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable onDeleteSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet setDeferrable 
 
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 49 (src line 973)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 52 (src line 1010)
 
-	setDeferrable  goto 195
-	onDeleteSet  goto 196
+	setDeferrable  goto 202
+	onDeleteSet  goto 203
 
-state 176
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.    (50)
+state 183
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.    (53)
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable onUpdateSet 
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet setDeferrable 
 
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	.  reduce 50 (src line 986)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	.  reduce 53 (src line 1023)
 
-	setDeferrable  goto 197
-	onUpdateSet  goto 198
-
-state 177
-	setDeferrable:  NOT_DEFERRABLE.    (63)
-
-	.  reduce 63 (src line 1194)
-
-
-state 178
-	setDeferrable:  DEFERED_DEFERRABLE.    (64)
-
-	.  reduce 64 (src line 1200)
-
-
-state 179
-	setDeferrable:  IMMEDIATE_DEFERRABLE.    (65)
-
-	.  reduce 65 (src line 1205)
-
-
-state 180
-	onUpdateSet:  UPDATE_NULL.    (66)
-
-	.  reduce 66 (src line 1213)
-
-
-state 181
-	onUpdateSet:  UPDATE_CASCADE.    (67)
-
-	.  reduce 67 (src line 1219)
-
-
-state 182
-	onDeleteSet:  DELETE_NULL.    (68)
-
-	.  reduce 68 (src line 1227)
-
-
-state 183
-	onDeleteSet:  DELETE_CASCADE.    (69)
-
-	.  reduce 69 (src line 1233)
-
+	setDeferrable  goto 204
+	onUpdateSet  goto 205
 
 state 184
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$114.DATE 
+	setDeferrable:  NOT_DEFERRABLE.    (66)
 
-	DATE  shift 199
-	.  error
+	.  reduce 66 (src line 1231)
 
 
 state 185
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN subQuery.    (90)
+	setDeferrable:  DEFERED_DEFERRABLE.    (67)
 
-	.  reduce 90 (src line 1492)
+	.  reduce 67 (src line 1237)
 
 
 state 186
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN ID.    (92)
+	setDeferrable:  IMMEDIATE_DEFERRABLE.    (68)
 
-	.  reduce 92 (src line 1512)
+	.  reduce 68 (src line 1242)
 
 
 state 187
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN.subQuery 
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN.ID 
+	onUpdateSet:  UPDATE_NULL.    (69)
 
-	DOT  shift 133
-	ID  shift 201
-	.  error
+	.  reduce 69 (src line 1250)
 
-	subQuery  goto 200
 
 state 188
-	predicate:  NOT attriNameOptionTableName compareMark ALL subQuery.    (81)
+	onUpdateSet:  UPDATE_CASCADE.    (70)
 
-	.  reduce 81 (src line 1397)
+	.  reduce 70 (src line 1256)
 
 
 state 189
-	predicate:  NOT attriNameOptionTableName compareMark ALL ID.    (85)
+	onDeleteSet:  DELETE_NULL.    (71)
 
-	.  reduce 85 (src line 1441)
+	.  reduce 71 (src line 1264)
 
 
 state 190
-	predicate:  NOT attriNameOptionTableName compareMark ANY subQuery.    (83)
+	onDeleteSet:  DELETE_CASCADE.    (72)
 
-	.  reduce 83 (src line 1419)
+	.  reduce 72 (src line 1270)
 
 
 state 191
-	predicate:  NOT attriNameOptionTableName compareMark ANY ID.    (87)
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$117.DATE 
 
-	.  reduce 87 (src line 1463)
+	DATE  shift 206
+	.  error
 
 
 state 192
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN subQuery.    (93)
+
+	.  reduce 93 (src line 1529)
+
+
+state 193
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN ID.    (95)
+
+	.  reduce 95 (src line 1549)
+
+
+state 194
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN.subQuery 
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN.ID 
+
+	DOT  shift 140
+	ID  shift 208
+	.  error
+
+	subQuery  goto 207
+
+state 195
+	predicate:  NOT attriNameOptionTableName compareMark ALL subQuery.    (84)
+
+	.  reduce 84 (src line 1434)
+
+
+state 196
+	predicate:  NOT attriNameOptionTableName compareMark ALL ID.    (88)
+
+	.  reduce 88 (src line 1478)
+
+
+state 197
+	predicate:  NOT attriNameOptionTableName compareMark ANY subQuery.    (86)
+
+	.  reduce 86 (src line 1456)
+
+
+state 198
+	predicate:  NOT attriNameOptionTableName compareMark ANY ID.    (90)
+
+	.  reduce 90 (src line 1500)
+
+
+state 199
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onUpdateSet 
@@ -1727,91 +1783,91 @@ state 192
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN.ID RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	ID  shift 202
+	ID  shift 209
 	.  error
 
 
-state 193
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.    (51)
+state 200
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.    (54)
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.onDeleteSet 
 
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 51 (src line 999)
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 54 (src line 1036)
 
-	onDeleteSet  goto 203
-
-state 194
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.    (52)
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.onUpdateSet 
-
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	.  reduce 52 (src line 1014)
-
-	onUpdateSet  goto 204
-
-state 195
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.    (53)
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.onDeleteSet 
-
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 53 (src line 1029)
-
-	onDeleteSet  goto 205
-
-state 196
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.    (54)
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.setDeferrable 
-
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	.  reduce 54 (src line 1044)
-
-	setDeferrable  goto 206
-
-state 197
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.    (55)
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.onUpdateSet 
-
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	.  reduce 55 (src line 1059)
-
-	onUpdateSet  goto 207
-
-state 198
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.    (56)
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.setDeferrable 
-
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	.  reduce 56 (src line 1074)
-
-	setDeferrable  goto 208
-
-state 199
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$114 DATE.    (115)
-
-	.  reduce 115 (src line 1707)
-
-
-state 200
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery.    (91)
-
-	.  reduce 91 (src line 1502)
-
+	onDeleteSet  goto 210
 
 state 201
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN ID.    (93)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.    (55)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.onUpdateSet 
 
-	.  reduce 93 (src line 1522)
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	.  reduce 55 (src line 1051)
 
+	onUpdateSet  goto 211
 
 state 202
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.    (56)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.onDeleteSet 
+
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 56 (src line 1066)
+
+	onDeleteSet  goto 212
+
+state 203
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.    (57)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	.  reduce 57 (src line 1081)
+
+	setDeferrable  goto 213
+
+state 204
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.    (58)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.onUpdateSet 
+
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	.  reduce 58 (src line 1096)
+
+	onUpdateSet  goto 214
+
+state 205
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.    (59)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	.  reduce 59 (src line 1111)
+
+	setDeferrable  goto 215
+
+state 206
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$117 DATE.    (118)
+
+	.  reduce 118 (src line 1744)
+
+
+state 207
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery.    (94)
+
+	.  reduce 94 (src line 1539)
+
+
+state 208
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN ID.    (96)
+
+	.  reduce 96 (src line 1559)
+
+
+state 209
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onUpdateSet 
@@ -1829,48 +1885,48 @@ state 202
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID.RPAREN onDeleteSet onUpdateSet setDeferrable 
 
-	RPAREN  shift 209
+	RPAREN  shift 216
 	.  error
 
 
-state 203
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet.    (57)
+state 210
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet.    (60)
 
-	.  reduce 57 (src line 1089)
-
-
-state 204
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet.    (58)
-
-	.  reduce 58 (src line 1106)
+	.  reduce 60 (src line 1126)
 
 
-state 205
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet.    (59)
+state 211
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet.    (61)
 
-	.  reduce 59 (src line 1123)
-
-
-state 206
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable.    (60)
-
-	.  reduce 60 (src line 1140)
+	.  reduce 61 (src line 1143)
 
 
-state 207
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet.    (61)
+state 212
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet.    (62)
 
-	.  reduce 61 (src line 1157)
-
-
-state 208
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable.    (62)
-
-	.  reduce 62 (src line 1174)
+	.  reduce 62 (src line 1160)
 
 
-state 209
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.    (26)
+state 213
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable.    (63)
+
+	.  reduce 63 (src line 1177)
+
+
+state 214
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet.    (64)
+
+	.  reduce 64 (src line 1194)
+
+
+state 215
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable.    (65)
+
+	.  reduce 65 (src line 1211)
+
+
+state 216
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.    (29)
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet 
@@ -1887,176 +1943,176 @@ state 209
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.onDeleteSet onUpdateSet setDeferrable 
 
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 26 (src line 648)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 29 (src line 685)
 
-	setDeferrable  goto 210
-	onUpdateSet  goto 211
-	onDeleteSet  goto 212
+	setDeferrable  goto 217
+	onUpdateSet  goto 218
+	onDeleteSet  goto 219
 
-state 210
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.    (27)
+state 217
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.    (30)
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onUpdateSet onDeleteSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable.onDeleteSet onUpdateSet 
 
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 27 (src line 659)
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 30 (src line 696)
 
-	onUpdateSet  goto 213
-	onDeleteSet  goto 214
+	onUpdateSet  goto 220
+	onDeleteSet  goto 221
 
-state 211
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.    (28)
+state 218
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.    (31)
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.setDeferrable onDeleteSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet.onDeleteSet setDeferrable 
 
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 28 (src line 672)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 31 (src line 709)
 
-	setDeferrable  goto 215
-	onDeleteSet  goto 216
+	setDeferrable  goto 222
+	onDeleteSet  goto 223
 
-state 212
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.    (29)
+state 219
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.    (32)
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.setDeferrable onUpdateSet 
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet.onUpdateSet setDeferrable 
 
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	.  reduce 29 (src line 686)
-
-	setDeferrable  goto 217
-	onUpdateSet  goto 218
-
-state 213
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.    (30)
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.onDeleteSet 
-
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 30 (src line 700)
-
-	onDeleteSet  goto 219
-
-state 214
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.    (31)
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.onUpdateSet 
-
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	.  reduce 31 (src line 716)
-
-	onUpdateSet  goto 220
-
-state 215
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.    (32)
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.onDeleteSet 
-
-	DELETE_NULL  shift 182
-	DELETE_CASCADE  shift 183
-	.  reduce 32 (src line 732)
-
-	onDeleteSet  goto 221
-
-state 216
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.    (33)
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.setDeferrable 
-
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	.  reduce 33 (src line 748)
-
-	setDeferrable  goto 222
-
-state 217
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.    (34)
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.onUpdateSet 
-
-	UPDATE_NULL  shift 180
-	UPDATE_CASCADE  shift 181
-	.  reduce 34 (src line 764)
-
-	onUpdateSet  goto 223
-
-state 218
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.    (35)
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.setDeferrable 
-
-	NOT_DEFERRABLE  shift 177
-	DEFERED_DEFERRABLE  shift 178
-	IMMEDIATE_DEFERRABLE  shift 179
-	.  reduce 35 (src line 780)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	.  reduce 32 (src line 723)
 
 	setDeferrable  goto 224
-
-state 219
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet.    (36)
-
-	.  reduce 36 (src line 796)
-
+	onUpdateSet  goto 225
 
 state 220
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet.    (37)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.    (33)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet.onDeleteSet 
 
-	.  reduce 37 (src line 814)
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 33 (src line 737)
 
+	onDeleteSet  goto 226
 
 state 221
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet.    (38)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.    (34)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet.onUpdateSet 
 
-	.  reduce 38 (src line 832)
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	.  reduce 34 (src line 753)
 
+	onUpdateSet  goto 227
 
 state 222
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable.    (39)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.    (35)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable.onDeleteSet 
 
-	.  reduce 39 (src line 850)
+	DELETE_NULL  shift 189
+	DELETE_CASCADE  shift 190
+	.  reduce 35 (src line 769)
 
+	onDeleteSet  goto 228
 
 state 223
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet.    (40)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.    (36)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet.setDeferrable 
 
-	.  reduce 40 (src line 868)
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	.  reduce 36 (src line 785)
 
+	setDeferrable  goto 229
 
 state 224
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable.    (41)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.    (37)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable.onUpdateSet 
 
-	.  reduce 41 (src line 886)
+	UPDATE_NULL  shift 187
+	UPDATE_CASCADE  shift 188
+	.  reduce 37 (src line 801)
+
+	onUpdateSet  goto 230
+
+state 225
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.    (38)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet.setDeferrable 
+
+	NOT_DEFERRABLE  shift 184
+	DEFERED_DEFERRABLE  shift 185
+	IMMEDIATE_DEFERRABLE  shift 186
+	.  reduce 38 (src line 817)
+
+	setDeferrable  goto 231
+
+state 226
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onUpdateSet onDeleteSet.    (39)
+
+	.  reduce 39 (src line 833)
 
 
-65 terminals, 27 nonterminals
-128 grammar rules, 225/16000 states
+state 227
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN setDeferrable onDeleteSet onUpdateSet.    (40)
+
+	.  reduce 40 (src line 851)
+
+
+state 228
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet setDeferrable onDeleteSet.    (41)
+
+	.  reduce 41 (src line 869)
+
+
+state 229
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onUpdateSet onDeleteSet setDeferrable.    (42)
+
+	.  reduce 42 (src line 887)
+
+
+state 230
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet setDeferrable onUpdateSet.    (43)
+
+	.  reduce 43 (src line 905)
+
+
+state 231
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN onDeleteSet onUpdateSet setDeferrable.    (44)
+
+	.  reduce 44 (src line 923)
+
+
+65 terminals, 28 nonterminals
+131 grammar rules, 232/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
-76 working sets used
-memory: parser 84/240000
+77 working sets used
+memory: parser 85/240000
 7 extra closures
-277 shift entries, 1 exceptions
-80 goto entries
+283 shift entries, 1 exceptions
+81 goto entries
 6 entries saved by goto default
-Optimizer space used: output 285/240000
-285 table entries, 0 zero
-maximum spread: 65, maximum offset: 218
+Optimizer space used: output 292/240000
+292 table entries, 0 zero
+maximum spread: 65, maximum offset: 225

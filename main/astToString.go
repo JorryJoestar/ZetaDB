@@ -155,7 +155,6 @@ func TableDropToString(table *parser.TableNode, tabs string) string {
 }
 
 func TableAlterAddToString(table *parser.TableNode, tabs string) string {
-	//TODO
 	s := tabs + "TableNode\n"
 	s += tabs + "TableName: " + table.TableName + "\n"
 	if len(table.AttributeNameList) != 0 {
@@ -180,8 +179,16 @@ func TableAlterAddToString(table *parser.TableNode, tabs string) string {
 }
 
 func TableAlterDropToString(table *parser.TableNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "TableNode\n"
+	s += tabs + "TableName: " + table.TableName + "\n"
+	if len(table.AttributeNameList) != 0 {
+		s += tabs + "AttributeNameList:\n"
+		for _, v := range table.AttributeNameList {
+			s += tabs + "\t" + v + "\n"
+		}
+	} else {
+		s += tabs + "ConstraintName: " + table.ConstraintName + "\n"
+	}
 	return s
 }
 

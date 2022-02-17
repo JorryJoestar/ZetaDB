@@ -316,7 +316,7 @@ const calcEofCode = 1
 const calcErrCode = 2
 const calcInitialStackSize = 16
 
-//line parser/grammar.y:1846
+//line parser/grammar.y:1883
 
 //line yacctab:1
 var calcExca = [...]int{
@@ -327,154 +327,160 @@ var calcExca = [...]int{
 
 const calcPrivate = 57344
 
-const calcLast = 285
+const calcLast = 292
 
 var calcAct = [...]int{
-	174, 132, 98, 119, 77, 175, 95, 55, 92, 22,
-	120, 121, 48, 100, 123, 176, 125, 126, 127, 128,
-	129, 124, 49, 50, 51, 52, 57, 58, 59, 133,
-	202, 61, 173, 133, 101, 47, 23, 156, 133, 201,
-	97, 56, 99, 191, 122, 101, 23, 133, 189, 133,
-	133, 131, 133, 57, 58, 59, 67, 186, 61, 169,
-	167, 75, 165, 27, 28, 29, 30, 31, 32, 33,
-	34, 35, 36, 37, 38, 39, 20, 40, 60, 90,
-	94, 133, 91, 101, 103, 143, 20, 139, 144, 112,
-	136, 150, 111, 110, 102, 93, 111, 161, 83, 76,
-	118, 43, 130, 68, 116, 60, 69, 24, 170, 20,
-	25, 209, 14, 13, 12, 153, 152, 146, 147, 109,
-	108, 140, 141, 149, 145, 114, 115, 114, 115, 82,
-	162, 160, 159, 155, 154, 78, 79, 80, 81, 158,
-	148, 135, 107, 78, 79, 80, 81, 163, 164, 166,
-	106, 105, 192, 168, 104, 73, 72, 71, 70, 138,
-	142, 157, 113, 185, 66, 65, 64, 63, 62, 15,
-	137, 88, 87, 188, 190, 86, 195, 197, 85, 84,
-	193, 133, 198, 134, 54, 199, 171, 172, 187, 200,
-	194, 196, 151, 49, 50, 51, 52, 206, 17, 208,
-	204, 182, 183, 207, 19, 180, 181, 23, 89, 203,
-	210, 205, 215, 217, 44, 211, 213, 222, 218, 224,
-	220, 42, 21, 223, 41, 212, 214, 216, 16, 219,
-	46, 221, 125, 126, 127, 128, 129, 124, 74, 177,
-	178, 179, 180, 181, 182, 183, 177, 178, 179, 11,
-	10, 182, 183, 180, 181, 182, 183, 177, 178, 179,
-	180, 181, 177, 178, 179, 49, 50, 51, 52, 6,
-	184, 9, 7, 8, 117, 26, 96, 45, 53, 5,
-	4, 18, 3, 2, 1,
+	181, 139, 105, 126, 84, 182, 102, 61, 99, 24,
+	209, 54, 127, 128, 27, 183, 130, 180, 132, 133,
+	134, 135, 136, 131, 55, 56, 57, 58, 107, 63,
+	64, 65, 140, 140, 67, 140, 138, 140, 25, 53,
+	140, 140, 208, 198, 62, 196, 129, 193, 140, 25,
+	176, 174, 140, 108, 26, 104, 163, 106, 172, 73,
+	108, 146, 157, 143, 63, 64, 65, 82, 108, 67,
+	150, 119, 117, 151, 118, 118, 199, 109, 22, 100,
+	90, 66, 83, 49, 177, 47, 97, 101, 98, 22,
+	22, 110, 31, 32, 33, 34, 35, 36, 37, 38,
+	39, 40, 41, 42, 43, 75, 44, 125, 76, 137,
+	28, 123, 15, 29, 89, 14, 66, 216, 13, 160,
+	159, 153, 154, 116, 115, 168, 121, 122, 147, 148,
+	156, 152, 121, 122, 85, 86, 87, 88, 167, 111,
+	162, 161, 166, 165, 142, 114, 113, 85, 86, 87,
+	88, 112, 80, 79, 170, 171, 173, 78, 169, 77,
+	175, 149, 72, 71, 70, 69, 145, 120, 68, 16,
+	192, 60, 155, 144, 95, 94, 93, 92, 91, 140,
+	195, 197, 141, 202, 204, 206, 194, 200, 158, 205,
+	132, 133, 134, 135, 136, 131, 207, 201, 203, 178,
+	179, 189, 190, 164, 213, 96, 215, 211, 74, 21,
+	214, 187, 188, 189, 190, 50, 210, 217, 212, 222,
+	224, 48, 218, 220, 229, 225, 231, 227, 23, 46,
+	230, 81, 219, 221, 223, 12, 226, 45, 228, 52,
+	55, 56, 57, 58, 184, 185, 186, 187, 188, 189,
+	190, 184, 185, 186, 25, 11, 189, 190, 184, 185,
+	186, 187, 188, 187, 188, 184, 185, 186, 55, 56,
+	57, 58, 19, 7, 18, 10, 8, 9, 17, 191,
+	124, 30, 103, 51, 59, 6, 5, 4, 20, 3,
+	2, 1,
 }
 
 var calcPact = [...]int{
-	265, -1000, -1000, -1000, -1000, -1000, 266, 245, 244, 49,
-	48, 47, 109, 222, 189, 44, -1000, 21, 46, -1000,
-	23, 218, 215, 36, 208, 11, 16, -1000, 108, 107,
-	106, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 105, 104,
-	-1000, -1000, -1000, 254, -1000, 42, -1000, -1000, -1000, 98,
-	97, 96, 95, 16, -1000, -1000, 34, 79, -1000, -1000,
-	66, 33, 123, 122, 119, 116, 115, -1000, 202, 182,
-	30, 30, -20, 29, -1000, -1000, 43, -1000, -1000, -1000,
-	-1000, -1000, -1000, 94, 90, 89, 81, 56, 55, -1000,
-	-1000, -1000, 32, -1000, 28, 101, -1000, -20, -18, 18,
-	126, 128, 80, -1000, 25, -1000, -1000, -1000, 114, 103,
-	-1000, 22, -1000, -1000, -20, -20, 99, 24, -18, 87,
-	82, 26, 163, 53, -1000, -1000, -1000, -1000, -1000, -1000,
-	198, 126, -1000, -1000, -28, 146, 78, 71, 70, -1000,
-	-1000, -1000, -1000, 68, -31, -1000, -3, -5, -1000, -1000,
-	-1000, -6, -1000, 45, 156, -1000, -1000, -33, 223, -1000,
-	-1000, -8, 159, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -17, -22, 92, 234, 230, 241, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, 132, -1000, -1000, -26, -1000, -1000,
-	-1000, -1000, -35, 180, 186, 180, 246, 186, 246, -1000,
-	-1000, -1000, 50, -1000, -1000, -1000, -1000, -1000, -1000, 223,
-	234, 230, 241, 180, 186, 180, 246, 186, 246, -1000,
-	-1000, -1000, -1000, -1000, -1000,
+	269, -1000, -1000, -1000, -1000, -1000, -1000, 270, 250, 230,
+	53, 50, 47, 109, 272, 265, 25, -1000, 24, -11,
+	49, -1000, 52, 231, 223, 20, 215, 18, 209, 13,
+	19, -1000, 108, 105, 104, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, 103, 102, -1000, -1000, -1000, 257, -1000, 202,
+	-1000, 44, -1000, -1000, -1000, 99, 97, 93, 92, 19,
+	-1000, -1000, 17, 78, -1000, -1000, 51, 15, 122, 121,
+	120, 119, 118, -1000, -1000, 199, 229, 14, 14, -5,
+	12, -1000, -1000, 54, -1000, -1000, -1000, -1000, -1000, -1000,
+	79, 90, 85, 84, 60, 59, -1000, -1000, -1000, 11,
+	-1000, 10, 106, -1000, -5, -16, 3, 124, 127, 83,
+	-1000, -2, -1000, -1000, -1000, 117, 110, -1000, -4, -1000,
+	-1000, -5, -5, 100, 9, -16, 91, 114, -3, 159,
+	57, -1000, -1000, -1000, -1000, -1000, -1000, 156, 124, -1000,
+	-1000, -9, 188, 82, 81, 77, -1000, -1000, -1000, -1000,
+	96, -12, -1000, -7, -14, -1000, -1000, -1000, -15, -1000,
+	21, 169, -1000, -1000, -48, 228, -1000, -1000, -18, 157,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -20, -22,
+	16, 192, 235, 242, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, 132, -1000, -1000, -23, -1000, -1000, -1000, -1000, -55,
+	180, 244, 180, 249, 244, 249, -1000, -1000, -1000, 56,
+	-1000, -1000, -1000, -1000, -1000, -1000, 228, 192, 235, 242,
+	180, 244, 180, 249, 244, 249, -1000, -1000, -1000, -1000,
+	-1000, -1000,
 }
 
 var calcPgo = [...]int{
-	0, 284, 283, 282, 281, 204, 280, 279, 278, 7,
-	184, 277, 12, 9, 0, 5, 15, 6, 276, 3,
-	275, 2, 1, 4, 274, 8, 270,
+	0, 291, 290, 289, 288, 209, 287, 286, 285, 284,
+	7, 171, 283, 11, 9, 0, 5, 15, 6, 282,
+	3, 281, 2, 1, 4, 280, 8, 279,
 }
 
 var calcR1 = [...]int{
-	0, 1, 2, 2, 2, 3, 3, 4, 4, 5,
-	5, 6, 7, 7, 8, 8, 8, 8, 11, 11,
-	11, 11, 13, 12, 12, 12, 12, 12, 12, 12,
-	12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
-	12, 12, 10, 9, 9, 9, 9, 9, 9, 9,
-	9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-	9, 9, 9, 14, 14, 14, 15, 15, 16, 16,
-	17, 17, 17, 17, 18, 18, 18, 18, 18, 18,
-	18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
-	18, 18, 18, 18, 18, 18, 19, 19, 19, 19,
-	19, 19, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 26, 20, 20, 21, 21, 22,
-	23, 23, 23, 23, 25, 25, 24, 24,
+	0, 1, 2, 2, 2, 2, 3, 3, 4, 4,
+	5, 5, 6, 7, 7, 8, 8, 9, 9, 9,
+	9, 12, 12, 12, 12, 14, 13, 13, 13, 13,
+	13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+	13, 13, 13, 13, 13, 11, 10, 10, 10, 10,
+	10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+	10, 10, 10, 10, 10, 10, 15, 15, 15, 16,
+	16, 17, 17, 18, 18, 18, 18, 19, 19, 19,
+	19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+	19, 19, 19, 19, 19, 19, 19, 19, 19, 20,
+	20, 20, 20, 20, 20, 21, 21, 21, 21, 21,
+	21, 21, 21, 21, 21, 21, 21, 27, 21, 21,
+	22, 22, 23, 24, 24, 24, 24, 26, 26, 25,
+	25,
 }
 
 var calcR2 = [...]int{
-	0, 1, 1, 1, 1, 7, 9, 1, 3, 2,
-	3, 4, 6, 6, 1, 1, 2, 2, 1, 1,
-	3, 3, 3, 4, 4, 4, 9, 10, 10, 10,
-	11, 11, 11, 11, 11, 11, 12, 12, 12, 12,
-	12, 12, 3, 2, 1, 1, 2, 5, 6, 6,
-	6, 7, 7, 7, 7, 7, 7, 8, 8, 8,
-	8, 8, 8, 1, 1, 1, 1, 1, 1, 1,
-	1, 3, 3, 3, 3, 3, 3, 4, 3, 4,
-	4, 5, 4, 5, 4, 5, 4, 5, 3, 4,
-	5, 6, 5, 6, 2, 3, 1, 1, 1, 1,
-	1, 1, 1, 4, 4, 4, 1, 1, 1, 1,
-	1, 1, 1, 6, 0, 8, 1, 1, 3, 1,
-	1, 1, 1, 1, 3, 1, 3, 1,
+	0, 1, 1, 1, 1, 1, 7, 9, 1, 3,
+	2, 3, 4, 6, 6, 6, 7, 1, 1, 2,
+	2, 1, 1, 3, 3, 3, 4, 4, 4, 9,
+	10, 10, 10, 11, 11, 11, 11, 11, 11, 12,
+	12, 12, 12, 12, 12, 3, 2, 1, 1, 2,
+	5, 6, 6, 6, 7, 7, 7, 7, 7, 7,
+	8, 8, 8, 8, 8, 8, 1, 1, 1, 1,
+	1, 1, 1, 1, 3, 3, 3, 3, 3, 3,
+	4, 3, 4, 4, 5, 4, 5, 4, 5, 4,
+	5, 3, 4, 5, 6, 5, 6, 2, 3, 1,
+	1, 1, 1, 1, 1, 1, 4, 4, 4, 1,
+	1, 1, 1, 1, 1, 1, 6, 0, 8, 1,
+	1, 3, 1, 1, 1, 1, 1, 3, 1, 3,
+	1,
 }
 
 var calcChk = [...]int{
-	-1000, -1, -2, -3, -6, -7, 4, 7, 8, 5,
-	5, 5, 65, 65, 65, 60, 6, 9, -4, -5,
-	65, -5, -13, 25, 61, 64, -20, 40, 41, 42,
-	43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
-	54, 6, 6, 65, 6, -11, -5, -13, -12, 11,
-	12, 13, 14, -8, -10, -9, 25, 10, 11, 12,
-	62, 15, 60, 60, 60, 60, 60, -12, 61, 64,
-	60, 60, 60, 60, -10, -9, 65, -23, 56, 57,
-	58, 59, 63, 65, 56, 56, 56, 56, 56, 6,
-	-13, -12, -25, 65, -25, -17, -18, 60, -21, 62,
-	33, 65, 65, -9, 60, 61, 61, 61, 64, 64,
-	61, 64, 61, 61, 26, 27, -17, -24, -21, -19,
-	28, 29, 62, 32, 39, 34, 35, 36, 37, 38,
-	-21, 33, -22, 55, 55, 61, 65, 56, 56, 65,
-	-17, -17, 61, 61, 64, -23, 30, 31, 58, -22,
-	65, 29, 63, 62, -19, -22, 65, 15, 61, 61,
-	61, 29, 62, -21, -22, 65, -22, 65, -22, 65,
-	63, 30, 31, 65, -14, -15, -16, 16, 17, 18,
-	19, 20, 21, 22, -26, -22, 65, 29, -22, 65,
-	-22, 65, 60, -15, -16, -14, -16, -14, -15, 53,
-	-22, 65, 65, -16, -15, -16, -14, -15, -14, 61,
-	-14, -15, -16, -15, -16, -14, -16, -14, -15, -16,
-	-15, -16, -14, -15, -14,
+	-1000, -1, -2, -3, -6, -7, -8, 4, 7, 8,
+	5, 5, 5, 65, 65, 65, 60, 6, 9, 7,
+	-4, -5, 65, -5, -14, 25, 65, 25, 61, 64,
+	-21, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+	49, 50, 51, 52, 54, 6, 6, 65, 6, 65,
+	6, -12, -5, -14, -13, 11, 12, 13, 14, -9,
+	-11, -10, 25, 10, 11, 12, 62, 15, 60, 60,
+	60, 60, 60, -13, 6, 61, 64, 60, 60, 60,
+	60, -11, -10, 65, -24, 56, 57, 58, 59, 63,
+	65, 56, 56, 56, 56, 56, 6, -14, -13, -26,
+	65, -26, -18, -19, 60, -22, 62, 33, 65, 65,
+	-10, 60, 61, 61, 61, 64, 64, 61, 64, 61,
+	61, 26, 27, -18, -25, -22, -20, 28, 29, 62,
+	32, 39, 34, 35, 36, 37, 38, -22, 33, -23,
+	55, 55, 61, 65, 56, 56, 65, -18, -18, 61,
+	61, 64, -24, 30, 31, 58, -23, 65, 29, 63,
+	62, -20, -23, 65, 15, 61, 61, 61, 29, 62,
+	-22, -23, 65, -23, 65, -23, 65, 63, 30, 31,
+	65, -15, -16, -17, 16, 17, 18, 19, 20, 21,
+	22, -27, -23, 65, 29, -23, 65, -23, 65, 60,
+	-16, -17, -15, -17, -15, -16, 53, -23, 65, 65,
+	-17, -16, -17, -15, -16, -15, 61, -15, -16, -17,
+	-16, -17, -15, -17, -15, -16, -17, -16, -17, -15,
+	-16, -15,
 }
 
 var calcDef = [...]int{
-	0, -2, 1, 2, 3, 4, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 11, 0, 0, 7,
-	0, 0, 0, 0, 0, 0, 9, 102, 0, 0,
-	0, 106, 107, 108, 109, 110, 111, 112, 0, 0,
-	116, 12, 13, 0, 5, 0, 8, 18, 19, 0,
-	0, 0, 0, 10, 14, 15, 0, 0, 44, 45,
-	0, 0, 0, 0, 0, 0, 0, 22, 0, 0,
-	0, 0, 0, 0, 16, 17, 0, 43, 120, 121,
-	122, 123, 46, 0, 0, 0, 0, 0, 0, 6,
-	20, 21, 0, 125, 0, 0, 70, 0, 0, 0,
-	0, 117, 0, 42, 0, 103, 104, 105, 0, 0,
-	23, 0, 24, 25, 0, 0, 0, 0, 127, 0,
-	0, 0, 0, 0, 96, 97, 98, 99, 100, 101,
-	0, 0, 94, 119, 0, 0, 0, 0, 0, 124,
-	72, 73, 71, 0, 0, 74, 0, 0, 75, 76,
-	78, 0, 88, 0, 0, 95, 118, 0, 47, 113,
-	114, 0, 0, 126, 80, 84, 82, 86, 77, 79,
-	89, 0, 0, 0, 48, 49, 50, 63, 64, 65,
-	66, 67, 68, 69, 0, 90, 92, 0, 81, 85,
-	83, 87, 0, 51, 52, 53, 54, 55, 56, 115,
-	91, 93, 0, 57, 58, 59, 60, 61, 62, 26,
-	27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-	37, 38, 39, 40, 41,
+	0, -2, 1, 2, 3, 4, 5, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 12, 0, 0,
+	0, 8, 0, 0, 0, 0, 0, 0, 0, 0,
+	10, 105, 0, 0, 0, 109, 110, 111, 112, 113,
+	114, 115, 0, 0, 119, 13, 14, 0, 15, 0,
+	6, 0, 9, 21, 22, 0, 0, 0, 0, 11,
+	17, 18, 0, 0, 47, 48, 0, 0, 0, 0,
+	0, 0, 0, 25, 16, 0, 0, 0, 0, 0,
+	0, 19, 20, 0, 46, 123, 124, 125, 126, 49,
+	0, 0, 0, 0, 0, 0, 7, 23, 24, 0,
+	128, 0, 0, 73, 0, 0, 0, 0, 120, 0,
+	45, 0, 106, 107, 108, 0, 0, 26, 0, 27,
+	28, 0, 0, 0, 0, 130, 0, 0, 0, 0,
+	0, 99, 100, 101, 102, 103, 104, 0, 0, 97,
+	122, 0, 0, 0, 0, 0, 127, 75, 76, 74,
+	0, 0, 77, 0, 0, 78, 79, 81, 0, 91,
+	0, 0, 98, 121, 0, 50, 116, 117, 0, 0,
+	129, 83, 87, 85, 89, 80, 82, 92, 0, 0,
+	0, 51, 52, 53, 66, 67, 68, 69, 70, 71,
+	72, 0, 93, 95, 0, 84, 88, 86, 90, 0,
+	54, 55, 56, 57, 58, 59, 118, 94, 96, 0,
+	60, 61, 62, 63, 64, 65, 29, 30, 31, 32,
+	33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+	43, 44,
 }
 
 var calcTok1 = [...]int{
@@ -834,7 +840,7 @@ calcdefault:
 
 	case 1:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:264
+//line parser/grammar.y:265
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = AST_NODE
@@ -847,7 +853,7 @@ calcdefault:
 		}
 	case 2:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:298
+//line parser/grammar.y:299
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DDL_NODE
@@ -858,7 +864,7 @@ calcdefault:
 		}
 	case 3:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:306
+//line parser/grammar.y:307
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DDL_NODE
@@ -869,7 +875,7 @@ calcdefault:
 		}
 	case 4:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:314
+//line parser/grammar.y:315
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DDL_NODE
@@ -879,8 +885,19 @@ calcdefault:
 			calcVAL.NodePt.Ddl.Table = calcDollar[1].NodePt.Table
 		}
 	case 5:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:323
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = DDL_NODE
+
+			calcVAL.NodePt.Ddl = &DDLNode{}
+			calcVAL.NodePt.Ddl.Type = DDL_TABLE_ALTER_DROP
+			calcVAL.NodePt.Ddl.Table = calcDollar[1].NodePt.Table
+		}
+	case 6:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:344
+//line parser/grammar.y:353
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = TABLE_NODE
@@ -896,9 +913,9 @@ calcdefault:
 				}
 			}
 		}
-	case 6:
+	case 7:
 		calcDollar = calcS[calcpt-9 : calcpt+1]
-//line parser/grammar.y:359
+//line parser/grammar.y:368
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = TABLE_NODE
@@ -917,24 +934,24 @@ calcdefault:
 			calcVAL.NodePt.Table.ConstraintListValid = true
 			calcVAL.NodePt.Table.ConstraintList = append(calcVAL.NodePt.Table.ConstraintList, calcDollar[7].List.ConstraintList...)
 		}
-	case 7:
+	case 8:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:381
+//line parser/grammar.y:390
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = ATTRIBUTE_DECLARATION_LIST
 			calcVAL.List.AttributeDeclarationList = append(calcVAL.List.AttributeDeclarationList, calcDollar[1].NodePt.AttributeDeclaration)
 		}
-	case 8:
+	case 9:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:386
+//line parser/grammar.y:395
 		{
 			calcVAL.List = calcDollar[1].List
 			calcVAL.List.AttributeDeclarationList = append(calcVAL.List.AttributeDeclarationList, calcDollar[3].NodePt.AttributeDeclaration)
 		}
-	case 9:
+	case 10:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:394
+//line parser/grammar.y:403
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ATTRIBUTE_DECLARATION_NODE
@@ -944,9 +961,9 @@ calcdefault:
 			calcVAL.NodePt.AttributeDeclaration.Domain = calcDollar[2].NodePt.Domain
 			calcVAL.NodePt.AttributeDeclaration.ConstraintAfterAttributeListValid = false
 		}
-	case 10:
+	case 11:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:403
+//line parser/grammar.y:412
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ATTRIBUTE_DECLARATION_NODE
@@ -973,9 +990,9 @@ calcdefault:
 				}
 			}
 		}
-	case 11:
+	case 12:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:440
+//line parser/grammar.y:449
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = TABLE_NODE
@@ -983,9 +1000,9 @@ calcdefault:
 			calcVAL.NodePt.Table = &TableNode{}
 			calcVAL.NodePt.Table.TableName = calcDollar[3].String
 		}
-	case 12:
+	case 13:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:459
+//line parser/grammar.y:468
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = TABLE_NODE
@@ -1001,9 +1018,9 @@ calcdefault:
 			}
 
 		}
-	case 13:
+	case 14:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:474
+//line parser/grammar.y:483
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = TABLE_NODE
@@ -1014,77 +1031,99 @@ calcdefault:
 			calcVAL.NodePt.Table.ConstraintListValid = true
 			calcVAL.NodePt.Table.ConstraintList = append(calcVAL.NodePt.Table.ConstraintList, calcDollar[5].NodePt.Constraint)
 		}
-	case 14:
-		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:568
-		{
-			calcVAL.List = List{}
-			calcVAL.List.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
-			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[1].NodePt.Constraint)
-		}
 	case 15:
-		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:573
+		calcDollar = calcS[calcpt-6 : calcpt+1]
+//line parser/grammar.y:505
 		{
-			calcVAL.List = List{}
-			calcVAL.List.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
-			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[1].NodePt.Constraint)
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = TABLE_NODE
+
+			calcVAL.NodePt.Table = &TableNode{}
+			calcVAL.NodePt.Table.TableName = calcDollar[3].String
+			calcVAL.NodePt.Table.AttributeNameList = append(calcVAL.NodePt.Table.AttributeNameList, calcDollar[5].String)
 		}
 	case 16:
-		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:578
+		calcDollar = calcS[calcpt-7 : calcpt+1]
+//line parser/grammar.y:513
 		{
-			calcVAL.List = calcDollar[1].List
-			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[2].NodePt.Constraint)
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = TABLE_NODE
+
+			calcVAL.NodePt.Table = &TableNode{}
+			calcVAL.NodePt.Table.TableName = calcDollar[3].String
+			calcVAL.NodePt.Table.ConstraintName = calcDollar[6].String
 		}
 	case 17:
-		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:582
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:605
 		{
-			calcVAL.List = calcDollar[1].List
-			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[2].NodePt.Constraint)
+			calcVAL.List = List{}
+			calcVAL.List.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
+			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[1].NodePt.Constraint)
 		}
 	case 18:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:590
+//line parser/grammar.y:610
 		{
 			calcVAL.List = List{}
-			calcVAL.List.Type = CONSTRAINT_LIST
-			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[1].NodePt.Constraint)
+			calcVAL.List.Type = CONSTRAINT_AFTER_ATTRIBUTE_LIST
+			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[1].NodePt.Constraint)
 		}
 	case 19:
+		calcDollar = calcS[calcpt-2 : calcpt+1]
+//line parser/grammar.y:615
+		{
+			calcVAL.List = calcDollar[1].List
+			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[2].NodePt.Constraint)
+		}
+	case 20:
+		calcDollar = calcS[calcpt-2 : calcpt+1]
+//line parser/grammar.y:619
+		{
+			calcVAL.List = calcDollar[1].List
+			calcVAL.List.ConstraintAfterAttributeList = append(calcVAL.List.ConstraintAfterAttributeList, calcDollar[2].NodePt.Constraint)
+		}
+	case 21:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:595
+//line parser/grammar.y:627
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = CONSTRAINT_LIST
 			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[1].NodePt.Constraint)
 		}
-	case 20:
-		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:600
-		{
-			calcVAL.List = calcDollar[1].List
-			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[3].NodePt.Constraint)
-		}
-	case 21:
-		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:604
-		{
-			calcVAL.List = calcDollar[1].List
-			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[3].NodePt.Constraint)
-		}
 	case 22:
+		calcDollar = calcS[calcpt-1 : calcpt+1]
+//line parser/grammar.y:632
+		{
+			calcVAL.List = List{}
+			calcVAL.List.Type = CONSTRAINT_LIST
+			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[1].NodePt.Constraint)
+		}
+	case 23:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:612
+//line parser/grammar.y:637
+		{
+			calcVAL.List = calcDollar[1].List
+			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[3].NodePt.Constraint)
+		}
+	case 24:
+		calcDollar = calcS[calcpt-3 : calcpt+1]
+//line parser/grammar.y:641
+		{
+			calcVAL.List = calcDollar[1].List
+			calcVAL.List.ConstraintList = append(calcVAL.List.ConstraintList, calcDollar[3].NodePt.Constraint)
+		}
+	case 25:
+		calcDollar = calcS[calcpt-3 : calcpt+1]
+//line parser/grammar.y:649
 		{
 			calcVAL.NodePt = calcDollar[3].NodePt
 			calcVAL.NodePt.Constraint.ConstraintNameValid = true
 			calcVAL.NodePt.Constraint.ConstraintName = calcDollar[2].String
 		}
-	case 23:
+	case 26:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:621
+//line parser/grammar.y:658
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1094,9 +1133,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_UNIQUE
 			calcVAL.NodePt.Constraint.AttriNameList = calcDollar[3].StringList
 		}
-	case 24:
+	case 27:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:630
+//line parser/grammar.y:667
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1106,9 +1145,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_PRIMARY_KEY
 			calcVAL.NodePt.Constraint.AttriNameList = calcDollar[3].StringList
 		}
-	case 25:
+	case 28:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:639
+//line parser/grammar.y:676
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1118,9 +1157,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_CHECK
 			calcVAL.NodePt.Constraint.Condition = calcDollar[3].NodePt.Condition
 		}
-	case 26:
+	case 29:
 		calcDollar = calcS[calcpt-9 : calcpt+1]
-//line parser/grammar.y:648
+//line parser/grammar.y:685
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1132,9 +1171,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
 			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
 		}
-	case 27:
+	case 30:
 		calcDollar = calcS[calcpt-10 : calcpt+1]
-//line parser/grammar.y:659
+//line parser/grammar.y:696
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1148,9 +1187,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Deferrable = calcDollar[10].NodePt.ConstraintDeferrable
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 		}
-	case 28:
+	case 31:
 		calcDollar = calcS[calcpt-10 : calcpt+1]
-//line parser/grammar.y:672
+//line parser/grammar.y:709
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1165,9 +1204,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 		}
-	case 29:
+	case 32:
 		calcDollar = calcS[calcpt-10 : calcpt+1]
-//line parser/grammar.y:686
+//line parser/grammar.y:723
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1182,9 +1221,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 30:
+	case 33:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:700
+//line parser/grammar.y:737
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1201,9 +1240,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 		}
-	case 31:
+	case 34:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:716
+//line parser/grammar.y:753
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1216,70 +1255,70 @@ calcdefault:
 			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
 			calcVAL.NodePt.Constraint.Deferrable = calcDollar[10].NodePt.ConstraintDeferrable
 			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 32:
-		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:732
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[11].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
-
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 33:
-		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:748
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 34:
-		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:764
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[11].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[10].NodePt.ConstraintDeleteSet
 
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
 	case 35:
 		calcDollar = calcS[calcpt-11 : calcpt+1]
-//line parser/grammar.y:780
+//line parser/grammar.y:769
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[11].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
+
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 36:
+		calcDollar = calcS[calcpt-11 : calcpt+1]
+//line parser/grammar.y:785
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 37:
+		calcDollar = calcS[calcpt-11 : calcpt+1]
+//line parser/grammar.y:801
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[11].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[10].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 38:
+		calcDollar = calcS[calcpt-11 : calcpt+1]
+//line parser/grammar.y:817
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1296,9 +1335,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 36:
+	case 39:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:796
+//line parser/grammar.y:833
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1312,69 +1351,6 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Deferrable = calcDollar[10].NodePt.ConstraintDeferrable
 			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[11].NodePt.ConstraintUpdateSet
 			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[12].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 37:
-		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:814
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[10].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[12].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 38:
-		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:832
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[11].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[12].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 39:
-		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:850
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[12].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
 
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
@@ -1382,7 +1358,70 @@ calcdefault:
 		}
 	case 40:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:868
+//line parser/grammar.y:851
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[10].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[12].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 41:
+		calcDollar = calcS[calcpt-12 : calcpt+1]
+//line parser/grammar.y:869
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[11].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[12].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 42:
+		calcDollar = calcS[calcpt-12 : calcpt+1]
+//line parser/grammar.y:887
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.AttributeNameLocal = calcDollar[3].String
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[6].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[8].String
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[12].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[10].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[11].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 43:
+		calcDollar = calcS[calcpt-12 : calcpt+1]
+//line parser/grammar.y:905
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1401,9 +1440,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 41:
+	case 44:
 		calcDollar = calcS[calcpt-12 : calcpt+1]
-//line parser/grammar.y:886
+//line parser/grammar.y:923
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1422,17 +1461,17 @@ calcdefault:
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 42:
+	case 45:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:908
+//line parser/grammar.y:945
 		{
 			calcVAL.NodePt = calcDollar[3].NodePt
 			calcVAL.NodePt.Constraint.ConstraintNameValid = true
 			calcVAL.NodePt.Constraint.ConstraintName = calcDollar[2].String
 		}
-	case 43:
+	case 46:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:917
+//line parser/grammar.y:954
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1442,9 +1481,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_DEFAULT
 			calcVAL.NodePt.Constraint.ElementaryValue = calcDollar[2].NodePt.ElementaryValue
 		}
-	case 44:
+	case 47:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:926
+//line parser/grammar.y:963
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1453,9 +1492,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_UNIQUE
 		}
-	case 45:
+	case 48:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:934
+//line parser/grammar.y:971
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1464,9 +1503,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_PRIMARY_KEY
 		}
-	case 46:
+	case 49:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:942
+//line parser/grammar.y:979
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1475,9 +1514,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_NOT_NULL
 		}
-	case 47:
+	case 50:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:950
+//line parser/grammar.y:987
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1488,9 +1527,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
 			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
 		}
-	case 48:
+	case 51:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:960
+//line parser/grammar.y:997
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1504,9 +1543,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 		}
-	case 49:
+	case 52:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:973
+//line parser/grammar.y:1010
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1520,9 +1559,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 		}
-	case 50:
+	case 53:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:986
+//line parser/grammar.y:1023
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1536,9 +1575,9 @@ calcdefault:
 
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 51:
+	case 54:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:999
+//line parser/grammar.y:1036
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1554,9 +1593,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 		}
-	case 52:
+	case 55:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:1014
+//line parser/grammar.y:1051
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1568,67 +1607,67 @@ calcdefault:
 			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
 			calcVAL.NodePt.Constraint.Deferrable = calcDollar[6].NodePt.ConstraintDeferrable
 			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 53:
-		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:1029
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-		}
-	case 54:
-		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:1044
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 55:
-		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:1059
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[6].NodePt.ConstraintDeleteSet
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
 
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
 	case 56:
 		calcDollar = calcS[calcpt-7 : calcpt+1]
-//line parser/grammar.y:1074
+//line parser/grammar.y:1066
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+		}
+	case 57:
+		calcDollar = calcS[calcpt-7 : calcpt+1]
+//line parser/grammar.y:1081
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 58:
+		calcDollar = calcS[calcpt-7 : calcpt+1]
+//line parser/grammar.y:1096
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[6].NodePt.ConstraintDeleteSet
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 59:
+		calcDollar = calcS[calcpt-7 : calcpt+1]
+//line parser/grammar.y:1111
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1644,9 +1683,9 @@ calcdefault:
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 57:
+	case 60:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1089
+//line parser/grammar.y:1126
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1659,66 +1698,6 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Deferrable = calcDollar[6].NodePt.ConstraintDeferrable
 			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[7].NodePt.ConstraintUpdateSet
 			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[8].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 58:
-		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1106
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[6].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[8].NodePt.ConstraintUpdateSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 59:
-		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1123
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[8].NodePt.ConstraintDeleteSet
-
-			calcVAL.NodePt.Constraint.DeferrableValid = true
-			calcVAL.NodePt.Constraint.UpdateSetValid = true
-			calcVAL.NodePt.Constraint.DeleteSetValid = true
-		}
-	case 60:
-		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1140
-		{
-			calcVAL.NodePt = &Node{}
-			calcVAL.NodePt.Type = CONSTRAINT_NODE
-			calcVAL.NodePt.Constraint = &ConstraintNode{}
-			calcVAL.NodePt.Constraint.ConstraintNameValid = false
-
-			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
-			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
-			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[8].NodePt.ConstraintDeferrable
 
 			calcVAL.NodePt.Constraint.DeferrableValid = true
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
@@ -1726,7 +1705,7 @@ calcdefault:
 		}
 	case 61:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1157
+//line parser/grammar.y:1143
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1736,8 +1715,8 @@ calcdefault:
 			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
 			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
 			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
-			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[6].NodePt.ConstraintDeleteSet
-			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[6].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
 			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[8].NodePt.ConstraintUpdateSet
 
 			calcVAL.NodePt.Constraint.DeferrableValid = true
@@ -1746,7 +1725,67 @@ calcdefault:
 		}
 	case 62:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1174
+//line parser/grammar.y:1160
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[8].NodePt.ConstraintDeleteSet
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 63:
+		calcDollar = calcS[calcpt-8 : calcpt+1]
+//line parser/grammar.y:1177
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[6].NodePt.ConstraintUpdateSet
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[7].NodePt.ConstraintDeleteSet
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[8].NodePt.ConstraintDeferrable
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 64:
+		calcDollar = calcS[calcpt-8 : calcpt+1]
+//line parser/grammar.y:1194
+		{
+			calcVAL.NodePt = &Node{}
+			calcVAL.NodePt.Type = CONSTRAINT_NODE
+			calcVAL.NodePt.Constraint = &ConstraintNode{}
+			calcVAL.NodePt.Constraint.ConstraintNameValid = false
+
+			calcVAL.NodePt.Constraint.Type = CONSTRAINT_FOREIGN_KEY
+			calcVAL.NodePt.Constraint.ForeignTableName = calcDollar[2].String
+			calcVAL.NodePt.Constraint.AttributeNameForeign = calcDollar[4].String
+			calcVAL.NodePt.Constraint.DeleteSet = calcDollar[6].NodePt.ConstraintDeleteSet
+			calcVAL.NodePt.Constraint.Deferrable = calcDollar[7].NodePt.ConstraintDeferrable
+			calcVAL.NodePt.Constraint.UpdateSet = calcDollar[8].NodePt.ConstraintUpdateSet
+
+			calcVAL.NodePt.Constraint.DeferrableValid = true
+			calcVAL.NodePt.Constraint.UpdateSetValid = true
+			calcVAL.NodePt.Constraint.DeleteSetValid = true
+		}
+	case 65:
+		calcDollar = calcS[calcpt-8 : calcpt+1]
+//line parser/grammar.y:1211
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_NODE
@@ -1764,65 +1803,65 @@ calcdefault:
 			calcVAL.NodePt.Constraint.UpdateSetValid = true
 			calcVAL.NodePt.Constraint.DeleteSetValid = true
 		}
-	case 63:
+	case 66:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1195
+//line parser/grammar.y:1232
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DEFERRABLE_ENUM
 			calcVAL.NodePt.ConstraintDeferrable = CONSTRAINT_NOT_DEFERRABLE
 		}
-	case 64:
+	case 67:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1200
+//line parser/grammar.y:1237
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DEFERRABLE_ENUM
 			calcVAL.NodePt.ConstraintDeferrable = CONSTRAINT_INITIALLY_DEFERRED
 		}
-	case 65:
+	case 68:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1205
+//line parser/grammar.y:1242
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DEFERRABLE_ENUM
 			calcVAL.NodePt.ConstraintDeferrable = CONSTRAINT_INITIALLY_IMMEDIATE
 		}
-	case 66:
+	case 69:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1214
+//line parser/grammar.y:1251
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_UPDATE_SET_ENUM
 			calcVAL.NodePt.ConstraintUpdateSet = CONSTRAINT_UPDATE_SET_NULL
 		}
-	case 67:
+	case 70:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1219
+//line parser/grammar.y:1256
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_UPDATE_SET_ENUM
 			calcVAL.NodePt.ConstraintUpdateSet = CONSTRAINT_UPDATE_SET_CASCADE
 		}
-	case 68:
+	case 71:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1228
+//line parser/grammar.y:1265
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DELETE_SET_ENUM
 			calcVAL.NodePt.ConstraintDeleteSet = CONSTRAINT_DELETE_SET_NULL
 		}
-	case 69:
+	case 72:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1233
+//line parser/grammar.y:1270
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONSTRAINT_DELETE_SET_ENUM
 			calcVAL.NodePt.ConstraintDeleteSet = CONSTRAINT_DELETE_SET_CASCADE
 		}
-	case 70:
+	case 73:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1252
+//line parser/grammar.y:1289
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONDITION_NODE
@@ -1831,15 +1870,15 @@ calcdefault:
 			calcVAL.NodePt.Condition.Type = CONDITION_PREDICATE
 			calcVAL.NodePt.Condition.Predicate = calcDollar[1].NodePt.Predicate
 		}
-	case 71:
+	case 74:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1260
+//line parser/grammar.y:1297
 		{
 			calcVAL.NodePt = calcDollar[2].NodePt
 		}
-	case 72:
+	case 75:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1263
+//line parser/grammar.y:1300
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONDITION_NODE
@@ -1849,9 +1888,9 @@ calcdefault:
 			calcVAL.NodePt.Condition.ConditionL = calcDollar[1].NodePt.Condition
 			calcVAL.NodePt.Condition.ConditionR = calcDollar[3].NodePt.Condition
 		}
-	case 73:
+	case 76:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1272
+//line parser/grammar.y:1309
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = CONDITION_NODE
@@ -1861,9 +1900,9 @@ calcdefault:
 			calcVAL.NodePt.Condition.ConditionL = calcDollar[1].NodePt.Condition
 			calcVAL.NodePt.Condition.ConditionR = calcDollar[3].NodePt.Condition
 		}
-	case 74:
+	case 77:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1323
+//line parser/grammar.y:1360
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1875,9 +1914,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[2].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.ElementaryValue = calcDollar[3].NodePt.ElementaryValue
 		}
-	case 75:
+	case 78:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1334
+//line parser/grammar.y:1371
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1890,9 +1929,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
 			calcVAL.NodePt.Predicate.ElementaryValue.StringValue = calcDollar[3].String
 		}
-	case 76:
+	case 79:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1346
+//line parser/grammar.y:1383
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1903,9 +1942,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameWithTableNameL = calcDollar[1].NodePt.AttriNameOptionTableName
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[3].NodePt.Subquery
 		}
-	case 77:
+	case 80:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1356
+//line parser/grammar.y:1393
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1916,9 +1955,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameWithTableNameL = calcDollar[1].NodePt.AttriNameOptionTableName
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[4].NodePt.Subquery
 		}
-	case 78:
+	case 81:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1366
+//line parser/grammar.y:1403
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1929,9 +1968,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameWithTableNameL = calcDollar[1].NodePt.AttriNameOptionTableName
 			calcVAL.NodePt.Predicate.TableName = calcDollar[3].String
 		}
-	case 79:
+	case 82:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1376
+//line parser/grammar.y:1413
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1942,9 +1981,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameWithTableNameL = calcDollar[1].NodePt.AttriNameOptionTableName
 			calcVAL.NodePt.Predicate.TableName = calcDollar[4].String
 		}
-	case 80:
+	case 83:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1386
+//line parser/grammar.y:1423
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1956,9 +1995,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[2].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[4].NodePt.Subquery
 		}
-	case 81:
+	case 84:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1397
+//line parser/grammar.y:1434
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1970,9 +2009,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[3].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[5].NodePt.Subquery
 		}
-	case 82:
+	case 85:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1408
+//line parser/grammar.y:1445
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1984,9 +2023,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[2].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[4].NodePt.Subquery
 		}
-	case 83:
+	case 86:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1419
+//line parser/grammar.y:1456
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -1998,9 +2037,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[3].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[5].NodePt.Subquery
 		}
-	case 84:
+	case 87:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1430
+//line parser/grammar.y:1467
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2012,9 +2051,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[2].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.TableName = calcDollar[4].String
 		}
-	case 85:
+	case 88:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1441
+//line parser/grammar.y:1478
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2026,9 +2065,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[3].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.TableName = calcDollar[5].String
 		}
-	case 86:
+	case 89:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1452
+//line parser/grammar.y:1489
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2040,9 +2079,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[2].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.TableName = calcDollar[4].String
 		}
-	case 87:
+	case 90:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1463
+//line parser/grammar.y:1500
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2054,9 +2093,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.CompareMark = calcDollar[3].NodePt.CompareMark
 			calcVAL.NodePt.Predicate.TableName = calcDollar[5].String
 		}
-	case 88:
+	case 91:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1474
+//line parser/grammar.y:1511
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2066,9 +2105,9 @@ calcdefault:
 
 			calcVAL.NodePt.Predicate.AttriNameWithTableNameL = calcDollar[1].NodePt.AttriNameOptionTableName
 		}
-	case 89:
+	case 92:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1483
+//line parser/grammar.y:1520
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2078,9 +2117,9 @@ calcdefault:
 
 			calcVAL.NodePt.Predicate.AttriNameWithTableNameL = calcDollar[1].NodePt.AttriNameOptionTableName
 		}
-	case 90:
+	case 93:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1492
+//line parser/grammar.y:1529
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2091,9 +2130,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameOptionTableNameList = calcDollar[2].List.AttriNameOptionTableNameList
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[5].NodePt.Subquery
 		}
-	case 91:
+	case 94:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:1502
+//line parser/grammar.y:1539
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2104,9 +2143,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameOptionTableNameList = calcDollar[2].List.AttriNameOptionTableNameList
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[6].NodePt.Subquery
 		}
-	case 92:
+	case 95:
 		calcDollar = calcS[calcpt-5 : calcpt+1]
-//line parser/grammar.y:1512
+//line parser/grammar.y:1549
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2117,9 +2156,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameOptionTableNameList = calcDollar[2].List.AttriNameOptionTableNameList
 			calcVAL.NodePt.Predicate.TableName = calcDollar[5].String
 		}
-	case 93:
+	case 96:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:1522
+//line parser/grammar.y:1559
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2130,9 +2169,9 @@ calcdefault:
 			calcVAL.NodePt.Predicate.AttriNameOptionTableNameList = calcDollar[2].List.AttriNameOptionTableNameList
 			calcVAL.NodePt.Predicate.TableName = calcDollar[6].String
 		}
-	case 94:
+	case 97:
 		calcDollar = calcS[calcpt-2 : calcpt+1]
-//line parser/grammar.y:1532
+//line parser/grammar.y:1569
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2142,9 +2181,9 @@ calcdefault:
 
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[2].NodePt.Subquery
 		}
-	case 95:
+	case 98:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1541
+//line parser/grammar.y:1578
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = PREDICATE_NODE
@@ -2154,57 +2193,57 @@ calcdefault:
 
 			calcVAL.NodePt.Predicate.Subquery = calcDollar[3].NodePt.Subquery
 		}
-	case 96:
+	case 99:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1554
+//line parser/grammar.y:1591
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
 			calcVAL.NodePt.CompareMark = COMPAREMARK_EQUAL
 		}
-	case 97:
+	case 100:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1559
+//line parser/grammar.y:1596
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
 			calcVAL.NodePt.CompareMark = COMPAREMARK_NOTEQUAL
 		}
-	case 98:
+	case 101:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1564
+//line parser/grammar.y:1601
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
 			calcVAL.NodePt.CompareMark = COMPAREMARK_LESS
 		}
-	case 99:
+	case 102:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1569
+//line parser/grammar.y:1606
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
 			calcVAL.NodePt.CompareMark = COMPAREMARK_GREATER
 		}
-	case 100:
+	case 103:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1574
+//line parser/grammar.y:1611
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
 			calcVAL.NodePt.CompareMark = COMPAREMARK_LESSEQUAL
 		}
-	case 101:
+	case 104:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1579
+//line parser/grammar.y:1616
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = COMPAREMARK_ENUM
 			calcVAL.NodePt.CompareMark = COMPAREMARK_GREATEREQUAL
 		}
-	case 102:
+	case 105:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1609
+//line parser/grammar.y:1646
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2212,9 +2251,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_CHAR
 		}
-	case 103:
+	case 106:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1616
+//line parser/grammar.y:1653
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2223,9 +2262,9 @@ calcdefault:
 			calcVAL.NodePt.Domain.Type = DOMAIN_VARCHAR
 			calcVAL.NodePt.Domain.N = calcDollar[3].Int
 		}
-	case 104:
+	case 107:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1624
+//line parser/grammar.y:1661
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2234,9 +2273,9 @@ calcdefault:
 			calcVAL.NodePt.Domain.Type = DOMAIN_BIT
 			calcVAL.NodePt.Domain.N = calcDollar[3].Int
 		}
-	case 105:
+	case 108:
 		calcDollar = calcS[calcpt-4 : calcpt+1]
-//line parser/grammar.y:1632
+//line parser/grammar.y:1669
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2245,9 +2284,9 @@ calcdefault:
 			calcVAL.NodePt.Domain.Type = DOMAIN_BITVARYING
 			calcVAL.NodePt.Domain.N = calcDollar[3].Int
 		}
-	case 106:
+	case 109:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1640
+//line parser/grammar.y:1677
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2255,9 +2294,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_BOOLEAN
 		}
-	case 107:
+	case 110:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1647
+//line parser/grammar.y:1684
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2265,9 +2304,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_INT
 		}
-	case 108:
+	case 111:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1654
+//line parser/grammar.y:1691
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2275,9 +2314,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_INTEGER
 		}
-	case 109:
+	case 112:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1661
+//line parser/grammar.y:1698
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2285,9 +2324,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_SHORTINT
 		}
-	case 110:
+	case 113:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1668
+//line parser/grammar.y:1705
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2295,9 +2334,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_FLOAT
 		}
-	case 111:
+	case 114:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1675
+//line parser/grammar.y:1712
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2305,9 +2344,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_REAL
 		}
-	case 112:
+	case 115:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1682
+//line parser/grammar.y:1719
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2315,9 +2354,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_DOUBLEPRECISION
 		}
-	case 113:
+	case 116:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:1689
+//line parser/grammar.y:1726
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2327,9 +2366,9 @@ calcdefault:
 			calcVAL.NodePt.Domain.N = calcDollar[3].Int
 			calcVAL.NodePt.Domain.D = calcDollar[5].Int
 		}
-	case 114:
+	case 117:
 		calcDollar = calcS[calcpt-6 : calcpt+1]
-//line parser/grammar.y:1698
+//line parser/grammar.y:1735
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2339,9 +2378,9 @@ calcdefault:
 			calcVAL.NodePt.Domain.N = calcDollar[3].Int
 			calcVAL.NodePt.Domain.D = calcDollar[5].Int
 		}
-	case 115:
+	case 118:
 		calcDollar = calcS[calcpt-8 : calcpt+1]
-//line parser/grammar.y:1707
+//line parser/grammar.y:1744
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2349,9 +2388,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_DATE
 		}
-	case 116:
+	case 119:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1714
+//line parser/grammar.y:1751
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = DOMAIN_NODE
@@ -2359,9 +2398,9 @@ calcdefault:
 			calcVAL.NodePt.Domain = &DomainNode{}
 			calcVAL.NodePt.Domain.Type = DOMAIN_TIME
 		}
-	case 117:
+	case 120:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1733
+//line parser/grammar.y:1770
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ATTRINAME_OPTION_TABLENAME_NODE
@@ -2369,9 +2408,9 @@ calcdefault:
 			calcVAL.NodePt.AttriNameOptionTableName.TableNameValid = false
 			calcVAL.NodePt.AttriNameOptionTableName.AttributeName = calcDollar[1].String
 		}
-	case 118:
+	case 121:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1740
+//line parser/grammar.y:1777
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ATTRINAME_OPTION_TABLENAME_NODE
@@ -2380,17 +2419,17 @@ calcdefault:
 			calcVAL.NodePt.AttriNameOptionTableName.TableName = calcDollar[1].String
 			calcVAL.NodePt.AttriNameOptionTableName.AttributeName = calcDollar[3].String
 		}
-	case 119:
+	case 122:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1759
+//line parser/grammar.y:1796
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = SUBQUERY_NODE
 			calcVAL.NodePt.Subquery = &QueryNode{}
 		}
-	case 120:
+	case 123:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1779
+//line parser/grammar.y:1816
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -2398,9 +2437,9 @@ calcdefault:
 			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_INT
 			calcVAL.NodePt.ElementaryValue.IntValue = calcDollar[1].Int
 		}
-	case 121:
+	case 124:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1786
+//line parser/grammar.y:1823
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -2408,9 +2447,9 @@ calcdefault:
 			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_FLOAT
 			calcVAL.NodePt.ElementaryValue.FloatValue = calcDollar[1].Float
 		}
-	case 122:
+	case 125:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1793
+//line parser/grammar.y:1830
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -2418,9 +2457,9 @@ calcdefault:
 			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
 			calcVAL.NodePt.ElementaryValue.StringValue = calcDollar[1].String
 		}
-	case 123:
+	case 126:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1800
+//line parser/grammar.y:1837
 		{
 			calcVAL.NodePt = &Node{}
 			calcVAL.NodePt.Type = ELEMENTARY_VALUE_NODE
@@ -2428,28 +2467,28 @@ calcdefault:
 			calcVAL.NodePt.ElementaryValue.Type = ELEMENTARY_VALUE_BOOLEAN
 			calcVAL.NodePt.ElementaryValue.BooleanValue = calcDollar[1].Boolean
 		}
-	case 124:
+	case 127:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1825
+//line parser/grammar.y:1862
 		{
 			calcVAL.StringList = append(calcDollar[1].StringList, calcDollar[3].String)
 		}
-	case 125:
+	case 128:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1828
+//line parser/grammar.y:1865
 		{
 			calcVAL.StringList = append(calcVAL.StringList, calcDollar[1].String)
 		}
-	case 126:
+	case 129:
 		calcDollar = calcS[calcpt-3 : calcpt+1]
-//line parser/grammar.y:1835
+//line parser/grammar.y:1872
 		{
 			calcVAL.List = calcDollar[1].List
 			calcVAL.List.AttriNameOptionTableNameList = append(calcVAL.List.AttriNameOptionTableNameList, calcDollar[3].NodePt.AttriNameOptionTableName)
 		}
-	case 127:
+	case 130:
 		calcDollar = calcS[calcpt-1 : calcpt+1]
-//line parser/grammar.y:1839
+//line parser/grammar.y:1876
 		{
 			calcVAL.List = List{}
 			calcVAL.List.Type = ATTRINAME_OPTION_TABLENAME_LIST

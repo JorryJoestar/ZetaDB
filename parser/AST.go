@@ -54,6 +54,7 @@ type DDLNode struct {
 //table
 type TableNode struct {
 	TableName           string
+	ConstraintName      string //alter drop constraint
 	AttributeNameList   []string
 	DomainList          []*DomainNode
 	ConstraintList      []*ConstraintNode

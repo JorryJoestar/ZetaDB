@@ -193,6 +193,7 @@ type AttributeDeclarationNode struct {
 
 // alterTable
 %type <NodePt> alterTableAddStmt
+%type <NodePt> alterTableDropStmt
 %token ALTER ADD
 
 // constraint
@@ -317,6 +318,14 @@ ddl
 
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_TABLE_ALTER_ADD
+        $$.Ddl.Table = $1.Table
+    }
+    |alterTableDropStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_TABLE_ALTER_DROP
         $$.Ddl.Table = $1.Table
     }
     ;
@@ -480,6 +489,34 @@ alterTableAddStmt
 
         $$.Table.ConstraintListValid = true
         $$.Table.ConstraintList = append($$.Table.ConstraintList,$5.Constraint)
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                               alterTableDropStmt                             |
+    --------------------------------------------------------------------------------
+		
+        alterTableDropStmt
+			ALTER TABLE ID DROP ID SEMICOLON
+			ALTER TABLE ID DROP CONSTRAINT ID SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+alterTableDropStmt
+    :ALTER TABLE ID DROP ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+
+        $$.Table = &TableNode{}
+        $$.Table.TableName = $3
+        $$.Table.AttributeNameList = append($$.Table.AttributeNameList,$5)
+    }
+	|ALTER TABLE ID DROP CONSTRAINT ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TABLE_NODE
+
+        $$.Table = &TableNode{}
+        $$.Table.TableName = $3
+        $$.Table.ConstraintName = $6
     }
     ;
 
