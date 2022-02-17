@@ -18,6 +18,9 @@
 [Vv][Ii][Ee][Ww]                                                {return VIEW;}
 [Aa][Ss]                                                        {return AS;}
 
+[Ii][Nn][Dd][Ee][Xx]                                            {return INDEX;}
+[Oo][Nn]                                                        {return ON;}
+
 [Uu][Nn][Ii][Qq][Uu][Ee]                                        {return UNIQUE;}
 [Pp][Rr][Ii][Mm][Aa][Rr][Yy][ ][Kk][Ee][Yy]                     {return PRIMARYKEY;}
 [Cc][Hh][Ee][Cc][Kk]                                            {return CHECK;}

@@ -17,6 +17,10 @@ enum {
     VIEW            = 317,
     AS              = 242,
 
+//createIndexStmt
+    INDEX           = 318,
+    ON              = 234,
+
 //constraint
     UNIQUE            = 231,
     PRIMARYKEY        = 230,  //PRIMARY KEY
@@ -95,20 +99,13 @@ enum {
     
 
 
-
-
-
-
     FROM            = 233,
-    ON              = 234,
     WHERE           = 235,
     GROUPBY         = 236,  //GROUP BY
     HAVING          = 237,
     ORDERBY         = 238,  //ORDER BY
     DISTINCT        = 239,
     SELECT          = 240,
-
-
 
     STAR            = 245,  //*
     AVG             = 259,
@@ -162,8 +159,6 @@ enum {
     END             = 314,
     REFERENCING     = 315,
     INSTEAD         = 316,
-
-    INDEX           = 318,
 
     CONNECT         = 319, 
     TO              = 320,

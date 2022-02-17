@@ -224,6 +224,13 @@ type ForeignKeyParameterNode struct {
 // dropView
 %type <NodePt> dropViewStmt
 
+// createIndex
+%type <NodePt> createIndexStmt
+%token INDEX ON
+
+// dropIndex
+%type <NodePt> dropIndexStmt
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -388,6 +395,22 @@ ddl
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_VIEW_DROP
         $$.Ddl.View = $1.View
+    }
+    |createIndexStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_INDEX_CREATE
+        $$.Ddl.Index = $1.Index
+    }
+    |dropIndexStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_INDEX_DROP
+        $$.Ddl.Index = $1.Index
     }
     ;
 
@@ -664,6 +687,44 @@ dropViewStmt
         
         $$.View = &ViewNode{}
         $$.View.ViewName = $3
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                 createIndexStmt                              |
+    --------------------------------------------------------------------------------
+
+        createIndexStmt
+            CREATE INDEX ID ON ID LPAREN attriNameList RPAREN SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+createIndexStmt
+    :CREATE INDEX ID ON ID LPAREN attriNameList RPAREN SEMICOLON {
+        $$ = &Node{}
+        $$.Type = INDEX_NODE
+        
+        $$.Index = &IndexNode{}
+        $$.Index.IndexName = $3
+        $$.Index.TableName = $5
+        $$.Index.AttributeNameList = $7
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                  dropIndexStmt                               |
+    --------------------------------------------------------------------------------
+
+        dropIndexStmt
+            DROP INDEX ID SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+dropIndexStmt
+    :DROP INDEX ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = INDEX_NODE
+
+        $$.Index = &IndexNode{}
+        $$.Index.IndexName = $3
     }
     ;
 

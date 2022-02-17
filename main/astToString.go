@@ -227,14 +227,19 @@ func ViewDropToString(view *parser.ViewNode, tabs string) string {
 }
 
 func IndexCreateToString(index *parser.IndexNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "IndexNode\n"
+	s += tabs + "IndexName: " + index.IndexName + "\n"
+	s += tabs + "TableName: " + index.TableName + "\n"
+	s += tabs + "AttributeNameList:\n"
+	for _, v := range index.AttributeNameList {
+		s += tabs + "\t" + v + "\n"
+	}
 	return s
 }
 
 func IndexDropToString(index *parser.IndexNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "IndexNode\n"
+	s += tabs + "IndexName: " + index.IndexName + "\n"
 	return s
 }
 

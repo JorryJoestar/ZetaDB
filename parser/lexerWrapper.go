@@ -65,6 +65,12 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.AS:
 		return AS
 
+	//createIndex
+	case C.INDEX:
+		return INDEX
+	case C.ON:
+		return ON
+
 	//constraint
 	case C.UNIQUE:
 		return UNIQUE
