@@ -214,6 +214,9 @@ type ForeignKeyParameterNode struct {
 %type <NodePt> createAssertStmt
 %token ASSERTION
 
+// dropAssert
+%type <NodePt> dropAssertStmt
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -353,6 +356,14 @@ ddl
 
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_ASSERT_CREATE
+        $$.Ddl.Assert = $1.Assert
+    }
+    |dropAssertStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_ASSERT_DROP
         $$.Ddl.Assert = $1.Assert
     }
     ;
@@ -550,7 +561,8 @@ alterTableDropStmt
 /*  --------------------------------------------------------------------------------
     |                                createAssertStmt                              |
     --------------------------------------------------------------------------------
-	    createAssertStmt
+	    
+        createAssertStmt
 			CREATE ASSERTION ID CHECK LPAREN condition RPAREN SEMICOLON
 
     -------------------------------------------------------------------------------- */
@@ -562,6 +574,24 @@ createAssertStmt
         $$.Assert = &AssertNode {}
         $$.Assert.AssertName = $3
         $$.Assert.Condition = $6.Condition
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                 dropAssertStmt                               |
+    --------------------------------------------------------------------------------
+	    
+        dropAssertStmt
+			DROP ASSERTION ID SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+dropAssertStmt
+    :DROP ASSERTION ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = ASSERT_NODE
+        
+        $$.Assert = &AssertNode {}
+        $$.Assert.AssertName = $3
     }
     ;
 

@@ -201,8 +201,8 @@ func AssertCreateToString(assert *parser.AssertNode, tabs string) string {
 }
 
 func AssertDropToString(assert *parser.AssertNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "AssertNode\n"
+	s += tabs + "AssertName: " + assert.AssertName + "\n"
 	return s
 }
 
