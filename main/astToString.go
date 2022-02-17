@@ -207,8 +207,16 @@ func AssertDropToString(assert *parser.AssertNode, tabs string) string {
 }
 
 func ViewCreateToString(view *parser.ViewNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "ViewNode\n"
+	s += tabs + "ViewName: " + view.ViewName + "\n"
+	if view.AttributeNameListValid {
+		s += tabs + "AttributeNameList:\n"
+		for _, v := range view.AttributeNameList {
+			s += tabs + "\t" + v + "\n"
+		}
+	}
+	s += tabs + "Query:\n"
+	s += QueryToString(view.Query, tabs+"\t")
 	return s
 }
 

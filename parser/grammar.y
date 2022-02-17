@@ -217,6 +217,10 @@ type ForeignKeyParameterNode struct {
 // dropAssert
 %type <NodePt> dropAssertStmt
 
+// createView
+%type <NodePt> createViewStmt
+%token VIEW AS
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -365,6 +369,14 @@ ddl
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_ASSERT_DROP
         $$.Ddl.Assert = $1.Assert
+    }
+    |createViewStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_VIEW_CREATE
+        $$.Ddl.View = $1.View        
     }
     ;
 
@@ -592,6 +604,37 @@ dropAssertStmt
         
         $$.Assert = &AssertNode {}
         $$.Assert.AssertName = $3
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                  createViewStmt                              |
+    --------------------------------------------------------------------------------
+
+        createViewStmt
+            CREATE VIEW ID AS subQuery SEMICOLON
+			CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+createViewStmt
+    :CREATE VIEW ID AS subQuery SEMICOLON {
+        $$ = &Node{}
+        $$.Type = VIEW_NODE
+
+        $$.View = &ViewNode{}
+        $$.View.ViewName = $3
+        $$.View.Query = $5.Query
+        $$.View.AttributeNameListValid = false
+    }
+	|CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON {
+        $$ = &Node{}
+        $$.Type = VIEW_NODE
+
+        $$.View = &ViewNode{}
+        $$.View.ViewName = $3
+        $$.View.Query = $8.Query
+        $$.View.AttributeNameListValid = true
+        $$.View.AttributeNameList = $5
     }
     ;
 

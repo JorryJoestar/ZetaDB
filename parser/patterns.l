@@ -15,6 +15,8 @@
 
 [Aa][Ss][Ss][Ee][Rr][Tt][Ii][Oo][Nn]                            {return ASSERTION;}
 
+[Vv][Ii][Ee][Ww]                                                {return VIEW;}
+[Aa][Ss]                                                        {return AS;}
 
 [Uu][Nn][Ii][Qq][Uu][Ee]                                        {return UNIQUE;}
 [Pp][Rr][Ii][Mm][Aa][Rr][Yy][ ][Kk][Ee][Yy]                     {return PRIMARYKEY;}

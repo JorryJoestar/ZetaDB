@@ -11,7 +11,11 @@ enum {
     ADD             = 228,
 
 //createAssertStmt
-    ASSERTION       = 301, 
+    ASSERTION       = 301,
+
+//createViewStmt
+    VIEW            = 317,
+    AS              = 242,
 
 //constraint
     UNIQUE            = 231,
@@ -105,7 +109,7 @@ enum {
     SELECT          = 240,
 
 
-    AS              = 242,
+
     STAR            = 245,  //*
     AVG             = 259,
     MIN             = 260,
@@ -158,7 +162,7 @@ enum {
     END             = 314,
     REFERENCING     = 315,
     INSTEAD         = 316,
-    VIEW            = 317,
+
     INDEX           = 318,
 
     CONNECT         = 319, 
