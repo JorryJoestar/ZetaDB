@@ -193,8 +193,10 @@ func TableAlterDropToString(table *parser.TableNode, tabs string) string {
 }
 
 func AssertCreateToString(assert *parser.AssertNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "AssertNode\n"
+	s += tabs + "AssertName: " + assert.AssertName + "\n"
+	s += tabs + "Condition:\n"
+	s += ConditionToString(assert.Condition, tabs+"\t")
 	return s
 }
 

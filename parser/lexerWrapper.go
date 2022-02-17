@@ -55,6 +55,10 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.ADD:
 		return ADD
 
+	//createAssert
+	case C.ASSERTION:
+		return ASSERTION
+
 	//constraint
 	case C.UNIQUE:
 		return UNIQUE

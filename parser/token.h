@@ -10,6 +10,9 @@ enum {
     ALTER           = 227,
     ADD             = 228,
 
+//createAssertStmt
+    ASSERTION       = 301, 
+
 //constraint
     UNIQUE            = 231,
     PRIMARYKEY        = 230,  //PRIMARY KEY
@@ -139,7 +142,7 @@ enum {
     COMMIT          = 286,
     ROLLBACK        = 287,
 
-    ASSERTION       = 301, 
+
     TRIGGER         = 302,
     BEFORE          = 303,
     OF              = 304,

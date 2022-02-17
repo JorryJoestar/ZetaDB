@@ -25,6 +25,6 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("alter table x add m int references t(x) on delete set cascade;")
+	ast := kernel.parser.ParseSql("create assertion a check(x < 12);")
 	fmt.Println(ASTToString(ast))
 }
