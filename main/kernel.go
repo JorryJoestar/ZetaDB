@@ -25,6 +25,6 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("create view v as .;")
+	ast := kernel.parser.ParseSql("drop view m;")
 	fmt.Println(ASTToString(ast))
 }

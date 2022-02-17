@@ -221,8 +221,8 @@ func ViewCreateToString(view *parser.ViewNode, tabs string) string {
 }
 
 func ViewDropToString(view *parser.ViewNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "ViewNode\n"
+	s += tabs + "ViewName: " + view.ViewName + "\n"
 	return s
 }
 

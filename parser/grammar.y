@@ -221,6 +221,9 @@ type ForeignKeyParameterNode struct {
 %type <NodePt> createViewStmt
 %token VIEW AS
 
+// dropView
+%type <NodePt> dropViewStmt
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -377,6 +380,14 @@ ddl
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_VIEW_CREATE
         $$.Ddl.View = $1.View        
+    }
+    |dropViewStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_VIEW_DROP
+        $$.Ddl.View = $1.View
     }
     ;
 
@@ -635,6 +646,24 @@ createViewStmt
         $$.View.Query = $8.Query
         $$.View.AttributeNameListValid = true
         $$.View.AttributeNameList = $5
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                   dropViewStmt                               |
+    --------------------------------------------------------------------------------
+        
+        dropViewStmt
+            DROP VIEW ID SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+dropViewStmt
+    :DROP VIEW ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = VIEW_NODE
+        
+        $$.View = &ViewNode{}
+        $$.View.ViewName = $3
     }
     ;
 
