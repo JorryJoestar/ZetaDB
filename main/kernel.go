@@ -27,8 +27,9 @@ func main() {
 	kernel := GetInstance()
 	s := ""
 	s += "create trigger t\n"
-	s += "instead of update of k on m\n"
+	s += "instead of update on m\n"
 	s += "referencing\n"
+	s += "\told row as k,\n"
 	s += "\told row as k\n"
 	s += "for each row\n"
 	s += "when (x < 12)\n"
@@ -37,5 +38,8 @@ func main() {
 	s += "end;"
 
 	ast := kernel.parser.ParseSql(s)
+	fmt.Println(ASTToString(ast))
+
+	ast = kernel.parser.ParseSql("drop trigger k;")
 	fmt.Println(ASTToString(ast))
 }

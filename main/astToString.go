@@ -100,7 +100,7 @@ func DDLToString(ddl *parser.DDLNode, tabs string) string {
 
 func DMLToString(dml *parser.DMLNode, tabs string) string {
 	//TODO
-	s := ""
+	s := tabs + "DMLToString TODO \n"
 	return s
 }
 
@@ -244,14 +244,69 @@ func IndexDropToString(index *parser.IndexNode, tabs string) string {
 }
 
 func TriggerCreateToString(trigger *parser.TriggerNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "TriggerNode\n"
+	s += tabs + "BeforeAfterType: "
+	switch trigger.BeforeAfterType {
+	case parser.BEFORE_UPDATE_OF:
+		s += "BEFORE_UPDATE_OF\n"
+		s += tabs + "BeforeAfterAttriName: " + trigger.BeforeAfterAttriName + "\n"
+	case parser.BEFORE_UPDATE:
+		s += "BEFORE_UPDATE\n"
+	case parser.AFTER_UPDATE_OF:
+		s += "AFTER_UPDATE_OF\n"
+		s += tabs + "BeforeAfterAttriName: " + trigger.BeforeAfterAttriName + "\n"
+	case parser.AFTER_UPDATE:
+		s += "AFTER_UPDATE\n"
+	case parser.INSTEAD_UPDATE_OF:
+		s += "INSTEAD_UPDATE_OF\n"
+		s += tabs + "BeforeAfterAttriName: " + trigger.BeforeAfterAttriName + "\n"
+	case parser.INSTEAD_UPDATE:
+		s += "INSTEAD_UPDATE\n"
+	case parser.BEFORE_INSERT:
+		s += "BEFORE_INSERT\n"
+	case parser.AFTER_INSERT:
+		s += "AFTER_INSERT\n"
+	case parser.INSTEAD_INSERT:
+		s += "INSTEAD_INSERT\n"
+	case parser.BEFORE_DELETE:
+		s += "BEFORE_DELETE\n"
+	case parser.AFTER_DELETE:
+		s += "AFTER_DELETE\n"
+	case parser.INSTEAD_DELETE:
+		s += "INSTEAD_DELETE\n"
+	}
+	s += tabs + "BeforeAfterTableName: " + trigger.BeforeAfterTableName + "\n"
+
+	if trigger.ReferencingValid {
+		s += tabs + "OldNewList:\n"
+		for _, v := range trigger.OldNewList {
+			s += TriggerOldNewEntryToString(v, tabs+"\t")
+		}
+	}
+
+	switch trigger.ForEachType {
+	case parser.FOR_EACH_ROW:
+		s += tabs + "ForEachType: FOR_EACH_ROW\n"
+	case parser.FOR_EACH_STATEMENT:
+		s += tabs + "ForEachType: FOR_EACH_STATEMENT\n"
+	}
+
+	if trigger.WhenValid {
+		s += tabs + "Condition:\n"
+		s += ConditionToString(trigger.Condition, tabs+"\t")
+	}
+
+	s += tabs + "DmlList:\n"
+	for _, v := range trigger.DmlList {
+		s += DMLToString(v, tabs+"\t")
+	}
+
 	return s
 }
 
 func TriggerDropToString(trigger *parser.TriggerNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "TriggerNode\n"
+	s += tabs + "TriggerName: " + trigger.TriggerName + "\n"
 	return s
 }
 
@@ -746,5 +801,21 @@ func QueryToString(query *parser.QueryNode, tabs string) string {
 	//TODO
 	s := tabs
 	s += "QueryToString TODO\n"
+	return s
+}
+
+func TriggerOldNewEntryToString(entry *parser.TriggerOldNewEntryNode, tabs string) string {
+	s := tabs + "TriggerOldNewEntryNode\n"
+	switch entry.Type {
+	case parser.OLD_ROW_AS:
+		s += tabs + "Type: OLD_ROW_AS\n"
+	case parser.NEW_ROW_AS:
+		s += tabs + "Type: NEW_ROW_AS\n"
+	case parser.OLD_TABLE_AS:
+		s += tabs + "Type: OLD_TABLE_AS\n"
+	case parser.NEW_TABLE_AS:
+		s += tabs + "Type: NEW_TABLE_AS\n"
+	}
+	s += tabs + "Name: " + entry.Name + "\n"
 	return s
 }

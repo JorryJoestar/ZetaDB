@@ -265,6 +265,9 @@ type TriggerBeforeAfterStmtNode struct {
 %token TRIGGER REFERENCING BEFORE UPDATE OF AFTER INSTEAD INSERT DELETE
 %token OLD ROW NEW FOR EACH STATEMENT WHEN BEGINTOKEN END
 
+// dropTrigger
+%type <NodePt> dropTriggerStmt
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -452,6 +455,14 @@ ddl
 
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_TRIGGER_CREATE
+        $$.Ddl.Trigger = $1.Trigger
+    }
+    |dropTriggerStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_TRIGGER_DROP
         $$.Ddl.Trigger = $1.Trigger
     }
     ;
@@ -1112,6 +1123,24 @@ dmlList
     |dmlList dml {
         $$ = $1
         $$.DmlList = append($$.DmlList,$2.Dml)
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                dropTriggerStmt                               |
+    --------------------------------------------------------------------------------
+        
+        dropTriggerStmt
+            DROP TRIGGER ID SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+dropTriggerStmt
+    :DROP TRIGGER ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = TRIGGER_NODE
+
+        $$.Trigger = &TriggerNode{}
+        $$.Trigger.TriggerName = $3
     }
     ;
 
