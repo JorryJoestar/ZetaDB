@@ -102,5 +102,5 @@
 [Nn][Oo][Tt]                                                    {return NOT;}
 [Nn][Uu][Ll][Ll]                                                {return NULLMARK;}
 [a-z_A-Z][a-z_A-Z0-9]*                                          {return ID;}
-[ \t]                                                           {/*ignore space*/}
+[ \t\n]                                                           {/*ignore space*/}
 %%

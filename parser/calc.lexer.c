@@ -421,7 +421,7 @@ static yyconst flex_int16_t yy_accept[389] =
 
 static yyconst flex_int32_t yy_ec[256] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    2,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    2,    2,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    3,    1,    4,    1,    1,    1,    1,    5,    6,
@@ -1364,6 +1364,7 @@ YY_RULE_SETUP
 {return ID;}
 	YY_BREAK
 case 84:
+/* rule 84 can match eol */
 YY_RULE_SETUP
 #line 105 "parser/patterns.l"
 {/*ignore space*/}
@@ -1373,7 +1374,7 @@ YY_RULE_SETUP
 #line 106 "parser/patterns.l"
 ECHO;
 	YY_BREAK
-#line 1377 "parser/calc.lexer.c"
+#line 1378 "parser/calc.lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
