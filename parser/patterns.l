@@ -55,6 +55,19 @@
 [Cc][Oo][Nn][Ss][Tt][Rr][Aa][Ii][Nn][Tt]                        {return CONSTRAINT;}
 [Dd][Ee][Ff][Aa][Uu][Ll][Tt]                                    {return DEFAULT;}
 
+[*]                                                             {return STAR;}
+[Ss][Uu][Mm]                                                    {return SUM;}
+[Aa][Vv][Gg]                                                    {return AVG;}
+[Mm][Ii][Nn]                                                    {return MIN;}
+[Mm][Aa][Xx]                                                    {return MAX;}
+[Cc][Oo][Uu][Nn][Tt]                                            {return COUNT;}
+[Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt]                                {return DISTINCT;}
+
+[+]                                                             {return PLUS;}
+[-]                                                             {return SUBTRACT;}
+[/]                                                             {return DIVISION;}
+[|][|]                                                          {return CONCATENATION;}
+
 [Cc][Hh][Aa][Rr]                                                {return CHAR;}
 [Vv][Aa][Rr][Cc][Hh][Aa][Rr]                                    {return VARCHAR;}
 [Bb][Ii][Tt]                                                    {return BIT;}

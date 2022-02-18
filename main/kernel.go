@@ -40,6 +40,5 @@ func main() {
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
 
-	ast = kernel.parser.ParseSql("drop trigger k;")
-	fmt.Println(ASTToString(ast))
+	ast = kernel.parser.ParseSql("a+(b*c/2)+6")
 }

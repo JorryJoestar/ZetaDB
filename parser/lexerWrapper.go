@@ -109,6 +109,32 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.END:
 		return END
 
+	//expression
+	case C.PLUS:
+		return PLUS
+	case C.SUBTRACT:
+		return SUBTRACT
+	case C.DIVISION:
+		return DIVISION
+	case C.CONCATENATION:
+		return CONCATENATION
+
+	//aggregation
+	case C.STAR:
+		return STAR
+	case C.SUM:
+		return SUM
+	case C.AVG:
+		return AVG
+	case C.MIN:
+		return MIN
+	case C.MAX:
+		return MAX
+	case C.COUNT:
+		return COUNT
+	case C.DISTINCT:
+		return DISTINCT
+
 	//constraint
 	case C.UNIQUE:
 		return UNIQUE

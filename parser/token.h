@@ -41,6 +41,15 @@ enum {
     BEGINTOKEN      = 283,  //BEGIN
     END             = 314,
 
+//aggregation
+    STAR            = 245,  //*
+    AVG             = 259,
+    MIN             = 260,
+    MAX             = 261,
+    COUNT           = 262,
+    SUM             = 263,
+    DISTINCT        = 239,
+
 //constraint
     UNIQUE            = 231,
     PRIMARYKEY        = 230,  //PRIMARY KEY
@@ -68,6 +77,12 @@ enum {
     ALL             = 254,
     ANY             = 255,
     IS              = 256,
+
+//expression
+    SUBTRACT        = 271,  //-
+    DIVISION        = 272,  ///
+    CONCATENATION   = 273,  //||
+    PLUS            = 274,  //+
 
     NOTEQUAL        = 246,  // <>
     LESS            = 247,  // <
@@ -124,15 +139,10 @@ enum {
     GROUPBY         = 236,  //GROUP BY
     HAVING          = 237,
     ORDERBY         = 238,  //ORDER BY
-    DISTINCT        = 239,
+
     SELECT          = 240,
 
-    STAR            = 245,  //*
-    AVG             = 259,
-    MIN             = 260,
-    MAX             = 261,
-    COUNT           = 262,
-    SUM             = 263,
+
 
     JOIN            = 264,
     NATURAL         = 265,
@@ -142,10 +152,6 @@ enum {
     OUTER           = 269,
     CROSS           = 270,
 
-    SUBTRACT        = 271,  //-
-    DIVISION        = 272,  ///
-    CONCATENATION   = 273,  //||
-    PLUS            = 274,  //+
 
     DESC            = 275,
     ASC             = 276,

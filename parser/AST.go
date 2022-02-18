@@ -217,18 +217,18 @@ type QueryNode struct {
 type SelectListEntryEnum uint8
 
 const (
-	SELECT_LIST_ENTRY_ATTRIBUTE_NAME SelectListEntryEnum = 1 //AttriNameWithTableName
+	SELECT_LIST_ENTRY_ATTRIBUTE_NAME SelectListEntryEnum = 1 //AttriNameOptionTableName
 	SELECT_LIST_ENTRY_AGGREGATION    SelectListEntryEnum = 2 //Aggregation
 	SELECT_LIST_ENTRY_EXPRESSION     SelectListEntryEnum = 3 //Expression
 )
 
 type SelectListEntryNode struct {
-	Type                   SelectListEntryEnum
-	AliasValid             bool
-	Alias                  string
-	AttriNameWithTableName *AttriNameOptionTableNameNode
-	Aggregation            *AggregationNode
-	Expression             *ExpressionNode
+	Type                     SelectListEntryEnum
+	AliasValid               bool
+	Alias                    string
+	AttriNameOptionTableName *AttriNameOptionTableNameNode
+	Aggregation              *AggregationNode
+	Expression               *ExpressionNode
 }
 
 type FromListEntryEnum uint8
@@ -266,10 +266,10 @@ const (
 )
 
 type OrderByListEntryNode struct {
-	Type                   OrderByListEntryEnum
-	Trend                  OrderTrendEnum
-	Expression             *ExpressionNode
-	AttriNameWithTableName *AttriNameOptionTableNameNode
+	Type                     OrderByListEntryEnum
+	Trend                    OrderTrendEnum
+	Expression               *ExpressionNode
+	AttriNameOptionTableName *AttriNameOptionTableNameNode
 }
 
 //---------------------------------------- DCL ----------------------------------------
@@ -549,11 +549,11 @@ const (
 )
 
 type ExpressionEntryNode struct {
-	Type                   ExpressionEntryEnum
-	ElementaryValue        *ElementaryValueNode          //EXPRESSION_ENTRY_ELEMENTARY_VALUE
-	AttriNameWithTableName *AttriNameOptionTableNameNode //EXPRESSION_ENTRY_ATTRIBUTE_NAME
-	Aggregation            *AggregationNode              //EXPRESSION_ENTRY_AGGREGATION
-	Expression             *ExpressionNode               //EXPRESSION_ENTRY_EXPRESSION
+	Type                     ExpressionEntryEnum
+	ElementaryValue          *ElementaryValueNode          //EXPRESSION_ENTRY_ELEMENTARY_VALUE
+	AttriNameOptionTableName *AttriNameOptionTableNameNode //EXPRESSION_ENTRY_ATTRIBUTE_NAME
+	Aggregation              *AggregationNode              //EXPRESSION_ENTRY_AGGREGATION
+	Expression               *ExpressionNode               //EXPRESSION_ENTRY_EXPRESSION
 }
 
 //aggregation
@@ -569,7 +569,7 @@ const (
 )
 
 type AggregationNode struct {
-	Type                   AggregationEnum
-	DistinctValid          bool                          //invalid when AGGREGATION_COUNT_ALL
-	AttriNameWithTableName *AttriNameOptionTableNameNode //invalid when AGGREGATION_COUNT_ALL
+	Type                     AggregationEnum
+	DistinctValid            bool                          //invalid when AGGREGATION_COUNT_ALL
+	AttriNameOptionTableName *AttriNameOptionTableNameNode //invalid when AGGREGATION_COUNT_ALL
 }

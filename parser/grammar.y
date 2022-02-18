@@ -2,6 +2,7 @@
 package parser
 
 import (
+    "fmt"
 )
 
 // -------------------- Node --------------------
@@ -56,9 +57,7 @@ const (
 
     CONDITION_NODE                  NodeEnum = 25
     PREDICATE_NODE                  NodeEnum = 26
-    EXPRESSION_NODE                 NodeEnum = 27
     EXPRESSION_ENTRY                NodeEnum = 28
-    AGGREGATION_NODE                NodeEnum = 29
 
 /* predicate */
     COMPAREMARK_ENUM                NodeEnum = 34
@@ -73,6 +72,13 @@ const (
     TRIGGER_FOR_EACH_ENUM           NodeEnum = 38
     TRIGGER_OLDNEW_ENTRY            NodeEnum = 39
     TRIGGER_BEFOREAFTER_NODE        NodeEnum = 40
+
+/* expression */
+    EXPRESSION_NODE                 NodeEnum = 41
+    EXPRESSION_ENTRY_NODE           NodeEnum = 42
+
+/* aggregation */
+    AGGREGATION_NODE                NodeEnum = 43
 )
 
 type Node struct {
@@ -116,6 +122,9 @@ type Node struct {
     Constraint           *ConstraintNode
     ForeignKeyParameter  *ForeignKeyParameterNode
 
+/* aggregation */
+    Aggregation             *AggregationNode
+
 /* condition */
     Condition                *ConditionNode
 
@@ -137,11 +146,11 @@ type Node struct {
     TriggerOldNewEntry       *TriggerOldNewEntryNode
     TriggerBeforeAfterStmt   *TriggerBeforeAfterStmtNode
 
-/* public */
-
+/* expression */
     Expression               *ExpressionNode
     ExpressionEntry          *ExpressionEntryNode
-    Aggregation              *AggregationNode
+
+/* public */
     Subquery                 *QueryNode
 }
 
@@ -268,6 +277,16 @@ type TriggerBeforeAfterStmtNode struct {
 // dropTrigger
 %type <NodePt> dropTriggerStmt
 
+// aggregation
+%type <NodePt> aggregation
+%token STAR SUM AVG MIN MAX COUNT DISTINCT
+
+// expression
+%type <NodePt> expression
+%type <NodePt> expressionEntry
+%token PLUS SUBTRACT DIVISION CONCATENATION
+%left PLUS SUBTRACT DIVISION CONCATENATION STAR
+
 // constraint
 %type <List> constraintAfterAttributeList
 %type <NodePt> constraintAfterAttribute
@@ -344,6 +363,14 @@ ast
         $$.Ast.Ddl = $1.Ddl
 
         GetInstance().AST = $$.Ast
+    }
+    |aggregation {  // TODO
+        $$ = &Node{}
+        fmt.Println("aaa")
+    }
+    |expression {   // TODO
+        $$ = &Node{}
+        fmt.Println("bbb")
     }
     ;
 
@@ -1141,6 +1168,304 @@ dropTriggerStmt
 
         $$.Trigger = &TriggerNode{}
         $$.Trigger.TriggerName = $3
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                 createPsmStmt                                |
+    --------------------------------------------------------------------------------
+
+        createPsmStmt
+            CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody SEMICOLON
+            CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody SEMICOLON
+            CREATE PROCEDURE ID psmLocalDeclarationList psmBody SEMICOLON
+            CREATE PROCEDURE ID psmBody SEMICOLON
+            CREATE FUNCTION ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody SEMICOLON
+            CREATE FUNCTION ID LPAREN psmParameterList RPAREN psmBody SEMICOLON
+            CREATE FUNCTION ID psmLocalDeclarationList psmBody SEMICOLON
+            CREATE FUNCTION ID psmBody SEMICOLON
+
+        psmParameterList
+            psmParameterList COMMA psmParameterEntry
+            psmParameterEntry
+
+        psmParameterEntry
+            IN ID domain
+			OUT ID domain
+			INOUT ID domain
+
+        psmLocalDeclarationList
+            psmLocalDeclarationList psmLocalDeclarationEntry
+            psmLocalDeclarationEntry
+
+        psmLocalDeclarationEntry
+            DECLARE ID domain SEMICOLON
+        ////
+        
+        psmBody
+            BEGINTOKEN psmExecList END SEMICOLON
+
+        psmExecList
+            psmExecList psmExecEntry
+
+        psmExecEntry
+            RETURN psmValue SEMICOLON
+			SET ID EQUAL psmValue SEMICOLON
+			OPEN ID SEMICOLON
+			CLOSE ID SEMICOLON
+			psmSimpleLoop
+			psmForLoop
+			psmExecption
+			psmBranch  
+            dml
+			LEAVE ID SEMICOLON
+			FETCH FROM ID INTO ID SEMICOLON
+        ////
+
+        psmValue
+            elementaryValue
+			psmCallStmt
+			expression
+			ID
+        ////
+
+
+    -------------------------------------------------------------------------------- */
+
+/*  --------------------------------------------------------------------------------
+    |                                  expression                                  |
+    --------------------------------------------------------------------------------
+
+        expression
+            expressionEntry PLUS expressionEntry
+            expressionEntry SUBTRACT expressionEntry
+            expressionEntry STAR expressionEntry
+            expressionEntry DIVISION expressionEntry
+            expressionEntry CONCATENATION expressionEntry
+
+        expressionEntry
+            elementaryValue
+            attriNameOptionTableName
+            aggregation
+            expression
+            LPAREN expression RPAREN
+
+    -------------------------------------------------------------------------------- */
+        
+/*  ---------------------------------- expression ---------------------------------- */
+expression
+    :expressionEntry PLUS expressionEntry {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_NODE
+
+        $$.Expression = &ExpressionNode{}
+        $$.Expression.Type = EXPRESSION_OPERATOR_PLUS
+        $$.Expression.ExpressionEntryL = $1.ExpressionEntry
+        $$.Expression.ExpressionEntryR = $3.ExpressionEntry
+    }
+    |expressionEntry SUBTRACT expressionEntry {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_NODE
+
+        $$.Expression = &ExpressionNode{}
+        $$.Expression.Type = EXPRESSION_OPERATOR_MINUS
+        $$.Expression.ExpressionEntryL = $1.ExpressionEntry
+        $$.Expression.ExpressionEntryR = $3.ExpressionEntry
+    }
+    |expressionEntry STAR expressionEntry {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_NODE
+
+        $$.Expression = &ExpressionNode{}
+        $$.Expression.Type = EXPRESSION_OPERATOR_MULTIPLY
+        $$.Expression.ExpressionEntryL = $1.ExpressionEntry
+        $$.Expression.ExpressionEntryR = $3.ExpressionEntry
+    }
+    |expressionEntry DIVISION expressionEntry {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_NODE
+
+        $$.Expression = &ExpressionNode{}
+        $$.Expression.Type = EXPRESSION_OPERATOR_DIVISION
+        $$.Expression.ExpressionEntryL = $1.ExpressionEntry
+        $$.Expression.ExpressionEntryR = $3.ExpressionEntry
+    }
+    |expressionEntry CONCATENATION expressionEntry {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_NODE
+
+        $$.Expression = &ExpressionNode{}
+        $$.Expression.Type = EXPRESSION_OPERATOR_CONCATENATION
+        $$.Expression.ExpressionEntryL = $1.ExpressionEntry
+        $$.Expression.ExpressionEntryR = $3.ExpressionEntry
+    }
+    ;
+
+/*  ------------------------------- expressionEntry -------------------------------- */
+expressionEntry
+    :elementaryValue {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_ENTRY_NODE
+
+        $$.ExpressionEntry = &ExpressionEntryNode{}
+        $$.ExpressionEntry.Type = EXPRESSION_ENTRY_ELEMENTARY_VALUE
+
+        $$.ExpressionEntry.ElementaryValue = $1.ElementaryValue
+    }
+    |attriNameOptionTableName {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_ENTRY_NODE
+
+        $$.ExpressionEntry = &ExpressionEntryNode{}
+        $$.ExpressionEntry.Type = EXPRESSION_ENTRY_ATTRIBUTE_NAME
+
+        $$.ExpressionEntry.AttriNameOptionTableName = $1.AttriNameOptionTableName
+    }
+    |aggregation {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_ENTRY_NODE
+
+        $$.ExpressionEntry = &ExpressionEntryNode{}
+        $$.ExpressionEntry.Type = EXPRESSION_ENTRY_AGGREGATION
+
+        $$.ExpressionEntry.Aggregation = $1.Aggregation
+    }
+    |expression {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_ENTRY_NODE
+
+        $$.ExpressionEntry = &ExpressionEntryNode{}
+        $$.ExpressionEntry.Type = EXPRESSION_ENTRY_EXPRESSION
+
+        $$.ExpressionEntry.Expression = $1.Expression
+    }
+    |LPAREN expression RPAREN {
+        $$ = &Node{}
+        $$.Type = EXPRESSION_ENTRY_NODE
+
+        $$.ExpressionEntry = &ExpressionEntryNode{}
+        $$.ExpressionEntry.Type = EXPRESSION_ENTRY_EXPRESSION
+
+        $$.ExpressionEntry.Expression = $2.Expression
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                 aggregation                                  |
+    --------------------------------------------------------------------------------
+
+        aggregation
+            SUM LPAREN DISTINCT attriNameOptionTableName RPAREN
+            SUM LPAREN attriNameOptionTableName RPAREN
+            AVG LPAREN DISTINCT attriNameOptionTableName RPAREN
+            AVG LPAREN attriNameOptionTableName RPAREN
+            MIN LPAREN DISTINCT attriNameOptionTableName RPAREN
+            MIN LPAREN attriNameOptionTableName RPAREN
+            MAX LPAREN DISTINCT attriNameOptionTableName RPAREN
+            MAX LPAREN attriNameOptionTableName RPAREN
+            COUNT LPAREN DISTINCT attriNameOptionTableName RPAREN
+            COUNT LPAREN attriNameOptionTableName RPAREN
+            COUNT LPAREN STAR RPAREN
+
+    -------------------------------------------------------------------------------- */
+aggregation
+    :SUM LPAREN DISTINCT attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_SUM
+        $$.Aggregation.DistinctValid = true
+        $$.Aggregation.AttriNameOptionTableName = $4.AttriNameOptionTableName
+    }
+    |SUM LPAREN attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_SUM
+        $$.Aggregation.DistinctValid = false
+        $$.Aggregation.AttriNameOptionTableName = $3.AttriNameOptionTableName
+    }
+    |AVG LPAREN DISTINCT attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_AVG
+        $$.Aggregation.DistinctValid = true
+        $$.Aggregation.AttriNameOptionTableName = $4.AttriNameOptionTableName
+    }
+    |AVG LPAREN attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_AVG
+        $$.Aggregation.DistinctValid = false
+        $$.Aggregation.AttriNameOptionTableName = $3.AttriNameOptionTableName
+    }
+    |MIN LPAREN DISTINCT attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_MIN
+        $$.Aggregation.DistinctValid = true
+        $$.Aggregation.AttriNameOptionTableName = $4.AttriNameOptionTableName
+    }
+    |MIN LPAREN attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_MIN
+        $$.Aggregation.DistinctValid = false
+        $$.Aggregation.AttriNameOptionTableName = $3.AttriNameOptionTableName
+    }
+    |MAX LPAREN DISTINCT attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_MAX
+        $$.Aggregation.DistinctValid = true
+        $$.Aggregation.AttriNameOptionTableName = $4.AttriNameOptionTableName
+    }
+    |MAX LPAREN attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_MAX
+        $$.Aggregation.DistinctValid = false
+        $$.Aggregation.AttriNameOptionTableName = $3.AttriNameOptionTableName
+    }
+    |COUNT LPAREN DISTINCT attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_COUNT
+        $$.Aggregation.DistinctValid = true
+        $$.Aggregation.AttriNameOptionTableName = $4.AttriNameOptionTableName
+    }
+    |COUNT LPAREN attriNameOptionTableName RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_COUNT
+        $$.Aggregation.DistinctValid = false
+        $$.Aggregation.AttriNameOptionTableName = $3.AttriNameOptionTableName
+    }
+    |COUNT LPAREN STAR RPAREN {
+        $$ = &Node{}
+        $$.Type = AGGREGATION_NODE
+
+        $$.Aggregation = &AggregationNode{}
+        $$.Aggregation.Type = AGGREGATION_COUNT_ALL
+        $$.Aggregation.DistinctValid = false
     }
     ;
 
