@@ -83,7 +83,60 @@ type IndexNode struct {
 }
 
 //trigger
+type TriggerBeforeAfterEnum uint8
+
+const (
+	BEFORE_UPDATE_OF  TriggerBeforeAfterEnum = 1
+	BEFORE_UPDATE     TriggerBeforeAfterEnum = 2
+	AFTER_UPDATE_OF   TriggerBeforeAfterEnum = 3
+	AFTER_UPDATE      TriggerBeforeAfterEnum = 4
+	INSTEAD_UPDATE_OF TriggerBeforeAfterEnum = 5
+	INSTEAD_UPDATE    TriggerBeforeAfterEnum = 6
+	BEFORE_INSERT     TriggerBeforeAfterEnum = 7
+	AFTER_INSERT      TriggerBeforeAfterEnum = 8
+	INSTEAD_INSERT    TriggerBeforeAfterEnum = 9
+	BEFORE_DELETE     TriggerBeforeAfterEnum = 10
+	AFTER_DELETE      TriggerBeforeAfterEnum = 11
+	INSTEAD_DELETE    TriggerBeforeAfterEnum = 12
+)
+
+type TriggerForEachEnum uint8
+
+const (
+	FOR_EACH_ROW       TriggerForEachEnum = 1
+	FOR_EACH_STATEMENT TriggerForEachEnum = 2
+)
+
 type TriggerNode struct {
+	TriggerName string
+
+	BeforeAfterType      TriggerBeforeAfterEnum
+	BeforeAfterAttriName string
+	BeforeAfterTableName string
+
+	ReferencingValid bool
+	OldNewList       []*TriggerOldNewEntryNode
+
+	ForEachType TriggerForEachEnum
+
+	WhenValid bool
+	Condition *ConditionNode
+
+	DmlList []*DMLNode
+}
+
+type TriggerOldNewEnum uint8
+
+const (
+	OLD_ROW_AS   TriggerOldNewEnum = 1
+	NEW_ROW_AS   TriggerOldNewEnum = 2
+	OLD_TABLE_AS TriggerOldNewEnum = 3
+	NEW_TABLE_AS TriggerOldNewEnum = 4
+)
+
+type TriggerOldNewEntryNode struct {
+	Type TriggerOldNewEnum
+	Name string
 }
 
 //PSM (function, procedure)

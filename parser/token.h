@@ -21,6 +21,26 @@ enum {
     INDEX           = 318,
     ON              = 234,
 
+//createTriggerStmt
+    TRIGGER         = 302,
+    REFERENCING     = 315,
+    BEFORE          = 303,
+    UPDATE          = 279,
+    OF              = 304,
+    AFTER           = 305,
+    INSTEAD         = 316,
+    INSERT          = 306,
+    DELETE          = 278,
+    OLD             = 307,
+    ROW             = 308,
+    NEW             = 309,
+    FOR             = 310,
+    EACH            = 311,
+    STATEMENT       = 312,
+    WHEN            = 313,
+    BEGINTOKEN      = 283,  //BEGIN
+    END             = 314,
+
 //constraint
     UNIQUE            = 231,
     PRIMARYKEY        = 230,  //PRIMARY KEY
@@ -131,34 +151,17 @@ enum {
     ASC             = 276,
     EXISTS          = 277,
 
-    DELETE          = 278,
-    UPDATE          = 279,
+
+
     SET             = 280,
     INSERTINTO      = 281,  //INSERT INTO
     VALUES          = 282,
 
-    BEGINTOKEN      = 283,  //BEGIN
+
     START           = 284,
     TRANSACTION     = 285,
     COMMIT          = 286,
     ROLLBACK        = 287,
-
-
-    TRIGGER         = 302,
-    BEFORE          = 303,
-    OF              = 304,
-    AFTER           = 305,
-    INSERT          = 306,
-    OLD             = 307,
-    ROW             = 308,
-    NEW             = 309,
-    FOR             = 310,
-    EACH            = 311,
-    STATEMENT       = 312,
-    WHEN            = 313,
-    END             = 314,
-    REFERENCING     = 315,
-    INSTEAD         = 316,
 
     CONNECT         = 319, 
     TO              = 320,

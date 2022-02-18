@@ -69,8 +69,10 @@ const (
 /* createTable */
     ATTRIBUTE_DECLARATION_NODE      NodeEnum = 36
 
-// NodeEnum = 38
-
+/* createTrigger */
+    TRIGGER_FOR_EACH_ENUM           NodeEnum = 38
+    TRIGGER_OLDNEW_ENTRY            NodeEnum = 39
+    TRIGGER_BEFOREAFTER_NODE        NodeEnum = 40
 )
 
 type Node struct {
@@ -130,6 +132,11 @@ type Node struct {
 /* domain */
     Domain                   *DomainNode
 
+/* trigger */
+    TriggerForEach           TriggerForEachEnum
+    TriggerOldNewEntry       *TriggerOldNewEntryNode
+    TriggerBeforeAfterStmt   *TriggerBeforeAfterStmtNode
+
 /* public */
 
     Expression               *ExpressionNode
@@ -146,6 +153,8 @@ const (
     CONSTRAINT_LIST                 ListEnum = 2
     ATTRINAME_OPTION_TABLENAME_LIST ListEnum = 3
     ATTRIBUTE_DECLARATION_LIST      ListEnum = 4
+    TRIGGER_OLDNEW_LIST             ListEnum = 5
+    DML_LIST                        ListEnum = 6
 )
 
 type List struct {
@@ -154,6 +163,8 @@ type List struct {
     ConstraintList               []*ConstraintNode
     AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
     AttributeDeclarationList     []*AttributeDeclarationNode
+    TriggerOldNewList            []*TriggerOldNewEntryNode
+    DmlList                      []*DMLNode
 }
 
 // -------------------- temporary struct --------------------
@@ -177,6 +188,13 @@ type ForeignKeyParameterNode struct {
 	DeleteSet            ConstraintDeleteSetEnum
 }
 
+// triggerBeforeAfterStmt
+type TriggerBeforeAfterStmtNode struct {
+    BeforeAfterType      TriggerBeforeAfterEnum
+	BeforeAfterAttriName string
+	BeforeAfterTableName string
+}
+
 %}
 
 %union {
@@ -194,6 +212,10 @@ type ForeignKeyParameterNode struct {
 
 // ddl
 %type <NodePt> ddl
+
+// dml
+%type <NodePt> dml
+
 
 // createTable
 %type <NodePt> createTableStmt
@@ -230,6 +252,18 @@ type ForeignKeyParameterNode struct {
 
 // dropIndex
 %type <NodePt> dropIndexStmt
+
+// createTrigger
+%type <NodePt> createTriggerStmt
+%type <NodePt> triggerBeforeAfterStmt
+%type <List>   triggerOldNewList
+%type <NodePt> oldNewEntry
+%type <NodePt> triggerForEachEnum
+%type <NodePt> triggerWhenCondition
+%type <List>   triggerExecStmt
+%type <List>   dmlList
+%token TRIGGER REFERENCING BEFORE UPDATE OF AFTER INSTEAD INSERT DELETE
+%token OLD ROW NEW FOR EACH STATEMENT WHEN BEGINTOKEN END
 
 // constraint
 %type <List> constraintAfterAttributeList
@@ -286,7 +320,7 @@ type ForeignKeyParameterNode struct {
 %%
 
 /*  --------------------------------------------------------------------------------
-    |                                      AST                                     |
+    |                                      ast                                     |
     --------------------------------------------------------------------------------
     
         ast
@@ -311,7 +345,7 @@ ast
     ;
 
 /*  --------------------------------------------------------------------------------
-    |                                     DDL                                      |
+    |                                     ddl                                      |
     --------------------------------------------------------------------------------
 
         ddl
@@ -411,6 +445,29 @@ ddl
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_INDEX_DROP
         $$.Ddl.Index = $1.Index
+    }
+    |createTriggerStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_TRIGGER_CREATE
+        $$.Ddl.Trigger = $1.Trigger
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                     dml                                      |
+    --------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------- */
+dml
+    :DOT SEMICOLON {
+        // TODO
+        $$ = &Node{}
+        $$.Type = DML_NODE
+
+        $$.Dml = &DMLNode{}
     }
     ;
 
@@ -725,6 +782,336 @@ dropIndexStmt
 
         $$.Index = &IndexNode{}
         $$.Index.IndexName = $3
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                               createTriggerStmt                              |
+    --------------------------------------------------------------------------------
+
+        createTriggerStmt
+            CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerWhenCondition triggerExecStmt
+            CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerWhenCondition triggerExecStmt
+            CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerExecStmt
+            CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerExecStmt
+
+        triggerBeforeAfterStmt
+            BEFORE UPDATE ON ID
+			BEFORE UPDATE OF ID ON ID
+			AFTER UPDATE ON ID
+			AFTER UPDATE OF ID ON ID
+			INSTEAD OF UPDATE ON ID
+			INSTEAD OF UPDATE OF ID ON ID
+			BEFORE INSERT ON ID
+			AFTER INSERT ON ID
+			INSTEAD OF INSERT ON ID
+			BEFORE DELETE ON ID
+			AFTER DELETE ON ID
+			INSTEAD OF DELETE ON ID
+
+        triggerOldNewList
+            oldNewEntry
+			triggerOldNewList COMMA oldNewEntry
+        
+        oldNewEntry
+            OLD ROW AS ID
+			NEW ROW AS ID
+			OLD TABLE AS ID
+			NEW TABLE AS ID
+        
+        triggerForEachEnum
+            FOR EACH ROW
+            FOR EACH STATEMENT
+
+        triggerWhenCondition
+            WHEN condition
+        
+        triggerExecStmt
+            BEGINTOKEN dmlList END SEMICOLON
+
+        dmlList
+            dml
+            dmlList dml
+
+    -------------------------------------------------------------------------------- */
+
+/*  ------------------------------ createTriggerStmt ------------------------------- */
+createTriggerStmt
+    :CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerWhenCondition triggerExecStmt {
+        $$ = &Node{}
+        $$.Type = TRIGGER_NODE
+
+        $$.Trigger = &TriggerNode{}
+        $$.Trigger.TriggerName = $3
+
+        $$.Trigger.BeforeAfterType = $4.TriggerBeforeAfterStmt.BeforeAfterType
+        $$.Trigger.BeforeAfterAttriName = $4.TriggerBeforeAfterStmt.BeforeAfterAttriName
+        $$.Trigger.BeforeAfterTableName = $4.TriggerBeforeAfterStmt.BeforeAfterTableName
+
+        $$.Trigger.ReferencingValid = true
+        $$.Trigger.OldNewList = $6.TriggerOldNewList
+
+        $$.Trigger.ForEachType = $7.TriggerForEach
+
+        $$.Trigger.WhenValid = true
+        $$.Trigger.Condition = $8.Condition
+
+        $$.Trigger.DmlList = $9.DmlList
+    }
+    |CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerWhenCondition triggerExecStmt {
+        $$ = &Node{}
+        $$.Type = TRIGGER_NODE
+
+        $$.Trigger = &TriggerNode{}
+        $$.Trigger.TriggerName = $3
+
+        $$.Trigger.BeforeAfterType = $4.TriggerBeforeAfterStmt.BeforeAfterType
+        $$.Trigger.BeforeAfterAttriName = $4.TriggerBeforeAfterStmt.BeforeAfterAttriName
+        $$.Trigger.BeforeAfterTableName = $4.TriggerBeforeAfterStmt.BeforeAfterTableName
+
+        $$.Trigger.ReferencingValid = false
+
+        $$.Trigger.ForEachType = $5.TriggerForEach
+
+        $$.Trigger.WhenValid = true
+        $$.Trigger.Condition = $6.Condition
+
+        $$.Trigger.DmlList = $7.DmlList
+    }
+    |CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerExecStmt {
+        $$ = &Node{}
+        $$.Type = TRIGGER_NODE
+
+        $$.Trigger = &TriggerNode{}
+        $$.Trigger.TriggerName = $3
+
+        $$.Trigger.BeforeAfterType = $4.TriggerBeforeAfterStmt.BeforeAfterType
+        $$.Trigger.BeforeAfterAttriName = $4.TriggerBeforeAfterStmt.BeforeAfterAttriName
+        $$.Trigger.BeforeAfterTableName = $4.TriggerBeforeAfterStmt.BeforeAfterTableName
+
+        $$.Trigger.ReferencingValid = true
+        $$.Trigger.OldNewList = $6.TriggerOldNewList
+
+        $$.Trigger.ForEachType = $7.TriggerForEach
+
+        $$.Trigger.WhenValid = false
+
+        $$.Trigger.DmlList = $8.DmlList
+    }
+    |CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerExecStmt {
+        $$ = &Node{}
+        $$.Type = TRIGGER_NODE
+
+        $$.Trigger = &TriggerNode{}
+        $$.Trigger.TriggerName = $3
+
+        $$.Trigger.BeforeAfterType = $4.TriggerBeforeAfterStmt.BeforeAfterType
+        $$.Trigger.BeforeAfterAttriName = $4.TriggerBeforeAfterStmt.BeforeAfterAttriName
+        $$.Trigger.BeforeAfterTableName = $4.TriggerBeforeAfterStmt.BeforeAfterTableName
+
+        $$.Trigger.ReferencingValid = false
+
+        $$.Trigger.ForEachType = $5.TriggerForEach
+
+        $$.Trigger.WhenValid = false
+
+        $$.Trigger.DmlList = $6.DmlList
+    }
+    ;
+
+/*  --------------------------- triggerBeforeAfterStmt ----------------------------- */
+triggerBeforeAfterStmt
+    :BEFORE UPDATE ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = BEFORE_UPDATE
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $4
+    }
+	|BEFORE UPDATE OF ID ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = BEFORE_UPDATE_OF
+        $$.TriggerBeforeAfterStmt.BeforeAfterAttriName = $4
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $6
+    }
+	|AFTER UPDATE ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = AFTER_UPDATE
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $4
+    }
+	|AFTER UPDATE OF ID ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = AFTER_UPDATE_OF
+        $$.TriggerBeforeAfterStmt.BeforeAfterAttriName = $4
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $6
+    }
+	|INSTEAD OF UPDATE ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = INSTEAD_UPDATE
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $5
+    }
+	|INSTEAD OF UPDATE OF ID ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = INSTEAD_UPDATE_OF
+        $$.TriggerBeforeAfterStmt.BeforeAfterAttriName = $5
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $7
+    }
+	|BEFORE INSERT ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = BEFORE_INSERT
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $4
+    }
+	|AFTER INSERT ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = AFTER_INSERT
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $4
+    }
+	|INSTEAD OF INSERT ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = INSTEAD_INSERT
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $5
+    }
+	|BEFORE DELETE ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = BEFORE_DELETE
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $4
+    }
+	|AFTER DELETE ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = AFTER_DELETE
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $4
+    }
+	|INSTEAD OF DELETE ON ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_BEFOREAFTER_NODE
+
+        $$.TriggerBeforeAfterStmt = &TriggerBeforeAfterStmtNode{}
+        $$.TriggerBeforeAfterStmt.BeforeAfterType = INSTEAD_DELETE
+        $$.TriggerBeforeAfterStmt.BeforeAfterTableName = $5
+    }
+    ;
+
+/*  ----------------------------- triggerOldNewList -------------------------------- */
+triggerOldNewList
+    :oldNewEntry {
+        $$ = List{}
+        $$.Type = TRIGGER_OLDNEW_LIST
+
+        $$.TriggerOldNewList = append($$.TriggerOldNewList,$1.TriggerOldNewEntry)
+    }
+	|triggerOldNewList COMMA oldNewEntry {
+        $$ = $1
+
+        $$.TriggerOldNewList = append($$.TriggerOldNewList,$3.TriggerOldNewEntry)
+    }
+    ;
+
+/*  --------------------------------- oldNewEntry ---------------------------------- */
+oldNewEntry
+    :OLD ROW AS ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_OLDNEW_ENTRY
+
+        $$.TriggerOldNewEntry = &TriggerOldNewEntryNode{}
+        $$.TriggerOldNewEntry.Type = OLD_ROW_AS
+        $$.TriggerOldNewEntry.Name = $4
+    }
+	|NEW ROW AS ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_OLDNEW_ENTRY
+
+        $$.TriggerOldNewEntry = &TriggerOldNewEntryNode{}
+        $$.TriggerOldNewEntry.Type = NEW_ROW_AS
+        $$.TriggerOldNewEntry.Name = $4
+    }
+	|OLD TABLE AS ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_OLDNEW_ENTRY
+
+        $$.TriggerOldNewEntry = &TriggerOldNewEntryNode{}
+        $$.TriggerOldNewEntry.Type = OLD_TABLE_AS
+        $$.TriggerOldNewEntry.Name = $4
+    }
+	|NEW TABLE AS ID {
+        $$ = &Node{}
+        $$.Type = TRIGGER_OLDNEW_ENTRY
+
+        $$.TriggerOldNewEntry = &TriggerOldNewEntryNode{}
+        $$.TriggerOldNewEntry.Type = NEW_TABLE_AS
+        $$.TriggerOldNewEntry.Name = $4
+    }
+    ;
+
+/*  ------------------------------ triggerForEachEnum ------------------------------ */
+triggerForEachEnum
+    :FOR EACH ROW {
+        $$ = &Node{}
+        $$.Type = TRIGGER_FOR_EACH_ENUM
+        $$.TriggerForEach = FOR_EACH_ROW
+    }
+    |FOR EACH STATEMENT {
+        $$ = &Node{}
+        $$.Type = TRIGGER_FOR_EACH_ENUM
+        $$.TriggerForEach = FOR_EACH_STATEMENT
+    }
+    ;
+
+/*  ---------------------------- triggerWhenCondition ------------------------------ */
+triggerWhenCondition
+    :WHEN condition {
+        $$ = $2
+    }
+    ;
+
+/*  -------------------------------- triggerExecStmt ------------------------------- */
+triggerExecStmt
+    :BEGINTOKEN dmlList END SEMICOLON {
+        $$ = $2
+    }
+    ;
+
+/*  ---------------------------------- dmlList ------------------------------------- */
+dmlList
+    :dml {
+        $$ = List{}
+        $$.Type = DML_LIST
+        
+        $$.DmlList = append($$.DmlList,$1.Dml)
+    }
+    |dmlList dml {
+        $$ = $1
+        $$.DmlList = append($$.DmlList,$2.Dml)
     }
     ;
 

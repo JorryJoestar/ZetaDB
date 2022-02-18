@@ -21,6 +21,25 @@
 [Ii][Nn][Dd][Ee][Xx]                                            {return INDEX;}
 [Oo][Nn]                                                        {return ON;}
 
+[Tt][Rr][Ii][Gg][Gg][Ee][Rr]                                    {return TRIGGER;}
+[Rr][Ee][Ff][Ee][Rr][Ee][Nn][Cc][Ii][Nn][Gg]                    {return REFERENCING;}
+[Bb][Ee][Ff][Oo][Rr][Ee]                                        {return BEFORE;}
+[Uu][Pp][Dd][Aa][Tt][Ee]                                        {return UPDATE;}
+[Oo][Ff]                                                        {return OF;}
+[Aa][Ff][Tt][Ee][Rr]                                            {return AFTER;}
+[Ii][Nn][Ss][Tt][Ee][Aa][Dd]                                    {return INSTEAD;}
+[Ii][Nn][Ss][Ee][Rr][Tt]                                        {return INSERT;}
+[Dd][Ee][Ll][Ee][Tt][Ee]                                        {return DELETE;}
+[Oo][Ll][Dd]                                                    {return OLD;}
+[Rr][Oo][Ww]                                                    {return ROW;}
+[Nn][Ee][Ww]                                                    {return NEW;}
+[Ff][Oo][Rr]                                                    {return FOR;}
+[Ee][Aa][Cc][Hh]                                                {return EACH;}
+[Ss][Tt][Aa][Tt][Ee][Mm][Ee][Nn][Tt]                            {return STATEMENT;}
+[Ww][Hh][Ee][Nn]                                                {return WHEN;}
+[Bb][Ee][Gg][Ii][Nn]                                            {return BEGINTOKEN;}
+[Ee][Nn][Dd]                                                    {return END;}
+
 [Uu][Nn][Ii][Qq][Uu][Ee]                                        {return UNIQUE;}
 [Pp][Rr][Ii][Mm][Aa][Rr][Yy][ ][Kk][Ee][Yy]                     {return PRIMARYKEY;}
 [Cc][Hh][Ee][Cc][Kk]                                            {return CHECK;}

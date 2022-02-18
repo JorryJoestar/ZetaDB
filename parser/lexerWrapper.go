@@ -71,6 +71,44 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.ON:
 		return ON
 
+	//createTrigger
+	case C.TRIGGER:
+		return TRIGGER
+	case C.REFERENCING:
+		return REFERENCING
+	case C.BEFORE:
+		return BEFORE
+	case C.UPDATE:
+		return UPDATE
+	case C.OF:
+		return OF
+	case C.AFTER:
+		return AFTER
+	case C.INSTEAD:
+		return INSTEAD
+	case C.INSERT:
+		return INSERT
+	case C.DELETE:
+		return DELETE
+	case C.OLD:
+		return OLD
+	case C.ROW:
+		return ROW
+	case C.NEW:
+		return NEW
+	case C.FOR:
+		return FOR
+	case C.EACH:
+		return EACH
+	case C.STATEMENT:
+		return STATEMENT
+	case C.WHEN:
+		return WHEN
+	case C.BEGINTOKEN:
+		return BEGINTOKEN
+	case C.END:
+		return END
+
 	//constraint
 	case C.UNIQUE:
 		return UNIQUE

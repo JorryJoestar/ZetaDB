@@ -314,7 +314,7 @@ extern int yylex (void);
 #undef YY_DECL
 #endif
 
-#line 87 "parser/patterns.l"
+#line 106 "parser/patterns.l"
 
 
 #line 321 "parser/calc.lexer.h"

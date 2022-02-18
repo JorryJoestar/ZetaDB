@@ -25,6 +25,17 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-	ast := kernel.parser.ParseSql("drop index i;")
+	s := ""
+	s += "create trigger t\n"
+	s += "instead of update of k on m\n"
+	s += "referencing\n"
+	s += "\told row as k\n"
+	s += "for each row\n"
+	s += "when (x < 12)\n"
+	s += "begin\n"
+	s += ".;.;"
+	s += "end;"
+
+	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
 }
