@@ -364,6 +364,7 @@ type TriggerBeforeAfterStmtNode struct {
 
 // psm
 %type <NodePt> createPsmStmt
+%type <NodePt> dropPsmStmt
 %type <List> psmParameterList
 %type <NodePt> psmParameterEntry
 %type <List> psmLocalDeclarationList
@@ -413,10 +414,6 @@ ast
         $$.Ast.Ddl = $1.Ddl
 
         GetInstance().AST = $$.Ast
-    }
-    |aggregation {  // TODO
-        $$ = &Node{}
-        fmt.Println("aaa")
     }
     |psmCallStmt { // TODO
         $$ = &Node{}
@@ -548,6 +545,14 @@ ddl
 
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_PSM_CREATE
+        $$.Ddl.Psm = $1.Psm
+    }
+    |dropPsmStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_PSM_DROP
         $$.Ddl.Psm = $1.Psm
     }
     ;
@@ -1663,6 +1668,34 @@ psmValue
         $$.PsmValue = &PsmValueNode{}
         $$.PsmValue.Type = PSMVALUE_ID
         $$.PsmValue.Id = $1
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                  dropPsmStmt                                 |
+    --------------------------------------------------------------------------------
+
+        dropPsmStmt
+            DROP FUNCTION ID SEMICOLON
+            DROP PROCEDURE ID SEMICOLON
+    
+    -------------------------------------------------------------------------------- */
+dropPsmStmt
+    :DROP FUNCTION ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_FUNCTION
+        $$.Psm.PsmName = $3
+    }
+    |DROP PROCEDURE ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_PROCEDURE
+        $$.Psm.PsmName = $3
     }
     ;
 

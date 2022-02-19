@@ -50,4 +50,9 @@ func main() {
 
 	ast = kernel.parser.ParseSql(k)
 	fmt.Println(ASTToString(ast))
+
+	l := "drop function m;"
+
+	ast = kernel.parser.ParseSql(l)
+	fmt.Println(ASTToString(ast))
 }

@@ -561,8 +561,17 @@ func PsmCallStmtToString(psmCall *parser.PsmNode, tabs string) string {
 }
 
 func PsmDropToString(psm *parser.PsmNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "PsmNode\n"
+
+	switch psm.Type {
+	case parser.PSM_PROCEDURE:
+		s += tabs + "Type: PSM_PROCEDURE\n"
+	case parser.PSM_FUNCTION:
+		s += tabs + "Type: PSM_FUNCTION\n"
+	}
+
+	s += tabs + "PsmName: " + psm.PsmName + "\n"
+
 	return s
 }
 
