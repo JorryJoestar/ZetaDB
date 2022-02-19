@@ -270,6 +270,18 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return RETURN
 	case C.SET:
 		return SET
+	case C.OUT:
+		return OUT
+	case C.INOUT:
+		return INOUT
+	case C.DECLARE:
+		return DECLARE
+	case C.PROCEDURE:
+		return PROCEDURE
+	case C.FUNCTION:
+		return FUNCTION
+	case C.RETURNS:
+		return RETURNS
 
 	//public
 	case C.LPAREN:

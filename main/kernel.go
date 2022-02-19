@@ -40,14 +40,14 @@ func main() {
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
 
-	k := "begin\n"
-	k += "if k < 12 then\n"
-	k += "\tset k = 1;\n"
-	k += "\telseif k>12 then set k = 100;\n"
-	k += "\telseif k>100 then set k = 0;\n"
-	k += "else return r;\n"
-	k += "end if;"
+	k := "create procedure p\n"
+	k += "(in f varchar(12),out x shortint)\n"
+	k += "declare m int;\n"
+	k += "declare h decimal(22,1);\n"
+	k += "begin\n"
+	k += "set n = 2;\n"
 	k += "end;\n"
 
 	ast = kernel.parser.ParseSql(k)
+	fmt.Println(ASTToString(ast))
 }

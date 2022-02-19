@@ -86,6 +86,8 @@ const (
     PSM_FOR_LOOP_NODE               NodeEnum = 46
     PSM_BRANCH_NODE                 NodeEnum = 47
     PSM_ELSEIF_ENTRY_NODE           NodeEnum = 48
+    PSM_PARAMETER_ENTRY_NODE        NodeEnum = 49
+    PSM_LOCAL_DECLARATION_ENTRY_NODE NodeEnum = 50
 )
 
 type Node struct {
@@ -163,7 +165,8 @@ type Node struct {
     PsmForLoop               *PsmForLoopNode
     PsmBranch                *PsmBranchNode
     PsmElseifEntry           *PsmElseifEntryNode
-
+    PsmParameterEntry        *PsmParameterEntryNode
+    PsmLocalDeclarationEntry *PsmLocalDeclarationEntryNode
 
 /* public */
     Subquery                 *QueryNode
@@ -182,6 +185,8 @@ const (
     PSM_VALUE_LIST                  ListEnum = 7
     PSM_EXEC_LIST                   ListEnum = 8
     PSM_ELSEIF_LIST                 ListEnum = 9
+    PSM_PARAMETER_LIST              ListEnum = 10
+    PSM_LOCAL_DECLARATION_LIST      ListEnum = 11
 )
 
 type List struct {
@@ -195,6 +200,8 @@ type List struct {
     PsmValueList                 []*PsmValueNode
     PsmExecList                  []*PsmExecEntryNode
     PsmElseifList                []*PsmElseifEntryNode
+    PsmParameterList             []*PsmParameterEntryNode
+    PsmLocalDeclarationList      []*PsmLocalDeclarationEntryNode
 }
 
 // -------------------- temporary struct --------------------
@@ -356,6 +363,11 @@ type TriggerBeforeAfterStmtNode struct {
 %token <Boolean> BOOLVALUE
 
 // psm
+%type <NodePt> createPsmStmt
+%type <List> psmParameterList
+%type <NodePt> psmParameterEntry
+%type <List> psmLocalDeclarationList
+%type <NodePt> psmLocalDeclarationEntry
 %type <List> psmBody
 %type <List> psmExecList
 %type <NodePt> psmExecEntry
@@ -364,7 +376,7 @@ type TriggerBeforeAfterStmtNode struct {
 %type <List> psmElseifList
 %type <NodePt> psmElseifEntry
 %type <NodePt> psmValue
-%token ELSEIF THEN IF ELSE CURSOR DO RETURN SET
+%token ELSEIF THEN IF ELSE CURSOR DO RETURN SET OUT INOUT DECLARE PROCEDURE FUNCTION RETURNS
 
 // psmCallStmt
 %type <NodePt> psmCallStmt
@@ -409,10 +421,6 @@ ast
     |psmCallStmt { // TODO
         $$ = &Node{}
         fmt.Println("psmCallStmt")
-    }
-    |psmBody {  // TODO
-        $$ = &Node{}
-        fmt.Println("psmBody")
     }
     ;
 
@@ -533,6 +541,14 @@ ddl
         $$.Ddl = &DDLNode{}
         $$.Ddl.Type = DDL_TRIGGER_DROP
         $$.Ddl.Trigger = $1.Trigger
+    }
+    |createPsmStmt {
+        $$ = &Node{}
+        $$.Type = DDL_NODE
+
+        $$.Ddl = &DDLNode{}
+        $$.Ddl.Type = DDL_PSM_CREATE
+        $$.Ddl.Psm = $1.Psm
     }
     ;
 
@@ -1218,14 +1234,14 @@ dropTriggerStmt
     --------------------------------------------------------------------------------
 
         createPsmStmt
-            CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody SEMICOLON
-            CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody SEMICOLON
-            CREATE PROCEDURE ID psmLocalDeclarationList psmBody SEMICOLON
-            CREATE PROCEDURE ID psmBody SEMICOLON
-            CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmLocalDeclarationList psmBody SEMICOLON
-            CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmBody SEMICOLON
-            CREATE FUNCTION ID RETURNS domain psmLocalDeclarationList psmBody SEMICOLON
-            CREATE FUNCTION ID RETURNS domain psmBody SEMICOLON
+            CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody
+            CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody
+            CREATE PROCEDURE ID psmLocalDeclarationList psmBody
+            CREATE PROCEDURE ID psmBody
+            CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmLocalDeclarationList psmBody
+            CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmBody
+            CREATE FUNCTION ID RETURNS domain psmLocalDeclarationList psmBody
+            CREATE FUNCTION ID RETURNS domain psmBody
 
         psmParameterList
             psmParameterList COMMA psmParameterEntry
@@ -1280,6 +1296,180 @@ dropTriggerStmt
 			ID
 
     -------------------------------------------------------------------------------- */
+
+/*  ------------------------------- createPsmStmt ---------------------------------- */
+createPsmStmt
+    :CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_PROCEDURE
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = true
+        $$.Psm.PsmParameterList = $5.PsmParameterList
+        $$.Psm.PsmLocalDeclarationListValid = true
+        $$.Psm.PsmLocalDeclarationList = $7.PsmLocalDeclarationList
+        $$.Psm.PsmBody = $8.PsmExecList
+
+    }
+    |CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_PROCEDURE
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = true
+        $$.Psm.PsmParameterList = $5.PsmParameterList
+        $$.Psm.PsmLocalDeclarationListValid = false
+        $$.Psm.PsmBody = $7.PsmExecList
+    }
+    |CREATE PROCEDURE ID psmLocalDeclarationList psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_PROCEDURE
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = false
+        $$.Psm.PsmLocalDeclarationListValid = true
+        $$.Psm.PsmLocalDeclarationList = $4.PsmLocalDeclarationList
+        $$.Psm.PsmBody = $5.PsmExecList
+    }
+    |CREATE PROCEDURE ID psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_PROCEDURE
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = false
+        $$.Psm.PsmLocalDeclarationListValid = false
+        $$.Psm.PsmBody = $4.PsmExecList
+    }
+    |CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmLocalDeclarationList psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_FUNCTION
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = true
+        $$.Psm.PsmParameterList = $5.PsmParameterList
+        $$.Psm.PsmLocalDeclarationListValid = true
+        $$.Psm.PsmLocalDeclarationList = $9.PsmLocalDeclarationList
+        $$.Psm.PsmBody = $10.PsmExecList
+    }
+    |CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_FUNCTION
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = true
+        $$.Psm.PsmParameterList = $5.PsmParameterList
+        $$.Psm.PsmLocalDeclarationListValid = false
+        $$.Psm.PsmBody = $9.PsmExecList
+    }
+    |CREATE FUNCTION ID RETURNS domain psmLocalDeclarationList psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_FUNCTION
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = false
+        $$.Psm.PsmLocalDeclarationListValid = true
+        $$.Psm.PsmLocalDeclarationList = $6.PsmLocalDeclarationList
+        $$.Psm.PsmBody = $7.PsmExecList
+    }
+    |CREATE FUNCTION ID RETURNS domain psmBody {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.Type = PSM_FUNCTION
+        $$.Psm.PsmName = $3
+        $$.Psm.PsmParameterListValid = false
+        $$.Psm.PsmLocalDeclarationListValid = false
+        $$.Psm.PsmBody = $6.PsmExecList
+    }
+    ;
+
+/*  ------------------------------- psmParameterList ------------------------------- */
+psmParameterList
+    :psmParameterList COMMA psmParameterEntry {
+        $$ = $1
+        $$.PsmParameterList = append($$.PsmParameterList,$3.PsmParameterEntry)
+    }
+    |psmParameterEntry {
+        $$ = List{}
+        $$.Type = PSM_PARAMETER_LIST
+
+        $$.PsmParameterList = append($$.PsmParameterList,$1.PsmParameterEntry)
+    }
+    ;
+
+/*  ------------------------------ psmParameterEntry-------------------------------- */
+psmParameterEntry
+    :IN ID domain {
+        $$ = &Node{}
+        $$.Type = PSM_PARAMETER_ENTRY_NODE
+
+        $$.PsmParameterEntry = &PsmParameterEntryNode{}
+        $$.PsmParameterEntry.Type = PSM_PARAMETER_IN
+        $$.PsmParameterEntry.Name = $2
+        $$.PsmParameterEntry.Domain = $3.Domain
+
+
+    }
+	|OUT ID domain {
+        $$ = &Node{}
+        $$.Type = PSM_PARAMETER_ENTRY_NODE
+
+        $$.PsmParameterEntry = &PsmParameterEntryNode{}
+        $$.PsmParameterEntry.Type = PSM_PARAMETER_OUT
+        $$.PsmParameterEntry.Name = $2
+        $$.PsmParameterEntry.Domain = $3.Domain
+    }
+	|INOUT ID domain {
+        $$ = &Node{}
+        $$.Type = PSM_PARAMETER_ENTRY_NODE
+
+        $$.PsmParameterEntry = &PsmParameterEntryNode{}
+        $$.PsmParameterEntry.Type = PSM_PARAMETER_INOUT
+        $$.PsmParameterEntry.Name = $2
+        $$.PsmParameterEntry.Domain = $3.Domain
+    }
+    ;
+
+/*  -------------------------- psmLocalDeclarationList ----------------------------- */
+psmLocalDeclarationList
+    :psmLocalDeclarationList psmLocalDeclarationEntry {
+        $$ = $1
+        $$.PsmLocalDeclarationList = append($$.PsmLocalDeclarationList,$2.PsmLocalDeclarationEntry)
+    }
+    |psmLocalDeclarationEntry {
+        $$ = List{}
+        $$.Type = PSM_LOCAL_DECLARATION_LIST
+
+        $$.PsmLocalDeclarationList = append($$.PsmLocalDeclarationList,$1.PsmLocalDeclarationEntry)
+    }
+    ;
+
+/*  -------------------------- psmLocalDeclarationEntry ---------------------------- */
+psmLocalDeclarationEntry
+    :DECLARE ID domain SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_LOCAL_DECLARATION_ENTRY_NODE
+
+        $$.PsmLocalDeclarationEntry = &PsmLocalDeclarationEntryNode{}
+        $$.PsmLocalDeclarationEntry.Name = $2
+        $$.PsmLocalDeclarationEntry.Domain = $3.Domain
+    }
+    ;
 
 /*  ----------------------------------- psmBody ------------------------------------ */
 psmBody
@@ -1456,7 +1646,7 @@ psmValue
 
         $$.PsmValue = &PsmValueNode{}
         $$.PsmValue.Type = PSMVALUE_CALL
-        $$.PsmValue.PsmCallStmt = $1.Psm
+        $$.PsmValue.PsmCall = $1.Psm
     }
 	|expression {
         $$ = &Node{}

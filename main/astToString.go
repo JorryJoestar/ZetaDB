@@ -88,11 +88,11 @@ func DDLToString(ddl *parser.DDLNode, tabs string) string {
 	case parser.DDL_PSM_CREATE:
 		s += tabs
 		s += "Type: DDL_PSM_CREATE\n"
-		s += PsmCreateToString(ddl.PSM, tabs+"\t")
+		s += PsmCreateToString(ddl.Psm, tabs+"\t")
 	case parser.DDL_PSM_DROP:
 		s += tabs
 		s += "Type: DDL_PSM_DROP\n"
-		s += PsmDropToString(ddl.PSM, tabs+"\t")
+		s += PsmDropToString(ddl.Psm, tabs+"\t")
 	}
 
 	return s
@@ -311,8 +311,252 @@ func TriggerDropToString(trigger *parser.TriggerNode, tabs string) string {
 }
 
 func PsmCreateToString(psm *parser.PsmNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "PsmNode\n"
+
+	switch psm.Type {
+	case parser.PSM_FUNCTION:
+		s += tabs + "Type: PSM_FUNCTION\n"
+	case parser.PSM_PROCEDURE:
+		s += tabs + "Type: PSM_PROCEDURE\n"
+	}
+
+	s += tabs + "PsmName: " + psm.PsmName + "\n"
+
+	if psm.PsmParameterListValid {
+		s += tabs + "PsmParameterList:\n"
+		for _, v := range psm.PsmParameterList {
+			s += PsmParameterEntryToString(v, tabs+"\t")
+		}
+	}
+
+	if psm.PsmLocalDeclarationListValid {
+		s += tabs + "PsmLocalDeclarationList:\n"
+		for _, v := range psm.PsmLocalDeclarationList {
+			s += PsmLocalDeclarationEntryToString(v, tabs+"\t")
+		}
+	}
+
+	s += tabs + "PsmBody:\n"
+	for _, v := range psm.PsmBody {
+		s += PsmExecEntryToString(v, tabs+"\t")
+	}
+
+	return s
+}
+
+func PsmParameterEntryToString(entry *parser.PsmParameterEntryNode, tabs string) string {
+	s := tabs + "PsmParameterEntryNode\n"
+
+	switch entry.Type {
+	case parser.PSM_PARAMETER_IN:
+		s += tabs + "Type: PSM_PARAMETER_IN\n"
+	case parser.PSM_PARAMETER_OUT:
+		s += tabs + "Type: PSM_PARAMETER_OUT\n"
+	case parser.PSM_PARAMETER_INOUT:
+		s += tabs + "Type: PSM_PARAMETER_INOUT\n"
+	}
+
+	s += tabs + "Name: " + entry.Name + "\n"
+
+	s += tabs + "Domain:\n"
+	s += DomainToString(entry.Domain, tabs+"\t")
+
+	return s
+}
+
+func PsmLocalDeclarationEntryToString(entry *parser.PsmLocalDeclarationEntryNode, tabs string) string {
+	s := tabs + "PsmLocalDeclarationEntryNode\n"
+	s += tabs + "Name: " + entry.Name + "\n"
+	s += tabs + "Domain:\n"
+	s += DomainToString(entry.Domain, tabs+"\t")
+
+	return s
+}
+
+func PsmExecEntryToString(entry *parser.PsmExecEntryNode, tabs string) string {
+	s := tabs + "PsmExecEntryNode\n"
+	switch entry.Type {
+	case parser.PSM_EXEC_RETURN:
+		s += tabs + "Type: PSM_EXEC_RETURN\n"
+		s += tabs + "PsmValue:\n"
+		s += PsmValueToString(entry.PsmValue, tabs+"\t")
+	case parser.PSM_EXEC_SET:
+		s += tabs + "Type: PSM_EXEC_SET\n"
+		s += tabs + "VariableName: " + entry.VariableName + "\n"
+		s += tabs + "PsmValue:\n"
+		s += PsmValueToString(entry.PsmValue, tabs+"\t")
+	case parser.PSM_EXEC_FOR_LOOP:
+		s += tabs + "Type: PSM_EXEC_FOR_LOOP\n"
+		s += tabs + "PsmForLoop:\n"
+		s += PsmForLoopToString(entry.PsmForLoop, tabs+"\t")
+	case parser.PSM_EXEC_BRANCH:
+		s += tabs + "Type: PSM_EXEC_BRANCH\n"
+		s += tabs + "PsmBranch:\n"
+		s += PsmBranchToString(entry.PsmBranch, tabs+"\n")
+	case parser.PSM_EXEC_DML:
+		s += tabs + "Type: PSM_EXEC_DML\n"
+		s += DMLToString(entry.Dml, tabs+"\t")
+	}
+	return s
+}
+
+func PsmBranchToString(branch *parser.PsmBranchNode, tabs string) string {
+	s := tabs + "PsmBranchNode\n"
+
+	s += tabs + "Condition:\n"
+	s += ConditionToString(branch.Condition, tabs+"\t")
+
+	s += tabs + "IfPsmExecList:\n"
+	for _, v := range branch.IfPsmExecList {
+		s += PsmExecEntryToString(v, tabs+"\t")
+	}
+
+	if branch.PsmElseifListValid {
+		s += tabs + "PsmElseifList:\n"
+		for _, v := range branch.PsmElseifList {
+			s += PsmElseifEntryToString(v, tabs+"\t")
+		}
+	}
+
+	if branch.ElseValid {
+		s += tabs + "ElsePsmExecList:\n"
+		for _, v := range branch.ElsePsmExecList {
+			s += PsmExecEntryToString(v, tabs+"\t")
+		}
+	}
+
+	return s
+}
+
+func PsmElseifEntryToString(entry *parser.PsmElseifEntryNode, tabs string) string {
+	s := tabs + "PsmElseifEntryNode\n"
+
+	s += tabs + "Condition:\n"
+	s += ConditionToString(entry.Condition, tabs+"\t")
+
+	s += tabs + "PsmExecList:\n"
+	for _, v := range entry.PsmExecList {
+		s += PsmExecEntryToString(v, tabs+"\t")
+	}
+	return s
+}
+
+func PsmForLoopToString(ForLoop *parser.PsmForLoopNode, tabs string) string {
+	s := tabs + "PsmForLoopNode\n"
+	s += tabs + "LoopName: " + ForLoop.LoopName + "\n"
+	s += tabs + "CursorName" + ForLoop.CursorName + "\n"
+	s += tabs + "Subquery:\n"
+	s += QueryToString(ForLoop.Subquery, tabs+"\t")
+	s += tabs + "PsmExecList:\n"
+	for _, v := range ForLoop.PsmExecList {
+		s += PsmExecEntryToString(v, tabs+"\t")
+	}
+	return s
+}
+
+func PsmValueToString(value *parser.PsmValueNode, tabs string) string {
+	s := tabs + "PsmValueNode\n"
+	switch value.Type {
+	case parser.PSMVALUE_ELEMENTARY_VALUE:
+		s += tabs + "Type: PSMVALUE_ELEMENTARY_VALUE\n"
+		s += ElementaryValueToString(value.ElementaryValue, tabs+"\t")
+	case parser.PSMVALUE_CALL:
+		s += tabs + "Type: PSMVALUE_CALL\n"
+		s += PsmCallStmtToString(value.PsmCall, tabs+"\t")
+	case parser.PSMVALUE_EXPRESSION:
+		s += tabs + "Type: PSMVALUE_EXPRESSION\n"
+		s += ExpressionToString(value.Expression, tabs+"\t")
+	case parser.PSMVALUE_ID:
+		s += tabs + "Type: PSMVALUE_ID\n"
+		s += tabs + "Id: " + value.Id + "\n"
+	}
+
+	return s
+}
+
+func ExpressionToString(expression *parser.ExpressionNode, tabs string) string {
+	s := tabs + "ExpressionNode\n"
+
+	switch expression.Type {
+	case parser.EXPRESSION_OPERATOR_PLUS:
+		s += tabs + "Type: EXPRESSION_OPERATOR_PLUS\n"
+	case parser.EXPRESSION_OPERATOR_MINUS:
+		s += tabs + "Type: EXPRESSION_OPERATOR_MINUS\n"
+	case parser.EXPRESSION_OPERATOR_DIVISION:
+		s += tabs + "Type: EXPRESSION_OPERATOR_DIVISION\n"
+	case parser.EXPRESSION_OPERATOR_MULTIPLY:
+		s += tabs + "Type: EXPRESSION_OPERATOR_MULTIPLY\n"
+	case parser.EXPRESSION_OPERATOR_CONCATENATION:
+		s += tabs + "Type: EXPRESSION_OPERATOR_CONCATENATION\n"
+	}
+
+	s += tabs + "ExpressionEntryL:\n"
+	s += ExpressionEntryToString(expression.ExpressionEntryL, tabs+"\t")
+
+	s += tabs + "ExpressionEntryR:\n"
+	s += ExpressionEntryToString(expression.ExpressionEntryR, tabs+"\t")
+
+	return s
+}
+
+func ExpressionEntryToString(entry *parser.ExpressionEntryNode, tabs string) string {
+	s := tabs + "ExpressionEntryNode\n"
+	switch entry.Type {
+	case parser.EXPRESSION_ENTRY_ELEMENTARY_VALUE:
+		s += tabs + "Type: EXPRESSION_ENTRY_ELEMENTARY_VALUE\n"
+		s += ElementaryValueToString(entry.ElementaryValue, tabs+"\t")
+	case parser.EXPRESSION_ENTRY_ATTRIBUTE_NAME:
+		s += tabs + "Type: EXPRESSION_ENTRY_ATTRIBUTE_NAME\n"
+		s += AttriNameOptionTableNameToString(entry.AttriNameOptionTableName, tabs+"\t")
+	case parser.EXPRESSION_ENTRY_AGGREGATION:
+		s += tabs + "Type: EXPRESSION_ENTRY_AGGREGATION\n"
+		s += AggregationToString(entry.Aggregation, tabs+"\t")
+	case parser.EXPRESSION_ENTRY_EXPRESSION:
+		s += tabs + "Type: EXPRESSION_ENTRY_EXPRESSION\n"
+		s += ExpressionToString(entry.Expression, tabs+"\t")
+	}
+	return s
+}
+
+func AggregationToString(aggregation *parser.AggregationNode, tabs string) string {
+	s := tabs + "AggregationNode\n"
+
+	switch aggregation.Type {
+	case parser.AGGREGATION_SUM:
+		s += tabs + "Type: AGGREGATION_SUM\n"
+	case parser.AGGREGATION_AVG:
+		s += tabs + "Type: AGGREGATION_AVG\n"
+	case parser.AGGREGATION_MIN:
+		s += tabs + "Type: AGGREGATION_MIN\n"
+	case parser.AGGREGATION_MAX:
+		s += tabs + "Type: AGGREGATION_MAX\n"
+	case parser.AGGREGATION_COUNT:
+		s += tabs + "Type: AGGREGATION_COUNT\n"
+	case parser.AGGREGATION_COUNT_ALL:
+		s += tabs + "Type: AGGREGATION_COUNT_ALL\n"
+	}
+
+	if aggregation.DistinctValid {
+		s += tabs + "DistinctValid\n"
+	}
+
+	if aggregation.Type != parser.AGGREGATION_COUNT_ALL {
+		s += AttriNameOptionTableNameToString(aggregation.AttriNameOptionTableName, tabs+"\t")
+	}
+
+	return s
+
+}
+
+func PsmCallStmtToString(psmCall *parser.PsmNode, tabs string) string {
+	s := tabs + "PsmNode\n"
+	s += tabs + "PsmName: " + psmCall.PsmName + "\n"
+	if psmCall.PsmValueListValid {
+		s += tabs + "PsmValueList:\n"
+		for _, v := range psmCall.PsmValueList {
+			s += PsmValueToString(v, tabs+"\t")
+		}
+	}
 	return s
 }
 
@@ -553,7 +797,6 @@ func ConditionToString(condition *parser.ConditionNode, tabs string) string {
 }
 
 func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
-	//TODO
 	s := ""
 	s += tabs
 	s += "PredicateNode\n"

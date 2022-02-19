@@ -127,6 +127,12 @@ enum {
     DO              = 569,
     RETURN          = 561,
     SET             = 280,
+    OUT             = 554,
+    INOUT           = 555,
+    DECLARE         = 557,
+    FUNCTION        = 552,
+    RETURNS         = 553,
+    PROCEDURE       = 556,
 
 //public
     NULLMARK        = 257,  //NULL
@@ -191,12 +197,6 @@ enum {
     DISCONNECT      = 322,
     CONNECTION      = 323,
 
-    FUNCTION        = 552,
-    RETURNS         = 553,
-    OUT             = 554,
-    INOUT           = 555,
-    PROCEDURE       = 556,
-    DECLARE         = 557,
     CONDITION       = 558,
     SQLSTATE        = 559,
 

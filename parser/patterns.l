@@ -117,7 +117,12 @@
 [Dd][Oo]                                                        {return DO;}
 [Rr][Ee][Tt][Uu][Rr][Nn]                                        {return RETURN;}
 [Ss][Ee][Tt]                                                    {return SET;}
-
+[Oo][Uu][Tt]                                                    {return OUT;}
+[Ii][Nn][Oo][Uu][Tt]                                            {return INOUT;}
+[Dd][Ee][Cc][Ll][Aa][Rr][Ee]                                    {return DECLARE;}
+[Pp][Rr][Oo][Cc][Ee][Dd][Uu][Rr][Ee]                            {return PROCEDURE;}
+[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn]                                {return FUNCTION;}
+[Rr][Ee][Tt][Uu][Rr][Nn][Ss]                                    {return RETURNS;}
 
 [;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}

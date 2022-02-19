@@ -40,7 +40,7 @@ const (
 
 //data definition language
 //CREATE, ALTER, DROP
-//table, view, PSM, trigger, constraint, assert, index
+//table, view, Psm, trigger, constraint, assert, index
 type DDLNode struct {
 	Type    DDLEnum
 	Table   *TableNode
@@ -48,7 +48,7 @@ type DDLNode struct {
 	View    *ViewNode
 	Index   *IndexNode
 	Trigger *TriggerNode
-	PSM     *PsmNode
+	Psm     *PsmNode
 }
 
 //table
@@ -140,7 +140,15 @@ type TriggerOldNewEntryNode struct {
 }
 
 //psm (function, procedure)
+type PsmEnum uint8
+
+const (
+	PSM_PROCEDURE PsmEnum = 1
+	PSM_FUNCTION  PsmEnum = 2
+)
+
 type PsmNode struct {
+	Type              PsmEnum
 	PsmName           string
 	PsmValueListValid bool            //call
 	PsmValueList      []*PsmValueNode //call
@@ -228,7 +236,7 @@ type PsmValueNode struct {
 	Type PsmValueEnum
 
 	ElementaryValue *ElementaryValueNode
-	PsmCallStmt     *PsmNode
+	PsmCall         *PsmNode
 	Expression      *ExpressionNode
 	Id              string
 }
