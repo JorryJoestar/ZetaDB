@@ -19,7 +19,6 @@ const (
     VIEW_NODE                       NodeEnum = 5
     INDEX_NODE                      NodeEnum = 6
     TRIGGER_NODE                    NodeEnum = 7
-    PSM_NODE                        NodeEnum = 8
 
 /* dql */
     DQL_NODE                        NodeEnum = 9
@@ -79,6 +78,11 @@ const (
 
 /* aggregation */
     AGGREGATION_NODE                NodeEnum = 43
+
+/* psm */
+    PSM_NODE                        NodeEnum = 8
+    PSM_VALUE_NODE                  NodeEnum = 44
+
 )
 
 type Node struct {
@@ -97,7 +101,6 @@ type Node struct {
     View    *ViewNode
     Index   *IndexNode
     Trigger *TriggerNode
-    Psm     *PsmNode
 
 /* dql */
     Query            *QueryNode
@@ -150,6 +153,10 @@ type Node struct {
     Expression               *ExpressionNode
     ExpressionEntry          *ExpressionEntryNode
 
+/* psm */
+    Psm                      *PsmNode
+    PsmValue                 *PsmValueNode
+
 /* public */
     Subquery                 *QueryNode
 }
@@ -164,6 +171,7 @@ const (
     ATTRIBUTE_DECLARATION_LIST      ListEnum = 4
     TRIGGER_OLDNEW_LIST             ListEnum = 5
     DML_LIST                        ListEnum = 6
+    PSM_VALUE_LIST                  ListEnum = 7
 )
 
 type List struct {
@@ -174,6 +182,7 @@ type List struct {
     AttributeDeclarationList     []*AttributeDeclarationNode
     TriggerOldNewList            []*TriggerOldNewEntryNode
     DmlList                      []*DMLNode
+    PsmValueList                 []*PsmValueNode
 }
 
 // -------------------- temporary struct --------------------
@@ -334,6 +343,15 @@ type TriggerBeforeAfterStmtNode struct {
 %token <String> STRINGVALUE 
 %token <Boolean> BOOLVALUE
 
+// psm
+%type <NodePt> psmValue
+
+// psmCallStmt
+%type <NodePt> psmCallStmt
+%type <NodePt> psmCall
+%type <List> psmValueList
+%token CALL
+
 // public
 %type <List> attriNameOptionTableNameList
 %type <StringList> attriNameList
@@ -368,9 +386,13 @@ ast
         $$ = &Node{}
         fmt.Println("aaa")
     }
-    |expression {   // TODO
+    |psmValue { // TODO
         $$ = &Node{}
-        fmt.Println("bbb")
+        fmt.Println("ccc")
+    }
+    |psmCallStmt { // TODO
+        $$ = &Node{}
+        fmt.Println("ddd")
     }
     ;
 
@@ -1180,10 +1202,10 @@ dropTriggerStmt
             CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody SEMICOLON
             CREATE PROCEDURE ID psmLocalDeclarationList psmBody SEMICOLON
             CREATE PROCEDURE ID psmBody SEMICOLON
-            CREATE FUNCTION ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody SEMICOLON
-            CREATE FUNCTION ID LPAREN psmParameterList RPAREN psmBody SEMICOLON
-            CREATE FUNCTION ID psmLocalDeclarationList psmBody SEMICOLON
-            CREATE FUNCTION ID psmBody SEMICOLON
+            CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmLocalDeclarationList psmBody SEMICOLON
+            CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmBody SEMICOLON
+            CREATE FUNCTION ID RETURNS domain psmLocalDeclarationList psmBody SEMICOLON
+            CREATE FUNCTION ID RETURNS domain psmBody SEMICOLON
 
         psmParameterList
             psmParameterList COMMA psmParameterEntry
@@ -1200,7 +1222,6 @@ dropTriggerStmt
 
         psmLocalDeclarationEntry
             DECLARE ID domain SEMICOLON
-        ////
         
         psmBody
             BEGINTOKEN psmExecList END SEMICOLON
@@ -1211,26 +1232,126 @@ dropTriggerStmt
         psmExecEntry
             RETURN psmValue SEMICOLON
 			SET ID EQUAL psmValue SEMICOLON
-			OPEN ID SEMICOLON
-			CLOSE ID SEMICOLON
-			psmSimpleLoop
 			psmForLoop
-			psmExecption
-			psmBranch  
+			psmBranch
             dml
-			LEAVE ID SEMICOLON
-			FETCH FROM ID INTO ID SEMICOLON
-        ////
+
+        psmForLoop
+            FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON
+
+        psmBranch
+            IF condition THEN psmExecList psmElseifList ELSE psmExecList SEMICOLON
+            IF condition THEN psmExecList psmElseifList SEMICOLON
+            IF condition THEN psmExecList ELSE psmExecList SEMICOLON
+            IF condition THEN psmExecList SEMICOLON
+
+        psmElseifList
+            psmElseifList psmElseifEntry
+
+        psmElseifEntry
+            ELSEIF condition THEN psmExecList
 
         psmValue
             elementaryValue
-			psmCallStmt
+			psmCall
 			expression
 			ID
-        ////
-
 
     -------------------------------------------------------------------------------- */
+
+/*  ------------------------------------ psmValue ---------------------------------- */
+psmValue
+    :elementaryValue {
+        $$ = &Node{}
+        $$.Type = PSM_VALUE_NODE
+
+        $$.PsmValue = &PsmValueNode{}
+        $$.PsmValue.Type = PSMVALUE_ELEMENTARY_VALUE
+        $$.PsmValue.ElementaryValue = $1.ElementaryValue
+    }
+	|psmCall {
+        $$ = &Node{}
+        $$.Type = PSM_VALUE_NODE
+
+        $$.PsmValue = &PsmValueNode{}
+        $$.PsmValue.Type = PSMVALUE_CALL
+        $$.PsmValue.PsmCallStmt = $1.Psm
+    }
+	|expression {
+        $$ = &Node{}
+        $$.Type = PSM_VALUE_NODE
+
+        $$.PsmValue = &PsmValueNode{}
+        $$.PsmValue.Type = PSMVALUE_EXPRESSION
+        $$.PsmValue.Expression = $1.Expression
+    }
+	|ID {
+        $$ = &Node{}
+        $$.Type = PSM_VALUE_NODE
+
+        $$.PsmValue = &PsmValueNode{}
+        $$.PsmValue.Type = PSMVALUE_ID
+        $$.PsmValue.Id = $1
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                  psmCallStmt                                 |
+    --------------------------------------------------------------------------------
+
+        psmCallStmt
+            psmCall SEMICOLON
+        
+        psmCall
+            CALL ID LPAREN psmValueList RPAREN
+            CALL ID LPAREN RPAREN
+
+        psmValueList
+            psmValueList COMMA psmValue
+            psmValue
+
+    -------------------------------------------------------------------------------- */
+
+/*  --------------------------------- psmCallStmt ---------------------------------- */
+psmCallStmt
+    :psmCall SEMICOLON {
+        $$ = $1
+    }
+    ;
+
+/*  ------------------------------------ psmCall ----------------------------------- */
+psmCall
+    :CALL ID LPAREN psmValueList RPAREN {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.PsmName = $2
+        $$.Psm.PsmValueListValid = true
+        $$.Psm.PsmValueList = $4.PsmValueList
+    }
+    |CALL ID LPAREN RPAREN {
+        $$ = &Node{}
+        $$.Type = PSM_NODE
+
+        $$.Psm = &PsmNode{}
+        $$.Psm.PsmName = $2
+        $$.Psm.PsmValueListValid = false
+    }
+    ;
+
+/*  --------------------------------- psmValueList --------------------------------- */
+psmValueList
+    :psmValueList COMMA psmValue {
+        $$ = $1
+        $$.PsmValueList = append($$.PsmValueList,$3.PsmValue)
+    }
+    |psmValue {
+        $$ = List{}
+        $$.Type = PSM_VALUE_LIST
+        $$.PsmValueList = append($$.PsmValueList,$1.PsmValue)
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                  expression                                  |

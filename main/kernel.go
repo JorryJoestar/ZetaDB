@@ -40,5 +40,5 @@ func main() {
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
 
-	ast = kernel.parser.ParseSql("a+(b*c/2)+6")
+	ast = kernel.parser.ParseSql("call t()")
 }

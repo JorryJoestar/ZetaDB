@@ -251,6 +251,10 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.DOT:
 		return DOT
 
+	//psm
+	case C.CALL:
+		return CALL
+
 	//public
 	case C.LPAREN:
 		return LPAREN

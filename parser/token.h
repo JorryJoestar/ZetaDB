@@ -117,6 +117,9 @@ enum {
     DATE            = 222,
     TIME            = 223,
 
+//psm
+    CALL            = 550,
+
 //public
     NULLMARK        = 257,  //NULL
     LPAREN            = 200,  //(
@@ -174,8 +177,6 @@ enum {
     AUTHORIZATION   = 321,
     DISCONNECT      = 322,
     CONNECTION      = 323,
-
-    CALL            = 550,
 
     FUNCTION        = 552,
     RETURNS         = 553,

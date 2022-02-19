@@ -139,8 +139,29 @@ type TriggerOldNewEntryNode struct {
 	Name string
 }
 
-//PSM (function, procedure)
+//psm (function, procedure)
 type PsmNode struct {
+	PsmName           string
+	PsmValueListValid bool
+	PsmValueList      []*PsmValueNode
+}
+
+type PsmValueEnum uint8
+
+const (
+	PSMVALUE_ELEMENTARY_VALUE PsmValueEnum = 1
+	PSMVALUE_CALL             PsmValueEnum = 2
+	PSMVALUE_EXPRESSION       PsmValueEnum = 3
+	PSMVALUE_ID               PsmValueEnum = 4
+)
+
+type PsmValueNode struct {
+	Type PsmValueEnum
+
+	ElementaryValue *ElementaryValueNode
+	PsmCallStmt     *PsmNode
+	Expression      *ExpressionNode
+	Id              string
 }
 
 //---------------------------------------- DQL ----------------------------------------
@@ -151,10 +172,10 @@ type PsmNode struct {
 type DQLEnum uint8
 
 const (
-	DQL_SINGLE_QUERY DQLEnum = 0 //use only QueryL
-	DQL_UNION        DQLEnum = 1
-	DQL_DIFFERENCE   DQLEnum = 2
-	DQL_INTERSECTION DQLEnum = 3
+	DQL_SINGLE_QUERY DQLEnum = 1 //use only QueryL
+	DQL_UNION        DQLEnum = 2
+	DQL_DIFFERENCE   DQLEnum = 3
+	DQL_INTERSECTION DQLEnum = 4
 )
 
 type DQLNode struct {

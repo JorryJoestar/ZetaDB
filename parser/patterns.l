@@ -108,6 +108,8 @@
 ["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
 [Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
 
+[Cc][Aa][Ll][Ll]                                                {return CALL;}
+
 [;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}
