@@ -142,8 +142,77 @@ type TriggerOldNewEntryNode struct {
 //psm (function, procedure)
 type PsmNode struct {
 	PsmName           string
-	PsmValueListValid bool
-	PsmValueList      []*PsmValueNode
+	PsmValueListValid bool            //call
+	PsmValueList      []*PsmValueNode //call
+
+	PsmParameterListValid bool
+	PsmParameterList      []*PsmParameterEntryNode
+
+	PsmLocalDeclarationListValid bool
+	PsmLocalDeclarationList      []*PsmLocalDeclarationEntryNode
+
+	PsmBody []*PsmExecEntryNode
+}
+
+type PsmParameterEntryEnum uint8
+
+const (
+	PSM_PARAMETER_IN    PsmParameterEntryEnum = 1
+	PSM_PARAMETER_OUT   PsmParameterEntryEnum = 2
+	PSM_PARAMETER_INOUT PsmParameterEntryEnum = 3
+)
+
+type PsmParameterEntryNode struct {
+	Type   PsmParameterEntryEnum
+	Name   string
+	Domain *DomainNode
+}
+
+type PsmLocalDeclarationEntryNode struct {
+	Name   string
+	Domain *DomainNode
+}
+
+type PsmExecEntryEnum uint8
+
+const (
+	PSM_EXEC_RETURN   PsmExecEntryEnum = 1
+	PSM_EXEC_SET      PsmExecEntryEnum = 2
+	PSM_EXEC_FOR_LOOP PsmExecEntryEnum = 3
+	PSM_EXEC_BRANCH   PsmExecEntryEnum = 4
+	PSM_EXEC_DML      PsmExecEntryEnum = 5
+)
+
+type PsmExecEntryNode struct {
+	Type         PsmExecEntryEnum
+	PsmValue     *PsmValueNode
+	VariableName string //PSM_EXEC_SET
+	PsmForLoop   *PsmForLoopNode
+	PsmBranch    *PsmBranchNode
+	Dml          *DMLNode
+}
+
+type PsmForLoopNode struct {
+	LoopName    string
+	CursorName  string
+	Subquery    *QueryNode
+	PsmExecList []*PsmExecEntryNode
+}
+
+type PsmBranchNode struct {
+	Condition     *ConditionNode
+	IfPsmExecList []*PsmExecEntryNode
+
+	PsmElseifListValid bool
+	PsmElseifList      []*PsmElseifEntryNode
+
+	ElseValid       bool
+	ElsePsmExecList []*PsmExecEntryNode
+}
+
+type PsmElseifEntryNode struct {
+	Condition   *ConditionNode
+	PsmExecList []*PsmExecEntryNode
 }
 
 type PsmValueEnum uint8

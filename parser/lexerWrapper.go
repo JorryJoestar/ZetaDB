@@ -254,6 +254,22 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	//psm
 	case C.CALL:
 		return CALL
+	case C.ELSEIF:
+		return ELSEIF
+	case C.THEN:
+		return THEN
+	case C.IF:
+		return IF
+	case C.ELSE:
+		return ELSE
+	case C.CURSOR:
+		return CURSOR
+	case C.DO:
+		return DO
+	case C.RETURN:
+		return RETURN
+	case C.SET:
+		return SET
 
 	//public
 	case C.LPAREN:

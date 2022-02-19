@@ -82,7 +82,10 @@ const (
 /* psm */
     PSM_NODE                        NodeEnum = 8
     PSM_VALUE_NODE                  NodeEnum = 44
-
+    PSM_EXEC_ENTRY_NODE             NodeEnum = 45
+    PSM_FOR_LOOP_NODE               NodeEnum = 46
+    PSM_BRANCH_NODE                 NodeEnum = 47
+    PSM_ELSEIF_ENTRY_NODE           NodeEnum = 48
 )
 
 type Node struct {
@@ -156,6 +159,11 @@ type Node struct {
 /* psm */
     Psm                      *PsmNode
     PsmValue                 *PsmValueNode
+    PsmExecEntry             *PsmExecEntryNode
+    PsmForLoop               *PsmForLoopNode
+    PsmBranch                *PsmBranchNode
+    PsmElseifEntry           *PsmElseifEntryNode
+
 
 /* public */
     Subquery                 *QueryNode
@@ -172,6 +180,8 @@ const (
     TRIGGER_OLDNEW_LIST             ListEnum = 5
     DML_LIST                        ListEnum = 6
     PSM_VALUE_LIST                  ListEnum = 7
+    PSM_EXEC_LIST                   ListEnum = 8
+    PSM_ELSEIF_LIST                 ListEnum = 9
 )
 
 type List struct {
@@ -183,6 +193,8 @@ type List struct {
     TriggerOldNewList            []*TriggerOldNewEntryNode
     DmlList                      []*DMLNode
     PsmValueList                 []*PsmValueNode
+    PsmExecList                  []*PsmExecEntryNode
+    PsmElseifList                []*PsmElseifEntryNode
 }
 
 // -------------------- temporary struct --------------------
@@ -344,7 +356,15 @@ type TriggerBeforeAfterStmtNode struct {
 %token <Boolean> BOOLVALUE
 
 // psm
+%type <List> psmBody
+%type <List> psmExecList
+%type <NodePt> psmExecEntry
+%type <NodePt> psmForLoop
+%type <NodePt> psmBranch
+%type <List> psmElseifList
+%type <NodePt> psmElseifEntry
 %type <NodePt> psmValue
+%token ELSEIF THEN IF ELSE CURSOR DO RETURN SET
 
 // psmCallStmt
 %type <NodePt> psmCallStmt
@@ -386,13 +406,13 @@ ast
         $$ = &Node{}
         fmt.Println("aaa")
     }
-    |psmValue { // TODO
-        $$ = &Node{}
-        fmt.Println("ccc")
-    }
     |psmCallStmt { // TODO
         $$ = &Node{}
-        fmt.Println("ddd")
+        fmt.Println("psmCallStmt")
+    }
+    |psmBody {  // TODO
+        $$ = &Node{}
+        fmt.Println("psmBody")
     }
     ;
 
@@ -1228,6 +1248,7 @@ dropTriggerStmt
 
         psmExecList
             psmExecList psmExecEntry
+            psmExecEntry
 
         psmExecEntry
             RETURN psmValue SEMICOLON
@@ -1240,13 +1261,14 @@ dropTriggerStmt
             FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON
 
         psmBranch
-            IF condition THEN psmExecList psmElseifList ELSE psmExecList SEMICOLON
-            IF condition THEN psmExecList psmElseifList SEMICOLON
-            IF condition THEN psmExecList ELSE psmExecList SEMICOLON
-            IF condition THEN psmExecList SEMICOLON
+            IF condition THEN psmExecList psmElseifList ELSE psmExecList END IF SEMICOLON
+            IF condition THEN psmExecList psmElseifList END IF SEMICOLON
+            IF condition THEN psmExecList ELSE psmExecList END IF SEMICOLON
+            IF condition THEN psmExecList END IF SEMICOLON
 
         psmElseifList
             psmElseifList psmElseifEntry
+            psmElseifEntry
 
         psmElseifEntry
             ELSEIF condition THEN psmExecList
@@ -1258,6 +1280,165 @@ dropTriggerStmt
 			ID
 
     -------------------------------------------------------------------------------- */
+
+/*  ----------------------------------- psmBody ------------------------------------ */
+psmBody
+    :BEGINTOKEN psmExecList END SEMICOLON {
+        $$ = $2
+    }
+    ;
+
+/*  --------------------------------- psmExecList ---------------------------------- */
+psmExecList
+    :psmExecList psmExecEntry {
+        $$ = $1
+        $$.PsmExecList = append($$.PsmExecList,$2.PsmExecEntry)
+
+    }
+    |psmExecEntry {
+        $$ = List{}
+        $$.Type = PSM_EXEC_LIST
+
+        $$.PsmExecList = append($$.PsmExecList,$1.PsmExecEntry)
+    }
+    ;
+
+/*  -------------------------------- psmExecEntry ---------------------------------- */
+psmExecEntry
+    :RETURN psmValue SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_EXEC_ENTRY_NODE
+
+        $$.PsmExecEntry = &PsmExecEntryNode{}
+        $$.PsmExecEntry.Type = PSM_EXEC_RETURN
+        $$.PsmExecEntry.PsmValue = $2.PsmValue
+    }
+    |SET ID EQUAL psmValue SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_EXEC_ENTRY_NODE
+
+        $$.PsmExecEntry = &PsmExecEntryNode{}
+        $$.PsmExecEntry.Type = PSM_EXEC_SET
+        $$.PsmExecEntry.VariableName = $2
+        $$.PsmExecEntry.PsmValue = $4.PsmValue
+    }
+	|psmForLoop {
+        $$ = &Node{}
+        $$.Type = PSM_EXEC_ENTRY_NODE
+
+        $$.PsmExecEntry = &PsmExecEntryNode{}
+        $$.PsmExecEntry.Type = PSM_EXEC_FOR_LOOP
+        $$.PsmExecEntry.PsmForLoop = $1.PsmForLoop
+    }
+	|psmBranch {
+        $$ = &Node{}
+        $$.Type = PSM_EXEC_ENTRY_NODE
+
+        $$.PsmExecEntry = &PsmExecEntryNode{}
+        $$.PsmExecEntry.Type = PSM_EXEC_BRANCH
+        $$.PsmExecEntry.PsmBranch = $1.PsmBranch
+    }
+    |dml {
+        $$ = &Node{}
+        $$.Type = PSM_EXEC_ENTRY_NODE
+
+        $$.PsmExecEntry = &PsmExecEntryNode{}
+        $$.PsmExecEntry.Type = PSM_EXEC_DML
+        $$.PsmExecEntry.Dml = $1.Dml
+    }
+    ;
+
+/*  ---------------------------------- psmForLoop ---------------------------------- */
+psmForLoop
+    :FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_FOR_LOOP_NODE
+
+        $$.PsmForLoop = &PsmForLoopNode{}
+        $$.PsmForLoop.LoopName = $2
+        $$.PsmForLoop.CursorName = $4
+        $$.PsmForLoop.Subquery = $7.Query
+        $$.PsmForLoop.PsmExecList = $9.PsmExecList
+    }
+    ;
+
+/*  ---------------------------------- psmBranch ----------------------------------- */
+psmBranch
+    :IF condition THEN psmExecList psmElseifList ELSE psmExecList END IF SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_BRANCH_NODE
+
+        $$.PsmBranch = &PsmBranchNode{}
+
+        $$.PsmBranch.Condition = $2.Condition
+        $$.PsmBranch.IfPsmExecList = $4.PsmExecList
+        $$.PsmBranch.PsmElseifListValid = true
+        $$.PsmBranch.PsmElseifList = $5.PsmElseifList
+        $$.PsmBranch.ElseValid = true
+        $$.PsmBranch.ElsePsmExecList = $7.PsmExecList
+    }
+    |IF condition THEN psmExecList psmElseifList END IF SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_BRANCH_NODE
+
+        $$.PsmBranch = &PsmBranchNode{}
+
+        $$.PsmBranch.Condition = $2.Condition
+        $$.PsmBranch.IfPsmExecList = $4.PsmExecList
+        $$.PsmBranch.PsmElseifListValid = true
+        $$.PsmBranch.PsmElseifList = $5.PsmElseifList
+        $$.PsmBranch.ElseValid = false
+    }
+    |IF condition THEN psmExecList ELSE psmExecList END IF SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_BRANCH_NODE
+
+        $$.PsmBranch = &PsmBranchNode{}
+
+        $$.PsmBranch.Condition = $2.Condition
+        $$.PsmBranch.IfPsmExecList = $4.PsmExecList
+        $$.PsmBranch.PsmElseifListValid = false
+        $$.PsmBranch.ElseValid = true
+        $$.PsmBranch.ElsePsmExecList = $6.PsmExecList
+    }
+    |IF condition THEN psmExecList END IF SEMICOLON {
+        $$ = &Node{}
+        $$.Type = PSM_BRANCH_NODE
+
+        $$.PsmBranch = &PsmBranchNode{}
+
+        $$.PsmBranch.Condition = $2.Condition
+        $$.PsmBranch.IfPsmExecList = $4.PsmExecList
+        $$.PsmBranch.PsmElseifListValid = false
+        $$.PsmBranch.ElseValid = false
+    }
+    ;
+
+/*  -------------------------------- psmElseifList --------------------------------- */
+psmElseifList
+    :psmElseifList psmElseifEntry {
+        $$ = $1
+        $$.PsmElseifList = append($$.PsmElseifList,$2.PsmElseifEntry)
+    }
+    |psmElseifEntry {
+        $$ = List{}
+        $$.Type = PSM_ELSEIF_LIST
+
+        $$.PsmElseifList = append($$.PsmElseifList,$1.PsmElseifEntry)
+    }
+    ;
+
+/*  ------------------------------- psmElseifEntry --------------------------------- */
+psmElseifEntry
+    :ELSEIF condition THEN psmExecList {
+        $$ = &Node{}
+        $$.Type = PSM_ELSEIF_ENTRY_NODE
+
+        $$.PsmElseifEntry = &PsmElseifEntryNode{}
+        $$.PsmElseifEntry.Condition = $2.Condition
+        $$.PsmElseifEntry.PsmExecList = $4.PsmExecList
+    }
+    ;
 
 /*  ------------------------------------ psmValue ---------------------------------- */
 psmValue

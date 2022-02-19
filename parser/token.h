@@ -119,6 +119,14 @@ enum {
 
 //psm
     CALL            = 550,
+    ELSEIF          = 577,
+    THEN            = 575,
+    IF              = 574,
+    ELSE            = 576,
+    CURSOR          = 560,
+    DO              = 569,
+    RETURN          = 561,
+    SET             = 280,
 
 //public
     NULLMARK        = 257,  //NULL
@@ -135,6 +143,11 @@ enum {
 
 
     
+
+
+
+
+
 
 
     FROM            = 233,
@@ -162,7 +175,7 @@ enum {
 
 
 
-    SET             = 280,
+
     INSERTINTO      = 281,  //INSERT INTO
     VALUES          = 282,
 
@@ -186,8 +199,8 @@ enum {
     DECLARE         = 557,
     CONDITION       = 558,
     SQLSTATE        = 559,
-    CURSOR          = 560,
-    RETURN          = 561,
+
+
     OPEN            = 562,
     CLOSE           = 563,
     COLON           = 564,  //:
@@ -195,14 +208,9 @@ enum {
     LEAVE           = 566,
     FETCH           = 567,
     INTO            = 568,
-    DO              = 569,
+
     CONTINUE        = 570,
     EXIT            = 571,
     UNDO            = 572,
     HANDLER         = 573,
-    IF              = 574,
-    THEN            = 575,
-    ELSE            = 576,
-    ELSEIF          = 577
-
 };

@@ -40,5 +40,14 @@ func main() {
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
 
-	ast = kernel.parser.ParseSql("call t()")
+	k := "begin\n"
+	k += "if k < 12 then\n"
+	k += "\tset k = 1;\n"
+	k += "\telseif k>12 then set k = 100;\n"
+	k += "\telseif k>100 then set k = 0;\n"
+	k += "else return r;\n"
+	k += "end if;"
+	k += "end;\n"
+
+	ast = kernel.parser.ParseSql(k)
 }

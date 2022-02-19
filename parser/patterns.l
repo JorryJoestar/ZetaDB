@@ -108,7 +108,16 @@
 ["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
 [Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
 
+[Ee][Ll][Ss][Ee][Ii][Ff]                                        {return ELSEIF;}
 [Cc][Aa][Ll][Ll]                                                {return CALL;}
+[Tt][Hh][Ee][Nn]                                                {return THEN;}
+[Ii][Ff]                                                        {return IF;}
+[Ee][Ll][Ss][Ee]                                                {return ELSE;}
+[Cc][Uu][Rr][Ss][Oo][Rr]                                        {return CURSOR;}
+[Dd][Oo]                                                        {return DO;}
+[Rr][Ee][Tt][Uu][Rr][Nn]                                        {return RETURN;}
+[Ss][Ee][Tt]                                                    {return SET;}
+
 
 [;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}
