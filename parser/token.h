@@ -134,6 +134,10 @@ enum {
     RETURNS         = 553,
     PROCEDURE       = 556,
 
+//delete
+    FROM            = 233,
+    WHERE           = 235,
+
 //public
     NULLMARK        = 257,  //NULL
     LPAREN            = 200,  //(
@@ -156,15 +160,13 @@ enum {
 
 
 
-    FROM            = 233,
-    WHERE           = 235,
+
+
     GROUPBY         = 236,  //GROUP BY
     HAVING          = 237,
     ORDERBY         = 238,  //ORDER BY
 
     SELECT          = 240,
-
-
 
     JOIN            = 264,
     NATURAL         = 265,
@@ -174,17 +176,12 @@ enum {
     OUTER           = 269,
     CROSS           = 270,
 
-
     DESC            = 275,
     ASC             = 276,
     EXISTS          = 277,
 
-
-
-
     INSERTINTO      = 281,  //INSERT INTO
     VALUES          = 282,
-
 
     START           = 284,
     TRANSACTION     = 285,
@@ -199,7 +196,6 @@ enum {
 
     CONDITION       = 558,
     SQLSTATE        = 559,
-
 
     OPEN            = 562,
     CLOSE           = 563,

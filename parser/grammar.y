@@ -36,7 +36,6 @@ const (
     UPDATE_NODE                     NodeEnum = 17
     UPDATE_LIST_ENTRY               NodeEnum = 18
     INSERT_NODE                     NodeEnum = 19
-    DELETE_NODE                     NodeEnum = 20
 
 /* constraint */
     CONSTRAINT_NODE                 NodeEnum = 23
@@ -88,6 +87,9 @@ const (
     PSM_ELSEIF_ENTRY_NODE           NodeEnum = 48
     PSM_PARAMETER_ENTRY_NODE        NodeEnum = 49
     PSM_LOCAL_DECLARATION_ENTRY_NODE NodeEnum = 50
+
+/* delete */
+    DELETE_NODE                     NodeEnum = 51
 )
 
 type Node struct {
@@ -167,6 +169,9 @@ type Node struct {
     PsmElseifEntry           *PsmElseifEntryNode
     PsmParameterEntry        *PsmParameterEntryNode
     PsmLocalDeclarationEntry *PsmLocalDeclarationEntryNode
+
+/* delete */
+    DeleteStmt               *DeleteNode
 
 /* public */
     Subquery                 *QueryNode
@@ -253,6 +258,9 @@ type TriggerBeforeAfterStmtNode struct {
 // dml
 %type <NodePt> dml
 
+// delete
+%type <NodePt> deleteStmt
+%token FROM WHERE
 
 // createTable
 %type <NodePt> createTableStmt
@@ -415,6 +423,16 @@ ast
 
         GetInstance().AST = $$.Ast
     }
+    |dml {
+        $$ = &Node{}
+        $$.Type = AST_NODE
+
+        $$.Ast = &ASTNode{}
+        $$.Ast.Type = AST_DML
+        $$.Ast.Dml = $1.Dml
+
+        GetInstance().AST = $$.Ast
+    }
     |psmCallStmt { // TODO
         $$ = &Node{}
         fmt.Println("psmCallStmt")
@@ -561,16 +579,57 @@ ddl
     |                                     dml                                      |
     --------------------------------------------------------------------------------
 
+        dml
+            deleteStmt
+            insertStmt
+            updateStmt
+
     -------------------------------------------------------------------------------- */
 dml
-    :DOT SEMICOLON {
-        // TODO
+    :deleteStmt {
         $$ = &Node{}
         $$.Type = DML_NODE
 
         $$.Dml = &DMLNode{}
+        $$.Dml.Type = DML_DELETE
+        $$.Dml.Delete = $1.DeleteStmt
     }
     ;
+
+/*  --------------------------------------------------------------------------------
+    |                                   deleteStmt                                 |
+    --------------------------------------------------------------------------------
+
+        deleteStmt
+            DELETE FROM ID WHERE condition SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+deleteStmt
+    :DELETE FROM ID WHERE condition SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DELETE_NODE
+
+        $$.DeleteStmt = &DeleteNode{}
+        $$.DeleteStmt.TableName = $3
+        $$.DeleteStmt.Condition = $5.Condition
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                   insertStmt                                 |
+    --------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------- */
+
+
+
+/*  --------------------------------------------------------------------------------
+    |                                   updateStmt                                 |
+    --------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------- */
+
+
 
 /*  --------------------------------------------------------------------------------
     |                                 createTableStmt                              |

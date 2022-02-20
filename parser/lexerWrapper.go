@@ -283,6 +283,12 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.RETURNS:
 		return RETURNS
 
+	//delete
+	case C.FROM:
+		return FROM
+	case C.WHERE:
+		return WHERE
+
 	//public
 	case C.LPAREN:
 		return LPAREN

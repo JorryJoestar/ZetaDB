@@ -34,7 +34,7 @@ func main() {
 	s += "for each row\n"
 	s += "when (x < 12)\n"
 	s += "begin\n"
-	s += ".;.;"
+	s += "delete from m where (x < 12);"
 	s += "end;"
 
 	ast := kernel.parser.ParseSql(s)
@@ -51,7 +51,7 @@ func main() {
 	ast = kernel.parser.ParseSql(k)
 	fmt.Println(ASTToString(ast))
 
-	l := "drop function m;"
+	l := "delete from m where x > 12;"
 
 	ast = kernel.parser.ParseSql(l)
 	fmt.Println(ASTToString(ast))

@@ -124,6 +124,9 @@
 [Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn]                                {return FUNCTION;}
 [Rr][Ee][Tt][Uu][Rr][Nn][Ss]                                    {return RETURNS;}
 
+[Ff][Rr][Oo][Mm]                                                {return FROM;}
+[Ww][Hh][Ee][Rr][Ee]                                            {return WHERE;}
+
 [;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}
