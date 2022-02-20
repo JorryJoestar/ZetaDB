@@ -177,8 +177,42 @@ func DeleteToString(delete *parser.DeleteNode, tabs string) string {
 }
 
 func DCLToString(dcl *parser.DCLNode, tabs string) string {
-	//TODO
-	s := "DCL"
+	s := tabs + "DCLNode\n"
+	switch dcl.Type {
+	case parser.DCL_TRANSACTION_BEGIN:
+		s += tabs + "Type: DCL_TRANSACTION_BEGIN\n"
+	case parser.DCL_TRANSACTION_COMMIT:
+		s += tabs + "Type: DCL_TRANSACTION_COMMIT\n"
+	case parser.DCL_TRANSACTION_ROLLBACK:
+		s += tabs + "Type: DCL_TRANSACTION_ROLLBACK\n"
+	case parser.DCL_SHOW_TABLES:
+		s += tabs + "Type: DCL_SHOW_TABLES\n"
+	case parser.DCL_SHOW_ASSERTIONS:
+		s += tabs + "Type: DCL_SHOW_ASSERTIONS\n"
+	case parser.DCL_SHOW_VIEWS:
+		s += tabs + "Type: DCL_SHOW_VIEWS\n"
+	case parser.DCL_SHOW_INDEXS:
+		s += tabs + "Type: DCL_SHOW_INDEXS\n"
+	case parser.DCL_SHOW_TRIGGERS:
+		s += tabs + "Type: DCL_SHOW_TRIGGERS\n"
+	case parser.DCL_SHOW_FUNCTIONS:
+		s += tabs + "Type: DCL_SHOW_FUNCTIONS\n"
+	case parser.DCL_SHOW_PROCEDURES:
+		s += tabs + "Type: DCL_SHOW_PROCEDURES\n"
+	case parser.DCL_CREATE_USER:
+		s += tabs + "Type: DCL_CREATE_USER\n"
+	case parser.DCL_LOG_USER:
+		s += tabs + "Type: DCL_LOG_USER\n"
+	case parser.DCL_PSMCALL:
+		s += tabs + "Type: DCL_PSMCALL\n"
+	}
+	if dcl.Type == parser.DCL_CREATE_USER || dcl.Type == parser.DCL_LOG_USER {
+		s += tabs + "UserName: " + dcl.UserName + "\n"
+		s += tabs + "Password: " + dcl.Password + "\n"
+	}
+	if dcl.Type == parser.DCL_PSMCALL {
+		s += PsmCallStmtToString(dcl.PsmCall, tabs+"\t")
+	}
 	return s
 }
 
