@@ -26,7 +26,7 @@ func GetInstance() *Kernel {
 func main() {
 	kernel := GetInstance()
 
-	s := "insert into k(p,m,q) values (1,2,3,4);"
+	s := "update m set x = 12 where (x > 12);"
 
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))

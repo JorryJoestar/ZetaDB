@@ -138,9 +138,35 @@ func InsertToString(insert *parser.InsertNode, tabs string) string {
 }
 
 func UpdateToString(update *parser.UpdateNode, tabs string) string {
-	s := ""
+	s := tabs + "UpdateNode\n"
+
+	s += tabs + "TableName: " + update.TableName + "\n"
+
+	s += tabs + "Condition:\n"
+	s += ConditionToString(update.Condition, tabs+"\t")
+
+	s += tabs + "UpdateList:\n"
+	for _, v := range update.UpdateList {
+		s += UpdateListEntryToString(v, tabs+"\t")
+	}
 	return s
-	//TODO
+}
+
+func UpdateListEntryToString(entry *parser.UpdateListEntryNode, tabs string) string {
+	s := tabs + "UpdateListEntryNode\n"
+	s += tabs + "AttributeName" + entry.AttributeName + "\n"
+
+	switch entry.Type {
+	case parser.UPDATE_LIST_ENTRY_EXPRESSION:
+		s += tabs + "Type: UPDATE_LIST_ENTRY_EXPRESSION\n"
+		s += tabs + "Expression:\n"
+		s += ExpressionToString(entry.Expression, tabs+"\t")
+	case parser.UPDATE_LIST_ENTRY_ELEMENTARY_VALUE:
+		s += tabs + "Type: UPDATE_LIST_ENTRY_ELEMENTARY_VALUE\n"
+		s += tabs + "ElementaryValue:\n"
+		s += ElementaryValueToString(entry.ElementaryValue, tabs+"\t")
+	}
+	return s
 }
 
 func DeleteToString(delete *parser.DeleteNode, tabs string) string {

@@ -422,6 +422,7 @@ const (
 )
 
 type UpdateListEntryNode struct {
+	Type            UpdateListEntryEnum
 	AttributeName   string
 	ElementaryValue *ElementaryValueNode
 	Expression      *ExpressionNode

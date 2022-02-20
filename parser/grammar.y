@@ -33,8 +33,6 @@ const (
 
 /* dml */
     DML_NODE                        NodeEnum = 16
-    UPDATE_NODE                     NodeEnum = 17
-    UPDATE_LIST_ENTRY               NodeEnum = 18
 
 /* constraint */
     CONSTRAINT_NODE                 NodeEnum = 23
@@ -92,6 +90,10 @@ const (
 
 /* insert */
     INSERT_NODE                     NodeEnum = 52
+
+/* update */
+    UPDATE_LIST_ENTRY               NodeEnum = 53
+    UPDATE_NODE                     NodeEnum = 54
 )
 
 type Node struct {
@@ -117,11 +119,6 @@ type Node struct {
     FromListEntry    *FromListEntryNode
     OnListEntry      *OnListEntryNode
     OrderByListEntry *OrderByListEntryNode
-
-/* dml */
-    Update          *UpdateNode
-    UpdateListEntry *UpdateListEntryNode
-    DeleteNode      *DeleteNode
 
 /* createTable */
     AttributeDeclaration *AttributeDeclarationNode
@@ -177,6 +174,10 @@ type Node struct {
 /* insert */
     Insert                   *InsertNode
 
+/* update */
+    Update                  *UpdateNode
+    UpdateListEntry         *UpdateListEntryNode
+
 /* public */
     Subquery                 *QueryNode
 }
@@ -197,6 +198,8 @@ const (
     PSM_PARAMETER_LIST              ListEnum = 10
     PSM_LOCAL_DECLARATION_LIST      ListEnum = 11
     ELEMENTARY_VALUE_LIST           ListEnum = 12
+    UPDATE_LIST                     ListEnum = 13
+
 )
 
 type List struct {
@@ -213,6 +216,7 @@ type List struct {
     PsmParameterList             []*PsmParameterEntryNode
     PsmLocalDeclarationList      []*PsmLocalDeclarationEntryNode
     ElementaryValueList          []*ElementaryValueNode
+    UpdateList                   []*UpdateListEntryNode
 }
 
 // -------------------- temporary struct --------------------
@@ -272,6 +276,11 @@ type TriggerBeforeAfterStmtNode struct {
 %type <NodePt> insertStmt
 %type <List> elementaryValueList
 %token INSERTINTO VALUES
+
+// update
+%type <NodePt> updateStmt
+%type <List> updateList
+%type <NodePt> updateListEntry
 
 // createTable
 %type <NodePt> createTableStmt
@@ -613,6 +622,14 @@ dml
         $$.Dml.Type = DML_INSERT
         $$.Dml.Insert = $1.Insert
     }
+    |updateStmt {
+        $$ = &Node{}
+        $$.Type = DML_NODE
+
+        $$.Dml = &DMLNode{}
+        $$.Dml.Type = DML_UPDATE
+        $$.Dml.Update = $1.Update
+    }
     ;
 
 /*  --------------------------------------------------------------------------------
@@ -717,10 +734,68 @@ elementaryValueList
 /*  --------------------------------------------------------------------------------
     |                                   updateStmt                                 |
     --------------------------------------------------------------------------------
+        
+        updateStmt
+			UPDATE ID SET updateList WHERE condition SEMICOLON
+
+        updateList
+			updateListEntry
+			updateList COMMA updateListEntry
+
+        updateListEntry
+        	ID EQUAL expression
+			ID EQUAL elementaryValue
 
     -------------------------------------------------------------------------------- */
 
+/*  ---------------------------------- updateStmt ---------------------------------- */
+updateStmt
+	:UPDATE ID SET updateList WHERE condition SEMICOLON {
+        $$ = &Node{}
+        $$.Type = UPDATE_NODE
 
+        $$.Update = &UpdateNode{}
+        $$.Update.TableName = $2
+        $$.Update.Condition = $6.Condition
+        $$.Update.UpdateList = $4.UpdateList
+    }
+    ;
+
+/*  ---------------------------------- updateList ---------------------------------- */
+updateList
+	:updateListEntry {
+        $$ = List{}
+        $$.Type = UPDATE_LIST
+        
+        $$.UpdateList = append($$.UpdateList,$1.UpdateListEntry)
+    }
+	|updateList COMMA updateListEntry {
+        $$ = $1
+        $$.UpdateList = append($$.UpdateList,$3.UpdateListEntry)
+    }
+    ;
+
+/*  ------------------------------- updateListEntry -------------------------------- */
+updateListEntry
+    :ID EQUAL expression {
+        $$ = &Node{}
+        $$.Type = UPDATE_LIST_ENTRY
+
+        $$.UpdateListEntry = &UpdateListEntryNode{}
+        $$.UpdateListEntry.Type = UPDATE_LIST_ENTRY_EXPRESSION
+        $$.UpdateListEntry.AttributeName = $1
+        $$.UpdateListEntry.Expression = $3.Expression
+    }
+    |ID EQUAL elementaryValue {
+        $$ = &Node{}
+        $$.Type = UPDATE_LIST_ENTRY
+
+        $$.UpdateListEntry = &UpdateListEntryNode{}
+        $$.UpdateListEntry.Type = UPDATE_LIST_ENTRY_ELEMENTARY_VALUE
+        $$.UpdateListEntry.AttributeName = $1
+        $$.UpdateListEntry.ElementaryValue = $3.ElementaryValue
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                 createTableStmt                              |
