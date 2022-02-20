@@ -103,11 +103,6 @@
 
 [.]                                                             {return DOT;}
 
-[1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
-[1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}
-["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
-[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
-
 [Ee][Ll][Ss][Ee][Ii][Ff]                                        {return ELSEIF;}
 [Cc][Aa][Ll][Ll]                                                {return CALL;}
 [Tt][Hh][Ee][Nn]                                                {return THEN;}
@@ -130,6 +125,27 @@
 [Ii][Nn][Ss][Ee][Rr][Tt][ ][Ii][Nn][Tt][Oo]                     {return INSERTINTO;}
 [Vv][Aa][Ll][Uu][Ee][Ss]                                        {return VALUES;}
 
+[Ss][Tt][Aa][Rr][Tt]                                            {return START;}
+[Tt][Rr][Aa][Nn][Ss][Aa][Cc][Tt][Ii][Oo][Nn]                    {return TRANSACTION;}
+[Cc][Oo][Mm][Mm][Ii][Tt]                                        {return COMMIT;}
+[Rr][Oo][Ll][Ll][Bb][Aa][Cc][Kk]                                {return ROLLBACK;}
+[Ss][Hh][Oo][Ww]                                                {return SHOW;}
+[Tt][Aa][Bb][Ll][Ee][Ss]                                        {return TABLES;}
+[Aa][Ss][Ss][Ee][Rr][Tt][Ii][Oo][Nn][Ss]                        {return ASSERTIONS;}
+[Vv][Ii][Ee][Ww][Ss]                                            {return VIEWS;}
+[Ii][Nn][Dd][Ee][Xx][Ss]                                        {return INDEXS;}
+[Tt][Rr][Ii][Gg][Gg][Ee][Rr][Ss]                                {return TRIGGERS;}
+[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][Ss]                            {return FUNCTIONS;}
+[Pp][Rr][Oo][Cc][Ee][Dd][Uu][Rr][Ee][Ss]                        {return PROCEDURES;}
+[Uu][Ss][Ee][Rr]                                                {return USER;}
+[Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]                                {return PASSWORD;}
+[Cc][Oo][Nn][Nn][Ee][Cc][Tt]                                    {return CONNECT;}
+
+[1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
+[1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}
+["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}
+[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]                           {return BOOLVALUE;}
+
 [;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}
@@ -137,5 +153,6 @@
 [Nn][Oo][Tt]                                                    {return NOT;}
 [Nn][Uu][Ll][Ll]                                                {return NULLMARK;}
 [a-z_A-Z][a-z_A-Z0-9]*                                          {return ID;}
+[a-z_A-Z0-9!]+                                                  {return PASSWORDS;}
 [ \t\n]                                                           {/*ignore space*/}
 %%

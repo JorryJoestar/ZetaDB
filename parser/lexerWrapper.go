@@ -295,6 +295,41 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.VALUES:
 		return VALUES
 
+	//dcl
+	case C.START:
+		return START
+	case C.TRANSACTION:
+		return TRANSACTION
+	case C.COMMIT:
+		return COMMIT
+	case C.ROLLBACK:
+		return ROLLBACK
+	case C.SHOW:
+		return SHOW
+	case C.TABLES:
+		return TABLES
+	case C.ASSERTIONS:
+		return ASSERTIONS
+	case C.VIEWS:
+		return VIEWS
+	case C.INDEXS:
+		return INDEXS
+	case C.TRIGGERS:
+		return TRIGGERS
+	case C.FUNCTIONS:
+		return FUNCTIONS
+	case C.PROCEDURES:
+		return PROCEDURES
+	case C.USER:
+		return USER
+	case C.PASSWORD:
+		return PASSWORD
+	case C.PASSWORDS:
+		yylval.String = p.yytext
+		return PASSWORDS
+	case C.CONNECT:
+		return CONNECT
+
 	//public
 	case C.LPAREN:
 		return LPAREN

@@ -2,7 +2,7 @@
 package parser
 
 import (
-    "fmt"
+    "strconv"
 )
 
 // -------------------- Node --------------------
@@ -103,7 +103,6 @@ type Node struct {
     Ast *ASTNode
     Ddl *DDLNode
     Dql *DQLNode
-    Dcl *DCLNode
     Dml *DMLNode
 
 /* ddl */
@@ -119,6 +118,9 @@ type Node struct {
     FromListEntry    *FromListEntryNode
     OnListEntry      *OnListEntryNode
     OrderByListEntry *OrderByListEntryNode
+
+/* dcl */
+    Dcl *DCLNode
 
 /* createTable */
     AttributeDeclaration *AttributeDeclarationNode
@@ -264,6 +266,14 @@ type TriggerBeforeAfterStmtNode struct {
 
 // ddl
 %type <NodePt> ddl
+
+// dcl
+%type <NodePt> dcl
+%type <NodePt> createUserStmt
+%type <NodePt> logUserStmt
+%token START TRANSACTION COMMIT ROLLBACK SHOW TABLES ASSERTIONS VIEWS
+%token INDEXS TRIGGERS FUNCTIONS PROCEDURES USER PASSWORD CONNECT
+%token <String> PASSWORDS
 
 // dml
 %type <NodePt> dml
@@ -453,9 +463,15 @@ ast
 
         GetInstance().AST = $$.Ast
     }
-    |psmCallStmt { // TODO
+    |dcl {
         $$ = &Node{}
-        fmt.Println("psmCallStmt")
+        $$.Type = AST_NODE
+
+        $$.Ast = &ASTNode{}
+        $$.Ast.Type = AST_DCL
+        $$.Ast.Dcl = $1.Dcl
+
+        GetInstance().AST = $$.Ast
     }
     ;
 
@@ -629,6 +645,195 @@ dml
         $$.Dml = &DMLNode{}
         $$.Dml.Type = DML_UPDATE
         $$.Dml.Update = $1.Update
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
+    |                                     dcl                                      |
+    --------------------------------------------------------------------------------
+
+        dcl
+            BEGINTOKEN SEMICOLON            // DCL_TRANSACTION_BEGIN
+			START TRANSACTION SEMICOLON     // DCL_TRANSACTION_BEGIN
+            COMMIT SEMICOLON                // DCL_TRANSACTION_COMMIT
+            ROLLBACK SEMICOLON              // DCL_TRANSACTION_ROLLBACK
+            SHOW TABLES SEMICOLON           // DCL_SHOW_TABLES
+            SHOW ASSERTIONS SEMICOLON       // DCL_SHOW_ASSERTIONS
+            SHOW VIEWS SEMICOLON            // DCL_SHOW_VIEWS
+            SHOW INDEXS SEMICOLON           // DCL_SHOW_INDEXS
+            SHOW TRIGGERS SEMICOLON         // DCL_SHOW_TRIGGERS
+            SHOW FUNCTIONS SEMICOLON        // DCL_SHOW_FUNCTIONS
+            SHOW PROCEDURES SEMICOLON       // DCL_SHOW_PROCEDURES
+            createUserStmt                  // DCL_CREATE_USER
+            logUserStmt                     // DCL_LOG_USER
+            psmCallStmt                     // DCL_PSMCALL
+
+        createUserStmt
+            CREATE USER ID PASSWORD PASSWORDS SEMICOLON
+            CREATE USER ID PASSWORD ID SEMICOLON
+            CREATE USER ID PASSWORD INTVALUE SEMICOLON
+
+        logUserStmt
+			CONNECT AS USER ID PASSWORD PASSWORDS SEMICOLON
+			CONNECT AS USER ID PASSWORD ID SEMICOLON
+			CONNECT AS USER ID PASSWORD INTVALUE SEMICOLON
+
+    -------------------------------------------------------------------------------- */
+
+/*  -------------------------------------- dcl ------------------------------------- */
+dcl
+    :BEGINTOKEN SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_TRANSACTION_BEGIN
+    }
+	|START TRANSACTION SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_TRANSACTION_BEGIN
+    }
+    |COMMIT SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_TRANSACTION_COMMIT
+    }
+    |ROLLBACK SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_TRANSACTION_ROLLBACK
+    }
+    |SHOW TABLES SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_TABLES
+    }
+    |SHOW ASSERTIONS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_ASSERTIONS
+    }
+    |SHOW VIEWS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_VIEWS
+    }
+    |SHOW INDEXS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_INDEXS
+    }
+    |SHOW TRIGGERS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_TRIGGERS
+    }
+    |SHOW FUNCTIONS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_FUNCTIONS
+    }
+    |SHOW PROCEDURES SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_SHOW_PROCEDURES
+    }
+    |createUserStmt {
+        $$ = $1
+    }
+    |logUserStmt {
+        $$ = $1
+    }
+    |psmCallStmt {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_PSMCALL
+        $$.Dcl.PsmCall = $1.Psm
+    }
+    ;
+
+/*  -------------------------------- createUserStmt -------------------------------- */
+createUserStmt
+    :CREATE USER ID PASSWORD PASSWORDS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_CREATE_USER
+        $$.Dcl.UserName = $3
+        $$.Dcl.Password = $5
+    }
+    |CREATE USER ID PASSWORD ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_CREATE_USER
+        $$.Dcl.UserName = $3
+        $$.Dcl.Password = $5
+    }
+    |CREATE USER ID PASSWORD INTVALUE SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_CREATE_USER
+        $$.Dcl.UserName = $3
+        $$.Dcl.Password = strconv.Itoa($5)
+    }
+    ;
+
+/*  --------------------------------- logUserStmt ---------------------------------- */
+logUserStmt
+	:CONNECT AS USER ID PASSWORD PASSWORDS SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_LOG_USER
+        $$.Dcl.UserName = $4
+        $$.Dcl.Password = $6
+    }
+	|CONNECT AS USER ID PASSWORD ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_LOG_USER
+        $$.Dcl.UserName = $4
+        $$.Dcl.Password = $6
+    }
+	|CONNECT AS USER ID PASSWORD INTVALUE SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_LOG_USER
+        $$.Dcl.UserName = $4
+        $$.Dcl.Password = strconv.Itoa($6)
     }
     ;
 

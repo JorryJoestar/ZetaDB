@@ -178,7 +178,7 @@ func DeleteToString(delete *parser.DeleteNode, tabs string) string {
 
 func DCLToString(dcl *parser.DCLNode, tabs string) string {
 	//TODO
-	s := ""
+	s := "DCL"
 	return s
 }
 

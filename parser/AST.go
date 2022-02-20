@@ -377,16 +377,25 @@ const (
 	DCL_TRANSACTION_BEGIN    DCLEnum = 1
 	DCL_TRANSACTION_COMMIT   DCLEnum = 2
 	DCL_TRANSACTION_ROLLBACK DCLEnum = 3
-	DCL_CONNECTION           DCLEnum = 4
+	DCL_SHOW_TABLES          DCLEnum = 4
+	DCL_SHOW_ASSERTIONS      DCLEnum = 5
+	DCL_SHOW_VIEWS           DCLEnum = 6
+	DCL_SHOW_INDEXS          DCLEnum = 7
+	DCL_SHOW_TRIGGERS        DCLEnum = 8
+	DCL_SHOW_FUNCTIONS       DCLEnum = 9
+	DCL_SHOW_PROCEDURES      DCLEnum = 10
+	DCL_CREATE_USER          DCLEnum = 11
+	DCL_LOG_USER             DCLEnum = 12
+	DCL_PSMCALL              DCLEnum = 13
 )
 
 //data control language
 //transaction, connection
 type DCLNode struct {
-	Type       DCLEnum
-	ServerName string
-	UserName   string
-	Password   string
+	Type     DCLEnum
+	UserName string
+	Password string
+	PsmCall  *PsmNode
 }
 
 //---------------------------------------- DML ----------------------------------------

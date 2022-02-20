@@ -142,14 +142,31 @@ enum {
     INSERTINTO      = 281,  //INSERT INTO
     VALUES          = 282,
 
+//dcl
+    START           = 284,
+    TRANSACTION     = 285,
+    COMMIT          = 286,
+    ROLLBACK        = 287,
+    SHOW            = 600,
+    TABLES          = 601,
+    ASSERTIONS      = 602,
+    VIEWS           = 603,
+    INDEXS          = 604,
+    TRIGGERS        = 605,
+    FUNCTIONS       = 606,
+    PROCEDURES      = 607,
+    USER            = 608,
+    PASSWORD        = 609,
+    PASSWORDS       = 610,
+    CONNECT         = 319, 
+
 //public
-    NULLMARK        = 257,  //NULL
+    NULLMARK          = 257,  //NULL
     LPAREN            = 200,  //(
     RPAREN            = 201,  //)
     SEMICOLON         = 202,  //;
     COMMA             = 203,  //,
     ID                = 207,  //begin with non-number character
-    PASSWORD          = 208,
     TABLEDOTATTRIBUTE = 209, //tableName.attributeName
 
 
@@ -184,12 +201,7 @@ enum {
     ASC             = 276,
     EXISTS          = 277,
 
-    START           = 284,
-    TRANSACTION     = 285,
-    COMMIT          = 286,
-    ROLLBACK        = 287,
 
-    CONNECT         = 319, 
     TO              = 320,
     AUTHORIZATION   = 321,
     DISCONNECT      = 322,
