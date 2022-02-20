@@ -127,6 +127,9 @@
 [Ff][Rr][Oo][Mm]                                                {return FROM;}
 [Ww][Hh][Ee][Rr][Ee]                                            {return WHERE;}
 
+[Ii][Nn][Ss][Ee][Rr][Tt][ ][Ii][Nn][Tt][Oo]                     {return INSERTINTO;}
+[Vv][Aa][Ll][Uu][Ee][Ss]                                        {return VALUES;}
+
 [;]                                                             {return SEMICOLON;}
 [(]                                                             {return LPAREN;}
 [)]                                                             {return RPAREN;}

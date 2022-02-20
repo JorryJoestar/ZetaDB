@@ -35,7 +35,6 @@ const (
     DML_NODE                        NodeEnum = 16
     UPDATE_NODE                     NodeEnum = 17
     UPDATE_LIST_ENTRY               NodeEnum = 18
-    INSERT_NODE                     NodeEnum = 19
 
 /* constraint */
     CONSTRAINT_NODE                 NodeEnum = 23
@@ -90,6 +89,9 @@ const (
 
 /* delete */
     DELETE_NODE                     NodeEnum = 51
+
+/* insert */
+    INSERT_NODE                     NodeEnum = 52
 )
 
 type Node struct {
@@ -119,7 +121,6 @@ type Node struct {
 /* dml */
     Update          *UpdateNode
     UpdateListEntry *UpdateListEntryNode
-    Insert          *InsertNode
     DeleteNode      *DeleteNode
 
 /* createTable */
@@ -171,7 +172,10 @@ type Node struct {
     PsmLocalDeclarationEntry *PsmLocalDeclarationEntryNode
 
 /* delete */
-    DeleteStmt               *DeleteNode
+    Delete                   *DeleteNode
+
+/* insert */
+    Insert                   *InsertNode
 
 /* public */
     Subquery                 *QueryNode
@@ -192,6 +196,7 @@ const (
     PSM_ELSEIF_LIST                 ListEnum = 9
     PSM_PARAMETER_LIST              ListEnum = 10
     PSM_LOCAL_DECLARATION_LIST      ListEnum = 11
+    ELEMENTARY_VALUE_LIST           ListEnum = 12
 )
 
 type List struct {
@@ -207,6 +212,7 @@ type List struct {
     PsmElseifList                []*PsmElseifEntryNode
     PsmParameterList             []*PsmParameterEntryNode
     PsmLocalDeclarationList      []*PsmLocalDeclarationEntryNode
+    ElementaryValueList          []*ElementaryValueNode
 }
 
 // -------------------- temporary struct --------------------
@@ -261,6 +267,11 @@ type TriggerBeforeAfterStmtNode struct {
 // delete
 %type <NodePt> deleteStmt
 %token FROM WHERE
+
+// insert
+%type <NodePt> insertStmt
+%type <List> elementaryValueList
+%token INSERTINTO VALUES
 
 // createTable
 %type <NodePt> createTableStmt
@@ -592,7 +603,15 @@ dml
 
         $$.Dml = &DMLNode{}
         $$.Dml.Type = DML_DELETE
-        $$.Dml.Delete = $1.DeleteStmt
+        $$.Dml.Delete = $1.Delete
+    }
+    |insertStmt {
+        $$ = &Node{}
+        $$.Type = DML_NODE
+
+        $$.Dml = &DMLNode{}
+        $$.Dml.Type = DML_INSERT
+        $$.Dml.Insert = $1.Insert
     }
     ;
 
@@ -609,9 +628,9 @@ deleteStmt
         $$ = &Node{}
         $$.Type = DELETE_NODE
 
-        $$.DeleteStmt = &DeleteNode{}
-        $$.DeleteStmt.TableName = $3
-        $$.DeleteStmt.Condition = $5.Condition
+        $$.Delete = &DeleteNode{}
+        $$.Delete.TableName = $3
+        $$.Delete.Condition = $5.Condition
     }
     ;
 
@@ -619,9 +638,81 @@ deleteStmt
     |                                   insertStmt                                 |
     --------------------------------------------------------------------------------
 
+        insertStmt
+			INSERTINTO ID VALUES subQuery SEMICOLON
+			INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON
+			INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON
+			INSERTINTO ID LPAREN attriNameList RPAREN VALUES LPAREN elementaryValueList RPAREN SEMICOLON
+
+        elementaryValueList
+            elementaryValueList COMMA elementaryValue
+            elementaryValue
+
     -------------------------------------------------------------------------------- */
 
+/*  ---------------------------------- insertStmt ---------------------------------- */
+insertStmt
+    :INSERTINTO ID VALUES subQuery SEMICOLON {
+        $$ = &Node{}
+        $$.Type = INSERT_NODE
 
+        $$.Insert = &InsertNode{}
+
+        $$.Insert.Type = INSERT_FROM_SUBQUERY
+        $$.Insert.TableName = $2
+        $$.Insert.Subquery = $4.Subquery
+        $$.Insert.AttriNameListValid = false
+    }
+    |INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON {
+        $$ = &Node{}
+        $$.Type = INSERT_NODE
+
+        $$.Insert = &InsertNode{}
+
+        $$.Insert.Type = INSERT_FROM_VALUELIST
+        $$.Insert.TableName = $2
+        $$.Insert.AttriNameListValid = false
+        $$.Insert.ElementaryValueList = $5.ElementaryValueList
+    }
+    |INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON {
+        $$ = &Node{}
+        $$.Type = INSERT_NODE
+
+        $$.Insert = &InsertNode{}
+
+        $$.Insert.Type = INSERT_FROM_SUBQUERY
+        $$.Insert.TableName = $2
+        $$.Insert.Subquery = $7.Subquery
+        $$.Insert.AttriNameListValid = true
+        $$.Insert.AttriNameList = $4
+    }
+    |INSERTINTO ID LPAREN attriNameList RPAREN VALUES LPAREN elementaryValueList RPAREN SEMICOLON {
+        $$ = &Node{}
+        $$.Type = INSERT_NODE
+
+        $$.Insert = &InsertNode{}
+
+        $$.Insert.Type = INSERT_FROM_VALUELIST
+        $$.Insert.TableName = $2
+        $$.Insert.ElementaryValueList = $8.ElementaryValueList
+        $$.Insert.AttriNameListValid = true
+        $$.Insert.AttriNameList = $4
+    }
+    ;
+
+/*  ----------------------------- elementaryValueList ------------------------------ */
+elementaryValueList
+    :elementaryValueList COMMA elementaryValue {
+        $$ = $1
+        $$.ElementaryValueList = append($$.ElementaryValueList,$3.ElementaryValue)
+    }
+    |elementaryValue {
+        $$ = List{}
+        $$.Type = ELEMENTARY_VALUE_LIST
+
+        $$.ElementaryValueList = append($$.ElementaryValueList,$1.ElementaryValue)
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                   updateStmt                                 |

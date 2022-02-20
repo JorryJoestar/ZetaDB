@@ -138,6 +138,10 @@ enum {
     FROM            = 233,
     WHERE           = 235,
 
+//insert
+    INSERTINTO      = 281,  //INSERT INTO
+    VALUES          = 282,
+
 //public
     NULLMARK        = 257,  //NULL
     LPAREN            = 200,  //(
@@ -179,9 +183,6 @@ enum {
     DESC            = 275,
     ASC             = 276,
     EXISTS          = 277,
-
-    INSERTINTO      = 281,  //INSERT INTO
-    VALUES          = 282,
 
     START           = 284,
     TRANSACTION     = 285,

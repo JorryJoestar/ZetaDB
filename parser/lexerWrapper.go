@@ -289,6 +289,12 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.WHERE:
 		return WHERE
 
+	//insert
+	case C.INSERTINTO:
+		return INSERTINTO
+	case C.VALUES:
+		return VALUES
+
 	//public
 	case C.LPAREN:
 		return LPAREN

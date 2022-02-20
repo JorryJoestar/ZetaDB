@@ -99,8 +99,54 @@ func DDLToString(ddl *parser.DDLNode, tabs string) string {
 }
 
 func DMLToString(dml *parser.DMLNode, tabs string) string {
+	s := tabs + "DMLNode\n"
+	switch dml.Type {
+	case parser.DML_INSERT:
+		s += InsertToString(dml.Insert, tabs+"\t")
+	case parser.DML_UPDATE:
+		s += UpdateToString(dml.Update, tabs+"\t")
+	case parser.DML_DELETE:
+		s += DeleteToString(dml.Delete, tabs+"\t")
+
+	}
+	return s
+}
+
+func InsertToString(insert *parser.InsertNode, tabs string) string {
+	s := tabs + "InsertNode\n"
+	s += tabs + "TableName: " + insert.TableName + "\n"
+
+	if insert.AttriNameListValid {
+		s += tabs + "AttriNameList:\n"
+		for _, v := range insert.AttriNameList {
+			s += tabs + "\t" + v + "\n"
+		}
+	}
+
+	switch insert.Type {
+	case parser.INSERT_FROM_SUBQUERY:
+		s += tabs + "Type: INSERT_FROM_SUBQUERY\n"
+		s += QueryToString(insert.Subquery, tabs+"\t")
+	case parser.INSERT_FROM_VALUELIST:
+		s += tabs + "Type: INSERT_FROM_VALUELIST\n"
+		s += tabs + "ElementaryValueList:\n"
+		for _, v := range insert.ElementaryValueList {
+			s += ElementaryValueToString(v, tabs+"\t")
+		}
+	}
+	return s
+}
+
+func UpdateToString(update *parser.UpdateNode, tabs string) string {
+	s := ""
+	return s
 	//TODO
-	s := tabs + "DMLToString TODO \n"
+}
+
+func DeleteToString(delete *parser.DeleteNode, tabs string) string {
+	s := tabs + "DeleteNode\n"
+	s += tabs + "TableName: " + delete.TableName + "\n"
+	s += ConditionToString(delete.Condition, tabs+"\t")
 	return s
 }
 
