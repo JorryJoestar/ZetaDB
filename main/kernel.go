@@ -26,7 +26,7 @@ func GetInstance() *Kernel {
 func main() {
 	kernel := GetInstance()
 
-	s := "connect as user simeon password 4319633jzy;"
+	s := "select distinct a+m"
 
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))

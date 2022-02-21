@@ -126,7 +126,7 @@ func InsertToString(insert *parser.InsertNode, tabs string) string {
 	switch insert.Type {
 	case parser.INSERT_FROM_SUBQUERY:
 		s += tabs + "Type: INSERT_FROM_SUBQUERY\n"
-		s += QueryToString(insert.Subquery, tabs+"\t")
+		s += QueryToString(insert.Query, tabs+"\t")
 	case parser.INSERT_FROM_VALUELIST:
 		s += tabs + "Type: INSERT_FROM_VALUELIST\n"
 		s += tabs + "ElementaryValueList:\n"
@@ -551,8 +551,8 @@ func PsmForLoopToString(ForLoop *parser.PsmForLoopNode, tabs string) string {
 	s := tabs + "PsmForLoopNode\n"
 	s += tabs + "LoopName: " + ForLoop.LoopName + "\n"
 	s += tabs + "CursorName" + ForLoop.CursorName + "\n"
-	s += tabs + "Subquery:\n"
-	s += QueryToString(ForLoop.Subquery, tabs+"\t")
+	s += tabs + "Query:\n"
+	s += QueryToString(ForLoop.Query, tabs+"\t")
 	s += tabs + "PsmExecList:\n"
 	for _, v := range ForLoop.PsmExecList {
 		s += PsmExecEntryToString(v, tabs+"\t")
@@ -944,16 +944,16 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 	case parser.PREDICATE_NOT_IN_SUBQUERY:
 		s += "PREDICATE_NOT_IN_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 	case parser.PREDICATE_IN_TABLE:
 		s += "PREDICATE_IN_TABLE\n"
 		s += tabs
@@ -976,8 +976,8 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
@@ -987,8 +987,8 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
@@ -998,8 +998,8 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
@@ -1009,8 +1009,8 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
@@ -1076,8 +1076,8 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 			s += AttriNameOptionTableNameToString(v, tabs+"\t")
 		}
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 	case parser.PREDICATE_TUPLE_NOT_IN_SUBQUERY:
 		s += "PREDICATE_TUPLE_NOT_IN_SUBQUERY\n"
 		s += tabs
@@ -1086,8 +1086,8 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 			s += AttriNameOptionTableNameToString(v, tabs+"\t")
 		}
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 	case parser.PREDICATE_TUPLE_IN_TABLE:
 		s += "PREDICATE_TUPLE_IN_TABLE\n"
 		s += tabs
@@ -1111,13 +1111,13 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 	case parser.PREDICATE_SUBQUERY_EXISTS:
 		s += "PREDICATE_SUBQUERY_EXISTS\n"
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 	case parser.PREDICATE_SUBQUERY_NOT_EXISTS:
 		s += "PREDICATE_SUBQUERY_NOT_EXISTS\n"
 		s += tabs
-		s += "Subquery:\n"
-		s += QueryToString(predicate.Subquery, tabs+"\t")
+		s += "Query:\n"
+		s += QueryToString(predicate.Query, tabs+"\t")
 	}
 
 	return s

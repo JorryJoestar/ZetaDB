@@ -141,6 +141,17 @@
 [Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]                                {return PASSWORD;}
 [Cc][Oo][Nn][Nn][Ee][Cc][Tt]                                    {return CONNECT;}
 
+[Aa][Ss][Cc]                                                    {return ASC;}
+[Dd][Ee][Ss][Cc]                                                {return DESC;}
+[Cc][Rr][Oo][Ss][Ss]                                            {return CROSS;}
+[Jj][Oo][Ii][Nn]                                                {return JOIN;}
+[Nn][Aa][Tt][Uu][Rr][Aa][Ll]                                    {return NATURAL;}
+[Ff][Uu][Ll][Ll]                                                {return FULL;}
+[Oo][Uu][Tt][Ee][Rr]                                            {return OUTER;}
+[Ll][Ee][Ff][Tt]                                                {return LEFT;}
+[Rr][Ii][Gg][Hh][Tt]                                            {return RIGHT;}
+[Ss][Ee][Ll][Ee][Cc][Tt]                                        {return SELECT;}
+
 [1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
 [1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}
 ["][a-z_A-Z0-9]*["]|['][a-z_A-Z0-9]*[']                         {return STRINGVALUE;}

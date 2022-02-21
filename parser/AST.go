@@ -203,7 +203,7 @@ type PsmExecEntryNode struct {
 type PsmForLoopNode struct {
 	LoopName    string
 	CursorName  string
-	Subquery    *QueryNode
+	Query       *QueryNode
 	PsmExecList []*PsmExecEntryNode
 }
 
@@ -261,20 +261,6 @@ type DQLNode struct {
 	QueryR *QueryNode
 }
 
-type JoinEnum uint8
-
-const (
-	CROSS_JOIN               JoinEnum = 1
-	JOIN_ON                  JoinEnum = 2
-	NATURAL_JOIN             JoinEnum = 3
-	NATURAL_FULL_OUTER_JOIN  JoinEnum = 4
-	NATURAL_LEFT_OUTER_JOIN  JoinEnum = 5
-	NATURAL_RIGHT_OUTER_JOIN JoinEnum = 6
-	FULL_OUTER_JOIN_ON       JoinEnum = 7
-	LEFT_OUTER_JOIN_ON       JoinEnum = 8
-	RIGHT_OUTER_JOIN_ON      JoinEnum = 9
-)
-
 //query
 type QueryNode struct {
 	//select
@@ -283,12 +269,10 @@ type QueryNode struct {
 	SelectList    []*SelectListEntryNode
 
 	//from
-	FromListValid  bool //true then FromList valid, false then Join valid
-	FromList       []*FromListEntryNode
-	JoinType       JoinEnum
-	JoinTableNameL string
-	JoinTableNameR string
-	OnList         []*OnListEntryNode
+
+	FromListValid bool //true then FromList valid, false then Join valid
+	FromList      []*FromListEntryNode
+	Join          *JoinNode
 
 	//where
 	WhereValid     bool
@@ -310,6 +294,27 @@ type QueryNode struct {
 	LimitValid bool
 	InitialPos int
 	OffsetPos  int
+}
+
+type JoinEnum uint8
+
+const (
+	CROSS_JOIN               JoinEnum = 1
+	JOIN_ON                  JoinEnum = 2
+	NATURAL_JOIN             JoinEnum = 3
+	NATURAL_FULL_OUTER_JOIN  JoinEnum = 4
+	NATURAL_LEFT_OUTER_JOIN  JoinEnum = 5
+	NATURAL_RIGHT_OUTER_JOIN JoinEnum = 6
+	FULL_OUTER_JOIN_ON       JoinEnum = 7
+	LEFT_OUTER_JOIN_ON       JoinEnum = 8
+	RIGHT_OUTER_JOIN_ON      JoinEnum = 9
+)
+
+type JoinNode struct {
+	Type           JoinEnum
+	JoinTableNameL string
+	JoinTableNameR string
+	OnList         []*OnListEntryNode
 }
 
 type SelectListEntryEnum uint8
@@ -339,7 +344,7 @@ const (
 type FromListEntryNode struct {
 	Type       FromListEntryEnum
 	TableName  string
-	Subquery   *QueryNode
+	Query      *QueryNode
 	AliasValid bool
 	Alias      string
 }
@@ -448,7 +453,7 @@ const (
 type InsertNode struct {
 	Type                InsertEnum
 	TableName           string
-	Subquery            *QueryNode
+	Query               *QueryNode
 	AttriNameListValid  bool
 	AttriNameList       []string
 	ElementaryValueList []*ElementaryValueNode
@@ -597,26 +602,26 @@ type PredicateEnum uint8
 const (
 	PREDICATE_COMPARE_ELEMENTARY_VALUE PredicateEnum = 1  //AttriNameWithTableNameL, ElementaryValue, CompareMark
 	PREDICATE_LIKE_STRING_VALUE        PredicateEnum = 2  //AttriNameWithTableNameL, ElementaryValue(string)
-	PREDICATE_IN_SUBQUERY              PredicateEnum = 3  //AttriNameWithTableNameL, Subquery
-	PREDICATE_NOT_IN_SUBQUERY          PredicateEnum = 4  //AttriNameWithTableNameL, Subquery
+	PREDICATE_IN_SUBQUERY              PredicateEnum = 3  //AttriNameWithTableNameL, Query
+	PREDICATE_NOT_IN_SUBQUERY          PredicateEnum = 4  //AttriNameWithTableNameL, Query
 	PREDICATE_IN_TABLE                 PredicateEnum = 5  //AttriNameWithTableNameL, TableName
 	PREDICATE_NOT_IN_TABLE             PredicateEnum = 6  //AttriNameWithTableNameL, TableName
-	PREDICATE_COMPARE_ALL_SUBQUERY     PredicateEnum = 7  //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_NOT_ALL_SUBQUERY PredicateEnum = 8  //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_ANY_SUBQUERY     PredicateEnum = 9  //AttriNameWithTableNameL, Subquery, CompareMark
-	PREDICATE_COMPARE_NOT_ANY_SUBQUERY PredicateEnum = 10 //AttriNameWithTableNameL, Subquery, CompareMark
+	PREDICATE_COMPARE_ALL_SUBQUERY     PredicateEnum = 7  //AttriNameWithTableNameL, Query, CompareMark
+	PREDICATE_COMPARE_NOT_ALL_SUBQUERY PredicateEnum = 8  //AttriNameWithTableNameL, Query, CompareMark
+	PREDICATE_COMPARE_ANY_SUBQUERY     PredicateEnum = 9  //AttriNameWithTableNameL, Query, CompareMark
+	PREDICATE_COMPARE_NOT_ANY_SUBQUERY PredicateEnum = 10 //AttriNameWithTableNameL, Query, CompareMark
 	PREDICATE_COMPARE_ALL_TABLE        PredicateEnum = 11 //AttriNameWithTableNameL, TableName, CompareMark
 	PREDICATE_COMPARE_NOT_ALL_TABLE    PredicateEnum = 12 //AttriNameWithTableNameL, TableName, CompareMark
 	PREDICATE_COMPARE_ANY_TABLE        PredicateEnum = 13 //AttriNameWithTableNameL, TableName, CompareMark
 	PREDICATE_COMPARE_NOT_ANY_TABLE    PredicateEnum = 14 //AttriNameWithTableNameL, TableName, CompareMark
 	PREDICATE_IS_NULL                  PredicateEnum = 15 //AttriNameWithTableNameL
 	PREDICATE_IS_NOT_NULL              PredicateEnum = 16 //AttriNameWithTableNameL
-	PREDICATE_TUPLE_IN_SUBQUERY        PredicateEnum = 17 //AttriNameOptionTableNameList, Subquery
-	PREDICATE_TUPLE_NOT_IN_SUBQUERY    PredicateEnum = 18 //AttriNameOptionTableNameList, Subquery
+	PREDICATE_TUPLE_IN_SUBQUERY        PredicateEnum = 17 //AttriNameOptionTableNameList, Query
+	PREDICATE_TUPLE_NOT_IN_SUBQUERY    PredicateEnum = 18 //AttriNameOptionTableNameList, Query
 	PREDICATE_TUPLE_IN_TABLE           PredicateEnum = 19 //AttriNameOptionTableNameList, TableName
 	PREDICATE_TUPLE_NOT_IN_TABLE       PredicateEnum = 20 //AttriNameOptionTableNameList, TableName
-	PREDICATE_SUBQUERY_EXISTS          PredicateEnum = 21 //Subquery
-	PREDICATE_SUBQUERY_NOT_EXISTS      PredicateEnum = 22 //Subquery
+	PREDICATE_SUBQUERY_EXISTS          PredicateEnum = 21 //Query
+	PREDICATE_SUBQUERY_NOT_EXISTS      PredicateEnum = 22 //Query
 )
 
 type PredicateNode struct {
@@ -626,7 +631,7 @@ type PredicateNode struct {
 	AttriNameWithTableNameL      *AttriNameOptionTableNameNode
 	AttriNameWithTableNameR      *AttriNameOptionTableNameNode
 	AttriNameOptionTableNameList []*AttriNameOptionTableNameNode
-	Subquery                     *QueryNode
+	Query                        *QueryNode
 	TableName                    string
 }
 

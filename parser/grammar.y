@@ -3,6 +3,7 @@ package parser
 
 import (
     "strconv"
+    "fmt"
 )
 
 // -------------------- Node --------------------
@@ -19,14 +20,6 @@ const (
     VIEW_NODE                       NodeEnum = 5
     INDEX_NODE                      NodeEnum = 6
     TRIGGER_NODE                    NodeEnum = 7
-
-/* dql */
-    DQL_NODE                        NodeEnum = 9
-    QUERY_NODE                      NodeEnum = 10
-    SELECT_LIST_ENTRY               NodeEnum = 11
-    FROM_LIST_ENTRY                 NodeEnum = 12
-    ON_LIST_ENTRY                   NodeEnum = 13
-    ORDERBY_LIST_ENTRY              NodeEnum = 14
 
 /* dcl */
     DCL_NODE                        NodeEnum = 15
@@ -94,6 +87,17 @@ const (
 /* update */
     UPDATE_LIST_ENTRY               NodeEnum = 53
     UPDATE_NODE                     NodeEnum = 54
+
+/* dql */
+    DQL_NODE                        NodeEnum = 9
+    QUERY_NODE                      NodeEnum = 10
+    SELECT_LIST_ENTRY               NodeEnum = 11
+    FROM_LIST_ENTRY                 NodeEnum = 12
+    ON_LIST_ENTRY                   NodeEnum = 13
+    ORDERBY_LIST_ENTRY              NodeEnum = 55
+    JOIN_NODE                       NodeEnum = 56
+    FROM_STMT_NODE                  NodeEnum = 57
+    SELECT_STMT_NODE                NodeEnum = 58
 )
 
 type Node struct {
@@ -111,13 +115,6 @@ type Node struct {
     View    *ViewNode
     Index   *IndexNode
     Trigger *TriggerNode
-
-/* dql */
-    Query            *QueryNode
-    SelectListEntry  *SelectListEntryNode
-    FromListEntry    *FromListEntryNode
-    OnListEntry      *OnListEntryNode
-    OrderByListEntry *OrderByListEntryNode
 
 /* dcl */
     Dcl *DCLNode
@@ -180,8 +177,17 @@ type Node struct {
     Update                  *UpdateNode
     UpdateListEntry         *UpdateListEntryNode
 
-/* public */
-    Subquery                 *QueryNode
+
+/* dql */
+    Query            *QueryNode
+    SelectListEntry  *SelectListEntryNode
+    FromListEntry    *FromListEntryNode
+    OnListEntry      *OnListEntryNode
+    OrderByListEntry *OrderByListEntryNode
+    Join             *JoinNode
+    FromStmt         *FromStmtNode
+    SelectStmt       *SelectStmtNode
+
 }
 
 // -------------------- List --------------------
@@ -201,7 +207,10 @@ const (
     PSM_LOCAL_DECLARATION_LIST      ListEnum = 11
     ELEMENTARY_VALUE_LIST           ListEnum = 12
     UPDATE_LIST                     ListEnum = 13
-
+    ORDERBY_LIST                    ListEnum = 14
+    FROM_LIST                       ListEnum = 15
+    ON_LIST                         ListEnum = 16
+    SELECT_LIST                     ListEnum = 17
 )
 
 type List struct {
@@ -219,6 +228,10 @@ type List struct {
     PsmLocalDeclarationList      []*PsmLocalDeclarationEntryNode
     ElementaryValueList          []*ElementaryValueNode
     UpdateList                   []*UpdateListEntryNode
+    OrderByList                  []*OrderByListEntryNode
+    FromList                     []*FromListEntryNode
+    OnList                       []*OnListEntryNode
+    SelectList                   []*SelectListEntryNode
 }
 
 // -------------------- temporary struct --------------------
@@ -249,6 +262,20 @@ type TriggerBeforeAfterStmtNode struct {
 	BeforeAfterTableName string
 }
 
+// fromStmt
+type FromStmtNode struct {
+    FromListValid bool
+    FromList      []*FromListEntryNode
+	Join          *JoinNode
+}
+
+// selectStmt
+type SelectStmtNode struct {
+	StarValid     bool
+	DistinctValid bool
+	SelectList    []*SelectListEntryNode
+}
+
 %}
 
 %union {
@@ -277,6 +304,20 @@ type TriggerBeforeAfterStmtNode struct {
 
 // dml
 %type <NodePt> dml
+
+// dql
+%type <NodePt> selectStmt
+%type <List> selectList
+%type <NodePt> selectListEntry
+%type <NodePt> fromStmt
+%type <NodePt> joinStmt
+%type <List> onList
+%type <NodePt> onListEntry
+%type <List> fromList
+%type <NodePt> fromListEntry
+%type <List> orderByList
+%type <NodePt> orderByListEntry
+%token ASC DESC CROSS JOIN NATURAL FULL OUTER LEFT RIGHT SELECT
 
 // delete
 %type <NodePt> deleteStmt
@@ -390,8 +431,8 @@ type TriggerBeforeAfterStmtNode struct {
 %type <NodePt> attriNameOptionTableName
 %token DOT
 
-// subQuery
-%type <NodePt> subQuery
+// query
+%type <NodePt> query
 
 // elementaryValue
 %type <NodePt> elementaryValue
@@ -472,6 +513,36 @@ ast
         $$.Ast.Dcl = $1.Dcl
 
         GetInstance().AST = $$.Ast
+    }
+    |DOT orderByList {
+        // TODO
+        fmt.Println("orderByList")
+        $$ = &Node{}
+        $$.Type = AST_NODE
+
+        $$.Ast = &ASTNode{}
+
+        GetInstance().AST = $$.Ast
+    }
+    |fromStmt {
+        // TODO
+        fmt.Println("fromStmt")
+        $$ = &Node{}
+        $$.Type = AST_NODE
+
+        $$.Ast = &ASTNode{}
+
+        GetInstance().AST = $$.Ast
+    }
+    |selectStmt {
+        // TODO
+        fmt.Println("selectStmt")
+        $$ = &Node{}
+        $$.Type = AST_NODE
+
+        $$.Ast = &ASTNode{}
+
+        GetInstance().AST = $$.Ast     
     }
     ;
 
@@ -653,19 +724,19 @@ dml
     --------------------------------------------------------------------------------
 
         dql
-            subQuery UNION subQuery SEMICOLON
-            subQuery DIFFERENCE subQuery SEMICOLON
-            subQuery INTERSECTION subQuery SEMICOLON
-            subQuery SEMICOLON
+            query UNION query SEMICOLON
+            query DIFFERENCE query SEMICOLON
+            query INTERSECTION query SEMICOLON
+            query SEMICOLON
         
     -------------------------------------------------------------------------------- */
 
 
 /*  --------------------------------------------------------------------------------
-    |                                    subQuery                                  |
+    |                                      query                                   |
     --------------------------------------------------------------------------------
 
-        subQuery
+        query
             selectStmt fromStmt
             selectStmt fromStmt WHERE condition
             selectStmt fromStmt GROUPBY attriNameOptionTableNameList
@@ -725,21 +796,22 @@ dml
 
         onList
             onList AND onListEntry
+            onListEntry
         
         onListEntry
             attriNameOptionTableName EQUAL attriNameOptionTableName
 
         fromList
-            fromList COMMAND fromListEntry
+            fromList COMMA fromListEntry
             fromListEntry
         
         fromListEntry
             ID
             ID ID
             ID AS ID
-            subQuery
-            subQuery ID
-            subQuery AS ID
+            query
+            query ID
+            query AS ID
 
         orderByList
             orderByList COMMA orderByListEntry
@@ -754,12 +826,402 @@ dml
             expression DESC
 
    -------------------------------------------------------------------------------- */
+
+/* ------------------------------------- query ------------------------------------ */
 // TODO
-subQuery
+query
     :DOT {
         $$ = &Node{}
         $$.Type = SUBQUERY_NODE
-        $$.Subquery = &QueryNode{}
+        $$.Query = &QueryNode{}
+    }
+    ;
+/* --------------------------------- selectStmt ----------------------------------- */
+selectStmt
+    :SELECT STAR {
+        $$ = &Node{}
+        $$.Type = SELECT_STMT_NODE
+
+        $$.SelectStmt = &SelectStmtNode{}
+        $$.SelectStmt.StarValid = true
+        $$.SelectStmt.DistinctValid = false
+    }
+    |SELECT selectList {
+        $$ = &Node{}
+        $$.Type = SELECT_STMT_NODE
+
+        $$.SelectStmt = &SelectStmtNode{}
+        $$.SelectStmt.StarValid = false
+        $$.SelectStmt.DistinctValid = false
+        $$.SelectStmt.SelectList = $2.SelectList
+    }
+    |SELECT DISTINCT selectList {
+        $$ = &Node{}
+        $$.Type = SELECT_STMT_NODE
+
+        $$.SelectStmt = &SelectStmtNode{}
+        $$.SelectStmt.StarValid = false
+        $$.SelectStmt.DistinctValid = true
+        $$.SelectStmt.SelectList = $3.SelectList
+    }
+    ;
+
+/* --------------------------------- selectList ----------------------------------- */
+selectList
+    :selectListEntry {
+        $$ = List{}
+        $$.Type = SELECT_LIST
+
+        $$.SelectList = append($$.SelectList,$1.SelectListEntry)
+    }
+    |selectList COMMA selectListEntry {
+        $$ = $1
+        $$.SelectList = append($$.SelectList,$3.SelectListEntry)
+    }
+    ;
+
+/* ------------------------------ selectListEntry --------------------------------- */
+selectListEntry
+    :attriNameOptionTableName {
+        $$ = &Node{}
+        $$.Type = SELECT_LIST_ENTRY
+
+        $$.SelectListEntry = &SelectListEntryNode{}
+        $$.SelectListEntry.Type = SELECT_LIST_ENTRY_ATTRIBUTE_NAME
+        $$.SelectListEntry.AliasValid = false
+        $$.SelectListEntry.AttriNameOptionTableName = $1.AttriNameOptionTableName
+    }
+    |attriNameOptionTableName AS ID {
+        $$ = &Node{}
+        $$.Type = SELECT_LIST_ENTRY
+
+        $$.SelectListEntry = &SelectListEntryNode{}
+        $$.SelectListEntry.Type = SELECT_LIST_ENTRY_ATTRIBUTE_NAME
+        $$.SelectListEntry.AliasValid = true
+        $$.SelectListEntry.Alias = $3
+        $$.SelectListEntry.AttriNameOptionTableName = $1.AttriNameOptionTableName
+    }
+    |aggregation {
+        $$ = &Node{}
+        $$.Type = SELECT_LIST_ENTRY
+
+        $$.SelectListEntry = &SelectListEntryNode{}
+        $$.SelectListEntry.Type = SELECT_LIST_ENTRY_AGGREGATION
+        $$.SelectListEntry.AliasValid = false
+        $$.SelectListEntry.Aggregation = $1.Aggregation
+    }
+    |aggregation AS ID {
+        $$ = &Node{}
+        $$.Type = SELECT_LIST_ENTRY
+
+        $$.SelectListEntry = &SelectListEntryNode{}
+        $$.SelectListEntry.Type = SELECT_LIST_ENTRY_AGGREGATION
+        $$.SelectListEntry.AliasValid = true
+        $$.SelectListEntry.Alias = $3
+        $$.SelectListEntry.Aggregation = $1.Aggregation
+    }
+    |expression {
+        $$ = &Node{}
+        $$.Type = SELECT_LIST_ENTRY
+
+        $$.SelectListEntry = &SelectListEntryNode{}
+        $$.SelectListEntry.Type = SELECT_LIST_ENTRY_EXPRESSION
+        $$.SelectListEntry.AliasValid = false
+        $$.SelectListEntry.Expression = $1.Expression
+    }
+    |expression AS ID {
+        $$ = &Node{}
+        $$.Type = SELECT_LIST_ENTRY
+
+        $$.SelectListEntry = &SelectListEntryNode{}
+        $$.SelectListEntry.Type = SELECT_LIST_ENTRY_EXPRESSION
+        $$.SelectListEntry.AliasValid = true
+        $$.SelectListEntry.Alias = $3
+        $$.SelectListEntry.Expression = $1.Expression
+    }
+    ;
+
+/* ---------------------------------- fromStmt ------------------------------------ */
+fromStmt
+    :FROM joinStmt {
+        $$ = &Node{}
+        $$.Type = FROM_STMT_NODE
+
+        $$.FromStmt = &FromStmtNode{}
+        $$.FromStmt.FromListValid = false
+        $$.FromStmt.Join = $2.Join
+    }
+    |FROM fromList {
+        $$ = &Node{}
+        $$.Type = FROM_STMT_NODE
+
+        $$.FromStmt = &FromStmtNode{}
+        $$.FromStmt.FromListValid = true
+        $$.FromStmt.FromList = $2.FromList
+    }
+    ;
+
+/* ---------------------------------- joinStmt ------------------------------------ */
+joinStmt
+    :ID CROSS JOIN ID {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = CROSS_JOIN
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $4
+    }
+    |ID JOIN ID ON onList {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = JOIN_ON
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $3
+        $$.Join.OnList = $5.OnList
+    }
+    |ID NATURAL JOIN ID {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = NATURAL_JOIN
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $4
+    }
+    |ID NATURAL FULL OUTER JOIN ID {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = NATURAL_FULL_OUTER_JOIN
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $6
+    }
+    |ID NATURAL LEFT OUTER JOIN ID {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = NATURAL_LEFT_OUTER_JOIN
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $6
+    }
+    |ID NATURAL RIGHT OUTER JOIN ID {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = NATURAL_RIGHT_OUTER_JOIN
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $6
+    }
+    |ID FULL OUTER JOIN ID ON onList {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = FULL_OUTER_JOIN_ON
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $5
+        $$.Join.OnList = $7.OnList
+    }
+    |ID LEFT OUTER JOIN ID ON onList {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = LEFT_OUTER_JOIN_ON
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $5
+        $$.Join.OnList = $7.OnList
+    }
+    |ID RIGHT OUTER JOIN ID ON onList {
+        $$ = &Node{}
+        $$.Type = JOIN_NODE
+
+        $$.Join = &JoinNode{}
+        $$.Join.Type = RIGHT_OUTER_JOIN_ON
+        $$.Join.JoinTableNameL = $1
+        $$.Join.JoinTableNameR = $5
+        $$.Join.OnList = $7.OnList
+    }
+    ;
+
+/* ---------------------------------- onList -------------------------------------- */
+onList
+    :onList AND onListEntry {
+        $$ = $1
+        $$.OnList = append($$.OnList,$3.OnListEntry)
+    }
+    |onListEntry {
+        $$ = List{}
+        $$.Type = ON_LIST
+
+        $$.OnList = append($$.OnList,$1.OnListEntry)
+    }
+    ;
+
+/* -------------------------------- onListEntry ----------------------------------- */
+onListEntry
+    :attriNameOptionTableName EQUAL attriNameOptionTableName {
+        $$ = &Node{}
+        $$.Type = ON_LIST_ENTRY
+
+        $$.OnListEntry = &OnListEntryNode{}
+        $$.OnListEntry.AttriNameWithTableNameL = $1.AttriNameOptionTableName
+        $$.OnListEntry.AttriNameWithTableNameR = $3.AttriNameOptionTableName
+    }
+    ;
+
+/* ---------------------------------- fromList ------------------------------------ */
+fromList
+    :fromList COMMA fromListEntry {
+        $$ = $1
+        $$.FromList = append($$.FromList,$3.FromListEntry)
+    }
+    |fromListEntry {
+        $$ = List{}
+        $$.Type = FROM_LIST
+
+        $$.FromList = append($$.FromList,$1.FromListEntry)
+    }
+    ;
+
+/* ------------------------------- fromListEntry ---------------------------------- */
+fromListEntry
+    :ID {
+        $$ = &Node{}
+        $$.Type = FROM_LIST_ENTRY
+
+        $$.FromListEntry = &FromListEntryNode{}
+        $$.FromListEntry.Type = FROM_LIST_ENTRY_TABLE
+        $$.FromListEntry.TableName = $1
+        $$.FromListEntry.AliasValid = false
+
+    }
+    |ID ID {
+        $$ = &Node{}
+        $$.Type = FROM_LIST_ENTRY
+
+        $$.FromListEntry = &FromListEntryNode{}
+        $$.FromListEntry.Type = FROM_LIST_ENTRY_TABLE
+        $$.FromListEntry.TableName = $1
+        $$.FromListEntry.AliasValid = true
+        $$.FromListEntry.Alias = $2
+    }
+    |ID AS ID {
+        $$ = &Node{}
+        $$.Type = FROM_LIST_ENTRY
+
+        $$.FromListEntry = &FromListEntryNode{}
+        $$.FromListEntry.Type = FROM_LIST_ENTRY_TABLE
+        $$.FromListEntry.TableName = $1
+        $$.FromListEntry.AliasValid = true
+        $$.FromListEntry.Alias = $3
+    }
+    |query {
+        $$ = &Node{}
+        $$.Type = FROM_LIST_ENTRY
+
+        $$.FromListEntry = &FromListEntryNode{}
+        $$.FromListEntry.Type = FROM_LIST_ENTRY_SUBQUERY
+        $$.FromListEntry.Query = $1.Query
+        $$.FromListEntry.AliasValid = false
+    }
+    |query ID {
+        $$ = &Node{}
+        $$.Type = FROM_LIST_ENTRY
+
+        $$.FromListEntry = &FromListEntryNode{}
+        $$.FromListEntry.Type = FROM_LIST_ENTRY_SUBQUERY
+        $$.FromListEntry.Query = $1.Query
+        $$.FromListEntry.AliasValid = true
+        $$.FromListEntry.Alias = $2
+    }
+    |query AS ID {
+        $$ = &Node{}
+        $$.Type = FROM_LIST_ENTRY
+
+        $$.FromListEntry = &FromListEntryNode{}
+        $$.FromListEntry.Type = FROM_LIST_ENTRY_SUBQUERY
+        $$.FromListEntry.Query = $1.Query
+        $$.FromListEntry.AliasValid = true
+        $$.FromListEntry.Alias = $3
+    }
+    ;
+
+/* -------------------------------- orderByList ----------------------------------- */
+orderByList
+    :orderByList COMMA orderByListEntry {
+        $$ = $1
+        $$.OrderByList = append($$.OrderByList,$3.OrderByListEntry)
+    }
+    |orderByListEntry {
+        $$ = List{}
+        $$.Type = ORDERBY_LIST
+
+        $$.OrderByList = append($$.OrderByList,$1.OrderByListEntry)
+    }
+    ;
+
+/* ----------------------------- orderByListEntry --------------------------------- */
+orderByListEntry
+    :attriNameOptionTableName {
+        $$ = &Node{}
+        $$.Type = ORDERBY_LIST_ENTRY
+
+        $$.OrderByListEntry = &OrderByListEntryNode{}
+        $$.OrderByListEntry.Type = ORDER_BY_LIST_ENTRY_ATTRIBUTE
+        $$.OrderByListEntry.Trend = ORDER_BY_LIST_ENTRY_ASC
+        $$.OrderByListEntry.AttriNameOptionTableName = $1.AttriNameOptionTableName
+    }
+    |attriNameOptionTableName ASC {
+        $$ = &Node{}
+        $$.Type = ORDERBY_LIST_ENTRY
+
+        $$.OrderByListEntry = &OrderByListEntryNode{}
+        $$.OrderByListEntry.Type = ORDER_BY_LIST_ENTRY_ATTRIBUTE
+        $$.OrderByListEntry.Trend = ORDER_BY_LIST_ENTRY_ASC
+        $$.OrderByListEntry.AttriNameOptionTableName = $1.AttriNameOptionTableName
+    }
+    |attriNameOptionTableName DESC {
+        $$ = &Node{}
+        $$.Type = ORDERBY_LIST_ENTRY
+
+        $$.OrderByListEntry = &OrderByListEntryNode{}
+        $$.OrderByListEntry.Type = ORDER_BY_LIST_ENTRY_ATTRIBUTE
+        $$.OrderByListEntry.Trend = ORDER_BY_LIST_ENTRY_DESC
+        $$.OrderByListEntry.AttriNameOptionTableName = $1.AttriNameOptionTableName
+    }
+    |expression {
+        $$ = &Node{}
+        $$.Type = ORDERBY_LIST_ENTRY
+
+        $$.OrderByListEntry = &OrderByListEntryNode{}
+        $$.OrderByListEntry.Type = ORDER_BY_LIST_ENTRY_EXPRESSION
+        $$.OrderByListEntry.Trend = ORDER_BY_LIST_ENTRY_ASC
+        $$.OrderByListEntry.Expression = $1.Expression
+    }
+    |expression ASC {
+        $$ = &Node{}
+        $$.Type = ORDERBY_LIST_ENTRY
+
+        $$.OrderByListEntry = &OrderByListEntryNode{}
+        $$.OrderByListEntry.Type = ORDER_BY_LIST_ENTRY_EXPRESSION
+        $$.OrderByListEntry.Trend = ORDER_BY_LIST_ENTRY_ASC
+        $$.OrderByListEntry.Expression = $1.Expression
+    }
+    |expression DESC {
+        $$ = &Node{}
+        $$.Type = ORDERBY_LIST_ENTRY
+
+        $$.OrderByListEntry = &OrderByListEntryNode{}
+        $$.OrderByListEntry.Type = ORDER_BY_LIST_ENTRY_EXPRESSION
+        $$.OrderByListEntry.Trend = ORDER_BY_LIST_ENTRY_DESC
+        $$.OrderByListEntry.Expression = $1.Expression
     }
     ;
 
@@ -976,9 +1438,9 @@ deleteStmt
     --------------------------------------------------------------------------------
 
         insertStmt
-			INSERTINTO ID VALUES subQuery SEMICOLON
+			INSERTINTO ID VALUES query SEMICOLON
 			INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON
-			INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON
+			INSERTINTO ID LPAREN attriNameList RPAREN VALUES query SEMICOLON
 			INSERTINTO ID LPAREN attriNameList RPAREN VALUES LPAREN elementaryValueList RPAREN SEMICOLON
 
         elementaryValueList
@@ -989,7 +1451,7 @@ deleteStmt
 
 /*  ---------------------------------- insertStmt ---------------------------------- */
 insertStmt
-    :INSERTINTO ID VALUES subQuery SEMICOLON {
+    :INSERTINTO ID VALUES query SEMICOLON {
         $$ = &Node{}
         $$.Type = INSERT_NODE
 
@@ -997,7 +1459,7 @@ insertStmt
 
         $$.Insert.Type = INSERT_FROM_SUBQUERY
         $$.Insert.TableName = $2
-        $$.Insert.Subquery = $4.Subquery
+        $$.Insert.Query = $4.Query
         $$.Insert.AttriNameListValid = false
     }
     |INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON {
@@ -1011,7 +1473,7 @@ insertStmt
         $$.Insert.AttriNameListValid = false
         $$.Insert.ElementaryValueList = $5.ElementaryValueList
     }
-    |INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON {
+    |INSERTINTO ID LPAREN attriNameList RPAREN VALUES query SEMICOLON {
         $$ = &Node{}
         $$.Type = INSERT_NODE
 
@@ -1019,7 +1481,7 @@ insertStmt
 
         $$.Insert.Type = INSERT_FROM_SUBQUERY
         $$.Insert.TableName = $2
-        $$.Insert.Subquery = $7.Subquery
+        $$.Insert.Query = $7.Query
         $$.Insert.AttriNameListValid = true
         $$.Insert.AttriNameList = $4
     }
@@ -1349,12 +1811,12 @@ dropAssertStmt
     --------------------------------------------------------------------------------
 
         createViewStmt
-            CREATE VIEW ID AS subQuery SEMICOLON
-			CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON
+            CREATE VIEW ID AS query SEMICOLON
+			CREATE VIEW ID LPAREN attriNameList RPAREN AS query SEMICOLON
 
     -------------------------------------------------------------------------------- */
 createViewStmt
-    :CREATE VIEW ID AS subQuery SEMICOLON {
+    :CREATE VIEW ID AS query SEMICOLON {
         $$ = &Node{}
         $$.Type = VIEW_NODE
 
@@ -1363,7 +1825,7 @@ createViewStmt
         $$.View.Query = $5.Query
         $$.View.AttributeNameListValid = false
     }
-	|CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON {
+	|CREATE VIEW ID LPAREN attriNameList RPAREN AS query SEMICOLON {
         $$ = &Node{}
         $$.Type = VIEW_NODE
 
@@ -1824,7 +2286,7 @@ dropTriggerStmt
             dml
 
         psmForLoop
-            FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON
+            FOR ID AS ID CURSOR FOR query DO psmExecList END FOR SEMICOLON
 
         psmBranch
             IF condition THEN psmExecList psmElseifList ELSE psmExecList END IF SEMICOLON
@@ -2090,14 +2552,14 @@ psmExecEntry
 
 /*  ---------------------------------- psmForLoop ---------------------------------- */
 psmForLoop
-    :FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON {
+    :FOR ID AS ID CURSOR FOR query DO psmExecList END FOR SEMICOLON {
         $$ = &Node{}
         $$.Type = PSM_FOR_LOOP_NODE
 
         $$.PsmForLoop = &PsmForLoopNode{}
         $$.PsmForLoop.LoopName = $2
         $$.PsmForLoop.CursorName = $4
-        $$.PsmForLoop.Subquery = $7.Query
+        $$.PsmForLoop.Query = $7.Query
         $$.PsmForLoop.PsmExecList = $9.PsmExecList
     }
     ;
@@ -3075,26 +3537,26 @@ condition
         predicate
 			attriNameOptionTableName compareMark elementaryValue
 			attriNameOptionTableName LIKE STRINGVALUE
-			attriNameOptionTableName IN subQuery
-			attriNameOptionTableName NOT IN subQuery
+			attriNameOptionTableName IN query
+			attriNameOptionTableName NOT IN query
 			attriNameOptionTableName IN ID
 			attriNameOptionTableName NOT IN ID
-			attriNameOptionTableName compareMark ALL subQuery
-			NOT attriNameOptionTableName compareMark ALL subQuery
-			attriNameOptionTableName compareMark ANY subQuery
-			NOT attriNameOptionTableName compareMark ANY subQuery
+			attriNameOptionTableName compareMark ALL query
+			NOT attriNameOptionTableName compareMark ALL query
+			attriNameOptionTableName compareMark ANY query
+			NOT attriNameOptionTableName compareMark ANY query
 			attriNameOptionTableName compareMark ALL ID
 			NOT attriNameOptionTableName compareMark ALL ID
 			attriNameOptionTableName compareMark ANY ID
 			NOT attriNameOptionTableName compareMark ANY ID
 			attriNameOptionTableName IS NULLMARK
 			attriNameOptionTableName IS NOT NULLMARK
-			LPAREN attriNameOptionTableNameList RPAREN IN subQuery
-			LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery
+			LPAREN attriNameOptionTableNameList RPAREN IN query
+			LPAREN attriNameOptionTableNameList RPAREN NOT IN query
 			LPAREN attriNameOptionTableNameList RPAREN IN ID
 			LPAREN attriNameOptionTableNameList RPAREN NOT IN ID
-			EXISTS subQuery
-			NOT EXISTS subQuery
+			EXISTS query
+			NOT EXISTS query
 
         compareMark
 			EQUAL
@@ -3131,7 +3593,7 @@ predicate
         $$.Predicate.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
         $$.Predicate.ElementaryValue.StringValue = $3
     }
-	|attriNameOptionTableName IN subQuery {
+	|attriNameOptionTableName IN query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3139,9 +3601,9 @@ predicate
         $$.Predicate.Type = PREDICATE_IN_SUBQUERY
 
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
-        $$.Predicate.Subquery = $3.Subquery
+        $$.Predicate.Query = $3.Query
     }
-	|attriNameOptionTableName NOT IN subQuery {
+	|attriNameOptionTableName NOT IN query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3149,7 +3611,7 @@ predicate
         $$.Predicate.Type = PREDICATE_NOT_IN_SUBQUERY
 
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
-        $$.Predicate.Subquery = $4.Subquery
+        $$.Predicate.Query = $4.Query
     }
 	|attriNameOptionTableName IN ID {
         $$ = &Node{}
@@ -3171,7 +3633,7 @@ predicate
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
         $$.Predicate.TableName = $4
     }
-	|attriNameOptionTableName compareMark ALL subQuery {
+	|attriNameOptionTableName compareMark ALL query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3180,9 +3642,9 @@ predicate
 
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
         $$.Predicate.CompareMark = $2.CompareMark
-        $$.Predicate.Subquery = $4.Subquery
+        $$.Predicate.Query = $4.Query
     }
-	|NOT attriNameOptionTableName compareMark ALL subQuery {
+	|NOT attriNameOptionTableName compareMark ALL query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3191,9 +3653,9 @@ predicate
 
         $$.Predicate.AttriNameWithTableNameL = $2.AttriNameOptionTableName
         $$.Predicate.CompareMark = $3.CompareMark
-        $$.Predicate.Subquery = $5.Subquery
+        $$.Predicate.Query = $5.Query
     }
-	|attriNameOptionTableName compareMark ANY subQuery {
+	|attriNameOptionTableName compareMark ANY query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3202,9 +3664,9 @@ predicate
 
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
         $$.Predicate.CompareMark = $2.CompareMark
-        $$.Predicate.Subquery = $4.Subquery
+        $$.Predicate.Query = $4.Query
     }
-	|NOT attriNameOptionTableName compareMark ANY subQuery {
+	|NOT attriNameOptionTableName compareMark ANY query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3213,7 +3675,7 @@ predicate
 
         $$.Predicate.AttriNameWithTableNameL = $2.AttriNameOptionTableName
         $$.Predicate.CompareMark = $3.CompareMark
-        $$.Predicate.Subquery = $5.Subquery
+        $$.Predicate.Query = $5.Query
     }
 	|attriNameOptionTableName compareMark ALL ID {
         $$ = &Node{}
@@ -3277,7 +3739,7 @@ predicate
 
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
     }
-	|LPAREN attriNameOptionTableNameList RPAREN IN subQuery {
+	|LPAREN attriNameOptionTableNameList RPAREN IN query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3285,9 +3747,9 @@ predicate
         $$.Predicate.Type = PREDICATE_TUPLE_IN_SUBQUERY
 
         $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
-        $$.Predicate.Subquery = $5.Subquery
+        $$.Predicate.Query = $5.Query
     }
-	|LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery {
+	|LPAREN attriNameOptionTableNameList RPAREN NOT IN query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3295,7 +3757,7 @@ predicate
         $$.Predicate.Type = PREDICATE_TUPLE_NOT_IN_SUBQUERY
 
         $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
-        $$.Predicate.Subquery = $6.Subquery
+        $$.Predicate.Query = $6.Query
     }
 	|LPAREN attriNameOptionTableNameList RPAREN IN ID {
         $$ = &Node{}
@@ -3317,23 +3779,23 @@ predicate
         $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
         $$.Predicate.TableName = $6
     }
-	|EXISTS subQuery {
+	|EXISTS query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
         $$.Predicate = &PredicateNode{}
         $$.Predicate.Type = PREDICATE_SUBQUERY_EXISTS
 
-        $$.Predicate.Subquery = $2.Subquery
+        $$.Predicate.Query = $2.Query
     }
-	|NOT EXISTS subQuery {
+	|NOT EXISTS query {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
         $$.Predicate = &PredicateNode{}
         $$.Predicate.Type = PREDICATE_SUBQUERY_NOT_EXISTS
 
-        $$.Predicate.Subquery = $3.Subquery
+        $$.Predicate.Query = $3.Query
     }
     ;
 

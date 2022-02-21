@@ -330,6 +330,28 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 	case C.CONNECT:
 		return CONNECT
 
+	//dql
+	case C.DESC:
+		return DESC
+	case C.ASC:
+		return ASC
+	case C.CROSS:
+		return CROSS
+	case C.JOIN:
+		return JOIN
+	case C.NATURAL:
+		return NATURAL
+	case C.FULL:
+		return FULL
+	case C.OUTER:
+		return OUTER
+	case C.LEFT:
+		return LEFT
+	case C.RIGHT:
+		return RIGHT
+	case C.SELECT:
+		return SELECT
+
 	//public
 	case C.LPAREN:
 		return LPAREN

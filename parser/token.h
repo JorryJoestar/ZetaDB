@@ -160,6 +160,18 @@ enum {
     PASSWORDS       = 610,
     CONNECT         = 319, 
 
+//dql
+    DESC            = 275,
+    ASC             = 276,
+    JOIN            = 264,
+    NATURAL         = 265,
+    FULL            = 266,
+    LEFT            = 267,
+    RIGHT           = 268,
+    OUTER           = 269,
+    CROSS           = 270,
+    SELECT          = 240,
+
 //public
     NULLMARK          = 257,  //NULL
     LPAREN            = 200,  //(
@@ -187,18 +199,8 @@ enum {
     HAVING          = 237,
     ORDERBY         = 238,  //ORDER BY
 
-    SELECT          = 240,
 
-    JOIN            = 264,
-    NATURAL         = 265,
-    FULL            = 266,
-    LEFT            = 267,
-    RIGHT           = 268,
-    OUTER           = 269,
-    CROSS           = 270,
 
-    DESC            = 275,
-    ASC             = 276,
     EXISTS          = 277,
 
 
