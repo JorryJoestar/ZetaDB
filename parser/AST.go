@@ -308,8 +308,8 @@ type QueryNode struct {
 
 	//limit
 	LimitValid bool
-	InitialPos uint32
-	OffsetPos  uint32
+	InitialPos int
+	OffsetPos  int
 }
 
 type SelectListEntryEnum uint8

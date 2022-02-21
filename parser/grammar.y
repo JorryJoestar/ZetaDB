@@ -649,6 +649,121 @@ dml
     ;
 
 /*  --------------------------------------------------------------------------------
+    |                                     dql                                      |
+    --------------------------------------------------------------------------------
+
+        dql
+            subQuery UNION subQuery SEMICOLON
+            subQuery DIFFERENCE subQuery SEMICOLON
+            subQuery INTERSECTION subQuery SEMICOLON
+            subQuery SEMICOLON
+        
+    -------------------------------------------------------------------------------- */
+
+
+/*  --------------------------------------------------------------------------------
+    |                                    subQuery                                  |
+    --------------------------------------------------------------------------------
+
+        subQuery
+            selectStmt fromStmt
+            selectStmt fromStmt WHERE condition
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition
+            selectStmt fromStmt ORDERBY orderByList
+            selectStmt fromStmt WHERE condition ORDERBY orderByList
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList ORDERBY orderByList
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList ORDERBY orderByList
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList
+            selectStmt fromStmt LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt WHERE condition LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt WHERE condition ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE
+            selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE
+
+        selectStmt
+            SELECT STAR
+            SELECT selectList
+            SELECT DISTINCT selectList
+        
+        selectList
+            selectListEntry
+            selectList COMMA selectListEntry
+
+        selectListEntry
+            attriNameOptionTableName
+            attriNameOptionTableName AS ID
+            aggregation
+            aggregation AS ID
+            expression
+            expression AS ID
+
+        fromStmt
+            FROM joinStmt
+            FROM fromList
+
+        joinStmt
+            ID CROSS JOIN ID
+            ID JOIN ID ON onList
+            ID NATURAL JOIN ID
+            ID NATURAL FULL OUTER JOIN ID
+            ID NATURAL LEFT OUTER JOIN ID
+            ID NATURAL RIGHT OUTER JOIN ID
+            ID FULL OUTER JOIN ID ON onList
+            ID LEFT OUTER JOIN ID ON onList
+            ID RIGHT OUTER JOIN ID ON onList
+
+        onList
+            onList AND onListEntry
+        
+        onListEntry
+            attriNameOptionTableName EQUAL attriNameOptionTableName
+
+        fromList
+            fromList COMMAND fromListEntry
+            fromListEntry
+        
+        fromListEntry
+            ID
+            ID ID
+            ID AS ID
+            subQuery
+            subQuery ID
+            subQuery AS ID
+
+        orderByList
+            orderByList COMMA orderByListEntry
+            orderByListEntry
+
+        orderByListEntry
+            attriNameOptionTableName
+            attriNameOptionTableName ASC
+            attriNameOptionTableName DESC
+            expression
+            expression ASC
+            expression DESC
+
+   -------------------------------------------------------------------------------- */
+// TODO
+subQuery
+    :DOT {
+        $$ = &Node{}
+        $$.Type = SUBQUERY_NODE
+        $$.Subquery = &QueryNode{}
+    }
+    ;
+
+/*  --------------------------------------------------------------------------------
     |                                     dcl                                      |
     --------------------------------------------------------------------------------
 
@@ -3417,22 +3532,6 @@ attriNameOptionTableName
         $$.AttriNameOptionTableName.TableNameValid = true
         $$.AttriNameOptionTableName.TableName = $1
         $$.AttriNameOptionTableName.AttributeName = $3
-    }
-    ;
-
-/*  --------------------------------------------------------------------------------
-    |                                    subQuery                                  |
-    --------------------------------------------------------------------------------
-
-        subQuery
-
-   -------------------------------------------------------------------------------- */
-// TODO
-subQuery
-    :DOT {
-        $$ = &Node{}
-        $$.Type = SUBQUERY_NODE
-        $$.Subquery = &QueryNode{}
     }
     ;
 

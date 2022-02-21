@@ -218,21 +218,21 @@ state 26
 
 
 state 27
-	dcl:  createUserStmt.    (32)
+	dcl:  createUserStmt.    (33)
 
-	.  reduce 32 (src line 762)
+	.  reduce 33 (src line 877)
 
 
 state 28
-	dcl:  logUserStmt.    (33)
+	dcl:  logUserStmt.    (34)
 
-	.  reduce 33 (src line 765)
+	.  reduce 34 (src line 880)
 
 
 state 29
-	dcl:  psmCallStmt.    (34)
+	dcl:  psmCallStmt.    (35)
 
-	.  reduce 34 (src line 768)
+	.  reduce 35 (src line 883)
 
 
 state 30
@@ -347,9 +347,9 @@ state 38
 
 
 state 39
-	dcl:  BEGINTOKEN SEMICOLON.    (21)
+	dcl:  BEGINTOKEN SEMICOLON.    (22)
 
-	.  reduce 21 (src line 684)
+	.  reduce 22 (src line 799)
 
 
 state 40
@@ -360,15 +360,15 @@ state 40
 
 
 state 41
-	dcl:  COMMIT SEMICOLON.    (23)
+	dcl:  COMMIT SEMICOLON.    (24)
 
-	.  reduce 23 (src line 699)
+	.  reduce 24 (src line 814)
 
 
 state 42
-	dcl:  ROLLBACK SEMICOLON.    (24)
+	dcl:  ROLLBACK SEMICOLON.    (25)
 
-	.  reduce 24 (src line 706)
+	.  reduce 25 (src line 821)
 
 
 state 43
@@ -583,9 +583,9 @@ state 69
 
 
 state 70
-	psmCallStmt:  psmCall SEMICOLON.    (138)
+	psmCallStmt:  psmCall SEMICOLON.    (139)
 
-	.  reduce 138 (src line 2150)
+	.  reduce 139 (src line 2265)
 
 
 state 71
@@ -597,51 +597,51 @@ state 71
 
 
 state 72
-	dcl:  START TRANSACTION SEMICOLON.    (22)
+	dcl:  START TRANSACTION SEMICOLON.    (23)
 
-	.  reduce 22 (src line 692)
+	.  reduce 23 (src line 807)
 
 
 state 73
-	dcl:  SHOW TABLES SEMICOLON.    (25)
+	dcl:  SHOW TABLES SEMICOLON.    (26)
 
-	.  reduce 25 (src line 713)
+	.  reduce 26 (src line 828)
 
 
 state 74
-	dcl:  SHOW ASSERTIONS SEMICOLON.    (26)
+	dcl:  SHOW ASSERTIONS SEMICOLON.    (27)
 
-	.  reduce 26 (src line 720)
+	.  reduce 27 (src line 835)
 
 
 state 75
-	dcl:  SHOW VIEWS SEMICOLON.    (27)
+	dcl:  SHOW VIEWS SEMICOLON.    (28)
 
-	.  reduce 27 (src line 727)
+	.  reduce 28 (src line 842)
 
 
 state 76
-	dcl:  SHOW INDEXS SEMICOLON.    (28)
+	dcl:  SHOW INDEXS SEMICOLON.    (29)
 
-	.  reduce 28 (src line 734)
+	.  reduce 29 (src line 849)
 
 
 state 77
-	dcl:  SHOW TRIGGERS SEMICOLON.    (29)
+	dcl:  SHOW TRIGGERS SEMICOLON.    (30)
 
-	.  reduce 29 (src line 741)
+	.  reduce 30 (src line 856)
 
 
 state 78
-	dcl:  SHOW FUNCTIONS SEMICOLON.    (30)
+	dcl:  SHOW FUNCTIONS SEMICOLON.    (31)
 
-	.  reduce 30 (src line 748)
+	.  reduce 31 (src line 863)
 
 
 state 79
-	dcl:  SHOW PROCEDURES SEMICOLON.    (31)
+	dcl:  SHOW PROCEDURES SEMICOLON.    (32)
 
-	.  reduce 31 (src line 755)
+	.  reduce 32 (src line 870)
 
 
 state 80
@@ -976,15 +976,15 @@ state 113
 	psmBody  goto 184
 
 state 114
-	createPsmStmt:  CREATE PROCEDURE ID psmBody.    (103)
+	createPsmStmt:  CREATE PROCEDURE ID psmBody.    (104)
 
-	.  reduce 103 (src line 1775)
+	.  reduce 104 (src line 1890)
 
 
 state 115
-	psmLocalDeclarationList:  psmLocalDeclarationEntry.    (114)
+	psmLocalDeclarationList:  psmLocalDeclarationEntry.    (115)
 
-	.  reduce 114 (src line 1889)
+	.  reduce 115 (src line 2004)
 
 
 state 116
@@ -1050,45 +1050,45 @@ state 119
 	domain  goto 197
 
 state 120
-	dropTableStmt:  DROP TABLE ID SEMICOLON.    (59)
+	dropTableStmt:  DROP TABLE ID SEMICOLON.    (60)
 
-	.  reduce 59 (src line 1120)
+	.  reduce 60 (src line 1235)
 
 
 state 121
-	dropAssertStmt:  DROP ASSERTION ID SEMICOLON.    (65)
+	dropAssertStmt:  DROP ASSERTION ID SEMICOLON.    (66)
 
-	.  reduce 65 (src line 1222)
+	.  reduce 66 (src line 1337)
 
 
 state 122
-	dropViewStmt:  DROP VIEW ID SEMICOLON.    (68)
+	dropViewStmt:  DROP VIEW ID SEMICOLON.    (69)
 
-	.  reduce 68 (src line 1271)
+	.  reduce 69 (src line 1386)
 
 
 state 123
-	dropIndexStmt:  DROP INDEX ID SEMICOLON.    (70)
+	dropIndexStmt:  DROP INDEX ID SEMICOLON.    (71)
 
-	.  reduce 70 (src line 1309)
+	.  reduce 71 (src line 1424)
 
 
 state 124
-	dropTriggerStmt:  DROP TRIGGER ID SEMICOLON.    (99)
+	dropTriggerStmt:  DROP TRIGGER ID SEMICOLON.    (100)
 
-	.  reduce 99 (src line 1657)
+	.  reduce 100 (src line 1772)
 
 
 state 125
-	dropPsmStmt:  DROP FUNCTION ID SEMICOLON.    (136)
+	dropPsmStmt:  DROP FUNCTION ID SEMICOLON.    (137)
 
-	.  reduce 136 (src line 2113)
+	.  reduce 137 (src line 2228)
 
 
 state 126
-	dropPsmStmt:  DROP PROCEDURE ID SEMICOLON.    (137)
+	dropPsmStmt:  DROP PROCEDURE ID SEMICOLON.    (138)
 
-	.  reduce 137 (src line 2122)
+	.  reduce 138 (src line 2237)
 
 
 state 127
@@ -1144,9 +1144,9 @@ state 131
 	elementaryValue  goto 226
 
 state 132
-	subQuery:  DOT.    (256)
+	subQuery:  DOT.    (21)
 
-	.  reduce 256 (src line 3431)
+	.  reduce 21 (src line 758)
 
 
 state 133
@@ -1162,7 +1162,7 @@ state 133
 state 134
 	attriNameList:  ID.    (262)
 
-	.  reduce 262 (src line 3501)
+	.  reduce 262 (src line 3600)
 
 
 state 135
@@ -1175,9 +1175,9 @@ state 135
 
 
 state 136
-	updateList:  updateListEntry.    (49)
+	updateList:  updateListEntry.    (50)
 
-	.  reduce 49 (src line 970)
+	.  reduce 50 (src line 1085)
 
 
 state 137
@@ -1207,77 +1207,77 @@ state 139
 
 
 state 140
-	psmCall:  CALL ID LPAREN RPAREN.    (140)
+	psmCall:  CALL ID LPAREN RPAREN.    (141)
 
-	.  reduce 140 (src line 2167)
+	.  reduce 141 (src line 2282)
 
 
 state 141
-	psmValueList:  psmValue.    (142)
+	psmValueList:  psmValue.    (143)
 
-	.  reduce 142 (src line 2183)
+	.  reduce 143 (src line 2298)
 
 
 state 142
-	psmValue:  elementaryValue.    (132)
-	expressionEntry:  elementaryValue.    (148)
+	psmValue:  elementaryValue.    (133)
+	expressionEntry:  elementaryValue.    (149)
 
-	SEMICOLON  reduce 132 (src line 2069)
-	RPAREN  reduce 132 (src line 2069)
-	COMMA  reduce 132 (src line 2069)
-	.  reduce 148 (src line 2260)
+	SEMICOLON  reduce 133 (src line 2184)
+	RPAREN  reduce 133 (src line 2184)
+	COMMA  reduce 133 (src line 2184)
+	.  reduce 149 (src line 2375)
 
 
 state 143
-	psmValue:  psmCall.    (133)
+	psmValue:  psmCall.    (134)
 
-	.  reduce 133 (src line 2078)
+	.  reduce 134 (src line 2193)
 
 
 state 144
-	psmValue:  expression.    (134)
-	expressionEntry:  expression.    (151)
+	psmValue:  expression.    (135)
+	expressionEntry:  expression.    (152)
 
-	SEMICOLON  reduce 134 (src line 2086)
-	RPAREN  reduce 134 (src line 2086)
-	COMMA  reduce 134 (src line 2086)
-	.  reduce 151 (src line 2288)
+	SEMICOLON  reduce 135 (src line 2201)
+	RPAREN  reduce 135 (src line 2201)
+	COMMA  reduce 135 (src line 2201)
+	.  reduce 152 (src line 2403)
 
 
 state 145
-	psmValue:  ID.    (135)
-	attriNameOptionTableName:  ID.    (254)
+	psmValue:  ID.    (136)
+	attriNameOptionTableName:  ID.    (255)
 	attriNameOptionTableName:  ID.DOT ID 
 
-	SEMICOLON  reduce 135 (src line 2094)
+	SEMICOLON  reduce 136 (src line 2209)
 	DOT  shift 235
-	RPAREN  reduce 135 (src line 2094)
-	COMMA  reduce 135 (src line 2094)
-	.  reduce 254 (src line 3405)
+	RPAREN  reduce 136 (src line 2209)
+	COMMA  reduce 136 (src line 2209)
+	.  reduce 255 (src line 3520)
 
 
 state 146
 	elementaryValue:  INTVALUE.    (257)
 
-	.  reduce 257 (src line 3451)
+	.  reduce 257 (src line 3550)
 
 
 state 147
 	elementaryValue:  FLOATVALUE.    (258)
 
-	.  reduce 258 (src line 3459)
+	.  reduce 258 (src line 3558)
 
 
 state 148
 	elementaryValue:  STRINGVALUE.    (259)
 
-	.  reduce 259 (src line 3466)
+	.  reduce 259 (src line 3565)
 
 
 state 149
 	elementaryValue:  BOOLVALUE.    (260)
 
-	.  reduce 260 (src line 3473)
+	.  reduce 260 (src line 3572)
 
 
 state 150
@@ -1296,15 +1296,15 @@ state 150
 
 
 state 151
-	expressionEntry:  attriNameOptionTableName.    (149)
+	expressionEntry:  attriNameOptionTableName.    (150)
 
-	.  reduce 149 (src line 2270)
+	.  reduce 150 (src line 2385)
 
 
 state 152
-	expressionEntry:  aggregation.    (150)
+	expressionEntry:  aggregation.    (151)
 
-	.  reduce 150 (src line 2279)
+	.  reduce 151 (src line 2394)
 
 
 state 153
@@ -1402,9 +1402,9 @@ state 162
 
 
 state 163
-	attributeDeclarationList:  attributeDeclaration.    (55)
+	attributeDeclarationList:  attributeDeclaration.    (56)
 
-	.  reduce 55 (src line 1061)
+	.  reduce 56 (src line 1176)
 
 
 state 164
@@ -1564,9 +1564,9 @@ state 179
 
 
 state 180
-	psmParameterList:  psmParameterEntry.    (109)
+	psmParameterList:  psmParameterEntry.    (110)
 
-	.  reduce 109 (src line 1842)
+	.  reduce 110 (src line 1957)
 
 
 state 181
@@ -1591,15 +1591,15 @@ state 183
 
 
 state 184
-	createPsmStmt:  CREATE PROCEDURE ID psmLocalDeclarationList psmBody.    (102)
+	createPsmStmt:  CREATE PROCEDURE ID psmLocalDeclarationList psmBody.    (103)
 
-	.  reduce 102 (src line 1763)
+	.  reduce 103 (src line 1878)
 
 
 state 185
-	psmLocalDeclarationList:  psmLocalDeclarationList psmLocalDeclarationEntry.    (113)
+	psmLocalDeclarationList:  psmLocalDeclarationList psmLocalDeclarationEntry.    (114)
 
-	.  reduce 113 (src line 1884)
+	.  reduce 114 (src line 1999)
 
 
 state 186
@@ -1625,9 +1625,9 @@ state 186
 	psmBranch  goto 191
 
 state 187
-	psmExecList:  psmExecEntry.    (118)
+	psmExecList:  psmExecEntry.    (119)
 
-	.  reduce 118 (src line 1923)
+	.  reduce 119 (src line 2038)
 
 
 state 188
@@ -1663,21 +1663,21 @@ state 189
 
 
 state 190
-	psmExecEntry:  psmForLoop.    (121)
+	psmExecEntry:  psmForLoop.    (122)
 
-	.  reduce 121 (src line 1950)
+	.  reduce 122 (src line 2065)
 
 
 state 191
-	psmExecEntry:  psmBranch.    (122)
+	psmExecEntry:  psmBranch.    (123)
 
-	.  reduce 122 (src line 1958)
+	.  reduce 123 (src line 2073)
 
 
 state 192
-	psmExecEntry:  dml.    (123)
+	psmExecEntry:  dml.    (124)
 
-	.  reduce 123 (src line 1966)
+	.  reduce 124 (src line 2081)
 
 
 state 193
@@ -1747,9 +1747,9 @@ state 197
 	psmBody  goto 292
 
 state 198
-	domain:  CHAR.    (239)
+	domain:  CHAR.    (240)
 
-	.  reduce 239 (src line 3281)
+	.  reduce 240 (src line 3396)
 
 
 state 199
@@ -1774,45 +1774,45 @@ state 201
 
 
 state 202
-	domain:  BOOLEAN.    (243)
+	domain:  BOOLEAN.    (244)
 
-	.  reduce 243 (src line 3313)
+	.  reduce 244 (src line 3428)
 
 
 state 203
-	domain:  INT.    (244)
+	domain:  INT.    (245)
 
-	.  reduce 244 (src line 3320)
+	.  reduce 245 (src line 3435)
 
 
 state 204
-	domain:  INTEGER.    (245)
+	domain:  INTEGER.    (246)
 
-	.  reduce 245 (src line 3327)
+	.  reduce 246 (src line 3442)
 
 
 state 205
-	domain:  SHORTINT.    (246)
+	domain:  SHORTINT.    (247)
 
-	.  reduce 246 (src line 3334)
+	.  reduce 247 (src line 3449)
 
 
 state 206
-	domain:  FLOAT.    (247)
+	domain:  FLOAT.    (248)
 
-	.  reduce 247 (src line 3341)
+	.  reduce 248 (src line 3456)
 
 
 state 207
-	domain:  REAL.    (248)
+	domain:  REAL.    (249)
 
-	.  reduce 248 (src line 3348)
+	.  reduce 249 (src line 3463)
 
 
 state 208
-	domain:  DOUBLEPRECISION.    (249)
+	domain:  DOUBLEPRECISION.    (250)
 
-	.  reduce 249 (src line 3355)
+	.  reduce 250 (src line 3470)
 
 
 state 209
@@ -1823,16 +1823,16 @@ state 209
 
 
 state 210
-	domain:  NUMERIC.LPAREN INTVALUE COMMA INTVALUE RPAREN $$251 DATE 
+	domain:  NUMERIC.LPAREN INTVALUE COMMA INTVALUE RPAREN $$252 DATE 
 
 	LPAREN  shift 297
 	.  error
 
 
 state 211
-	domain:  TIME.    (253)
+	domain:  TIME.    (254)
 
-	.  reduce 253 (src line 3387)
+	.  reduce 254 (src line 3502)
 
 
 state 212
@@ -1882,9 +1882,9 @@ state 217
 
 
 state 218
-	condition:  predicate.    (207)
+	condition:  predicate.    (208)
 
-	.  reduce 207 (src line 2924)
+	.  reduce 208 (src line 3039)
 
 
 state 219
@@ -1955,17 +1955,17 @@ state 222
 	subQuery  goto 322
 
 state 223
-	attriNameOptionTableName:  ID.    (254)
+	attriNameOptionTableName:  ID.    (255)
 	attriNameOptionTableName:  ID.DOT ID 
 
 	DOT  shift 235
-	.  reduce 254 (src line 3405)
+	.  reduce 255 (src line 3520)
 
 
 state 224
-	insertStmt:  INSERTINTO ID VALUES subQuery SEMICOLON.    (42)
+	insertStmt:  INSERTINTO ID VALUES subQuery SEMICOLON.    (43)
 
-	.  reduce 42 (src line 876)
+	.  reduce 43 (src line 991)
 
 
 state 225
@@ -1978,9 +1978,9 @@ state 225
 
 
 state 226
-	elementaryValueList:  elementaryValue.    (47)
+	elementaryValueList:  elementaryValue.    (48)
 
-	.  reduce 47 (src line 931)
+	.  reduce 48 (src line 1046)
 
 
 state 227
@@ -2054,9 +2054,9 @@ state 232
 
 
 state 233
-	psmCall:  CALL ID LPAREN psmValueList RPAREN.    (139)
+	psmCall:  CALL ID LPAREN psmValueList RPAREN.    (140)
 
-	.  reduce 139 (src line 2157)
+	.  reduce 140 (src line 2272)
 
 
 state 234
@@ -2202,17 +2202,17 @@ state 240
 	elementaryValue  goto 242
 
 state 241
-	expressionEntry:  expression.    (151)
+	expressionEntry:  expression.    (152)
 	expressionEntry:  LPAREN expression.RPAREN 
 
 	RPAREN  shift 342
-	.  reduce 151 (src line 2288)
+	.  reduce 152 (src line 2403)
 
 
 state 242
-	expressionEntry:  elementaryValue.    (148)
+	expressionEntry:  elementaryValue.    (149)
 
-	.  reduce 148 (src line 2260)
+	.  reduce 149 (src line 2375)
 
 
 state 243
@@ -2268,21 +2268,21 @@ state 247
 	attriNameOptionTableName  goto 352
 
 state 248
-	createUserStmt:  CREATE USER ID PASSWORD PASSWORDS SEMICOLON.    (35)
+	createUserStmt:  CREATE USER ID PASSWORD PASSWORDS SEMICOLON.    (36)
 
-	.  reduce 35 (src line 779)
+	.  reduce 36 (src line 894)
 
 
 state 249
-	createUserStmt:  CREATE USER ID PASSWORD ID SEMICOLON.    (36)
+	createUserStmt:  CREATE USER ID PASSWORD ID SEMICOLON.    (37)
 
-	.  reduce 36 (src line 789)
+	.  reduce 37 (src line 904)
 
 
 state 250
-	createUserStmt:  CREATE USER ID PASSWORD INTVALUE SEMICOLON.    (37)
+	createUserStmt:  CREATE USER ID PASSWORD INTVALUE SEMICOLON.    (38)
 
-	.  reduce 37 (src line 798)
+	.  reduce 38 (src line 913)
 
 
 state 251
@@ -2310,7 +2310,7 @@ state 252
 	constraintWithName  goto 357
 
 state 253
-	attributeDeclaration:  ID domain.    (57)
+	attributeDeclaration:  ID domain.    (58)
 	attributeDeclaration:  ID domain.constraintAfterAttributeList 
 
 	DEFAULT  shift 367
@@ -2319,7 +2319,7 @@ state 253
 	REFERENCES  shift 371
 	CONSTRAINT  shift 366
 	NOT  shift 370
-	.  reduce 57 (src line 1074)
+	.  reduce 58 (src line 1189)
 
 	constraintAfterAttributeList  goto 363
 	constraintAfterAttribute  goto 365
@@ -2337,9 +2337,9 @@ state 254
 
 
 state 255
-	createViewStmt:  CREATE VIEW ID AS subQuery SEMICOLON.    (66)
+	createViewStmt:  CREATE VIEW ID AS subQuery SEMICOLON.    (67)
 
-	.  reduce 66 (src line 1241)
+	.  reduce 67 (src line 1356)
 
 
 state 256
@@ -2369,9 +2369,9 @@ state 258
 	triggerForEachEnum  goto 375
 
 state 259
-	triggerOldNewList:  oldNewEntry.    (87)
+	triggerOldNewList:  oldNewEntry.    (88)
 
-	.  reduce 87 (src line 1557)
+	.  reduce 88 (src line 1672)
 
 
 state 260
@@ -2401,9 +2401,9 @@ state 262
 	triggerExecStmt  goto 381
 
 state 263
-	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerExecStmt.    (74)
+	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerExecStmt.    (75)
 
-	.  reduce 74 (src line 1432)
+	.  reduce 75 (src line 1547)
 
 
 state 264
@@ -2614,9 +2614,9 @@ state 283
 
 
 state 284
-	psmExecList:  psmExecList psmExecEntry.    (117)
+	psmExecList:  psmExecList psmExecEntry.    (118)
 
-	.  reduce 117 (src line 1917)
+	.  reduce 118 (src line 2032)
 
 
 state 285
@@ -2681,9 +2681,9 @@ state 291
 	psmBody  goto 412
 
 state 292
-	createPsmStmt:  CREATE FUNCTION ID RETURNS domain psmBody.    (107)
+	createPsmStmt:  CREATE FUNCTION ID RETURNS domain psmBody.    (108)
 
-	.  reduce 107 (src line 1823)
+	.  reduce 108 (src line 1938)
 
 
 state 293
@@ -2715,22 +2715,22 @@ state 296
 
 
 state 297
-	domain:  NUMERIC LPAREN.INTVALUE COMMA INTVALUE RPAREN $$251 DATE 
+	domain:  NUMERIC LPAREN.INTVALUE COMMA INTVALUE RPAREN $$252 DATE 
 
 	INTVALUE  shift 417
 	.  error
 
 
 state 298
-	alterTableAddStmt:  ALTER TABLE ID ADD attributeDeclaration SEMICOLON.    (60)
+	alterTableAddStmt:  ALTER TABLE ID ADD attributeDeclaration SEMICOLON.    (61)
 
-	.  reduce 60 (src line 1139)
+	.  reduce 61 (src line 1254)
 
 
 state 299
-	alterTableAddStmt:  ALTER TABLE ID ADD constraintWithName SEMICOLON.    (61)
+	alterTableAddStmt:  ALTER TABLE ID ADD constraintWithName SEMICOLON.    (62)
 
-	.  reduce 61 (src line 1155)
+	.  reduce 62 (src line 1270)
 
 
 state 300
@@ -2745,9 +2745,9 @@ state 300
 	constraint  goto 418
 
 state 301
-	alterTableDropStmt:  ALTER TABLE ID DROP ID SEMICOLON.    (62)
+	alterTableDropStmt:  ALTER TABLE ID DROP ID SEMICOLON.    (63)
 
-	.  reduce 62 (src line 1176)
+	.  reduce 63 (src line 1291)
 
 
 state 302
@@ -2758,9 +2758,9 @@ state 302
 
 
 state 303
-	deleteStmt:  DELETE FROM ID WHERE condition SEMICOLON.    (41)
+	deleteStmt:  DELETE FROM ID WHERE condition SEMICOLON.    (42)
 
-	.  reduce 41 (src line 848)
+	.  reduce 42 (src line 963)
 
 
 state 304
@@ -2837,7 +2837,7 @@ state 308
 	GREATEREQUAL  shift 319
 	EQUAL  shift 314
 	NOT  shift 312
-	.  reduce 264 (src line 3512)
+	.  reduce 264 (src line 3611)
 
 	compareMark  goto 309
 
@@ -2893,39 +2893,39 @@ state 313
 
 
 state 314
-	compareMark:  EQUAL.    (233)
+	compareMark:  EQUAL.    (234)
 
-	.  reduce 233 (src line 3226)
+	.  reduce 234 (src line 3341)
 
 
 state 315
-	compareMark:  NOTEQUAL.    (234)
+	compareMark:  NOTEQUAL.    (235)
 
-	.  reduce 234 (src line 3232)
+	.  reduce 235 (src line 3347)
 
 
 state 316
-	compareMark:  LESS.    (235)
+	compareMark:  LESS.    (236)
 
-	.  reduce 235 (src line 3237)
+	.  reduce 236 (src line 3352)
 
 
 state 317
-	compareMark:  GREATER.    (236)
+	compareMark:  GREATER.    (237)
 
-	.  reduce 236 (src line 3242)
+	.  reduce 237 (src line 3357)
 
 
 state 318
-	compareMark:  LESSEQUAL.    (237)
+	compareMark:  LESSEQUAL.    (238)
 
-	.  reduce 237 (src line 3247)
+	.  reduce 238 (src line 3362)
 
 
 state 319
-	compareMark:  GREATEREQUAL.    (238)
+	compareMark:  GREATEREQUAL.    (239)
 
-	.  reduce 238 (src line 3252)
+	.  reduce 239 (src line 3367)
 
 
 state 320
@@ -2953,9 +2953,9 @@ state 321
 	subQuery  goto 435
 
 state 322
-	predicate:  EXISTS subQuery.    (231)
+	predicate:  EXISTS subQuery.    (232)
 
-	.  reduce 231 (src line 3205)
+	.  reduce 232 (src line 3320)
 
 
 state 323
@@ -2989,7 +2989,7 @@ state 325
 state 326
 	attriNameList:  attriNameList COMMA ID.    (261)
 
-	.  reduce 261 (src line 3497)
+	.  reduce 261 (src line 3596)
 
 
 state 327
@@ -3004,27 +3004,27 @@ state 327
 
 
 state 328
-	updateList:  updateList COMMA updateListEntry.    (50)
+	updateList:  updateList COMMA updateListEntry.    (51)
 
-	.  reduce 50 (src line 977)
+	.  reduce 51 (src line 1092)
 
 
 state 329
-	updateListEntry:  ID EQUAL expression.    (51)
-	expressionEntry:  expression.    (151)
+	updateListEntry:  ID EQUAL expression.    (52)
+	expressionEntry:  expression.    (152)
 
-	WHERE  reduce 51 (src line 984)
-	COMMA  reduce 51 (src line 984)
-	.  reduce 151 (src line 2288)
+	WHERE  reduce 52 (src line 1099)
+	COMMA  reduce 52 (src line 1099)
+	.  reduce 152 (src line 2403)
 
 
 state 330
-	updateListEntry:  ID EQUAL elementaryValue.    (52)
-	expressionEntry:  elementaryValue.    (148)
+	updateListEntry:  ID EQUAL elementaryValue.    (53)
+	expressionEntry:  elementaryValue.    (149)
 
-	WHERE  reduce 52 (src line 994)
-	COMMA  reduce 52 (src line 994)
-	.  reduce 148 (src line 2260)
+	WHERE  reduce 53 (src line 1109)
+	COMMA  reduce 53 (src line 1109)
+	.  reduce 149 (src line 2375)
 
 
 state 331
@@ -3049,54 +3049,54 @@ state 333
 
 
 state 334
-	psmValueList:  psmValueList COMMA psmValue.    (141)
+	psmValueList:  psmValueList COMMA psmValue.    (142)
 
-	.  reduce 141 (src line 2178)
+	.  reduce 142 (src line 2293)
 
 
 state 335
-	attriNameOptionTableName:  ID DOT ID.    (255)
+	attriNameOptionTableName:  ID DOT ID.    (256)
 
-	.  reduce 255 (src line 3413)
+	.  reduce 256 (src line 3528)
 
 
 state 336
 	expression:  expressionEntry.PLUS expressionEntry 
-	expression:  expressionEntry PLUS expressionEntry.    (143)
+	expression:  expressionEntry PLUS expressionEntry.    (144)
 	expression:  expressionEntry.SUBTRACT expressionEntry 
 	expression:  expressionEntry.STAR expressionEntry 
 	expression:  expressionEntry.DIVISION expressionEntry 
 	expression:  expressionEntry.CONCATENATION expressionEntry 
 
-	.  reduce 143 (src line 2211)
+	.  reduce 144 (src line 2326)
 
 
 state 337
-	expressionEntry:  expression.    (151)
+	expressionEntry:  expression.    (152)
 
-	.  reduce 151 (src line 2288)
+	.  reduce 152 (src line 2403)
 
 
 state 338
 	expression:  expressionEntry.PLUS expressionEntry 
 	expression:  expressionEntry.SUBTRACT expressionEntry 
-	expression:  expressionEntry SUBTRACT expressionEntry.    (144)
+	expression:  expressionEntry SUBTRACT expressionEntry.    (145)
 	expression:  expressionEntry.STAR expressionEntry 
 	expression:  expressionEntry.DIVISION expressionEntry 
 	expression:  expressionEntry.CONCATENATION expressionEntry 
 
-	.  reduce 144 (src line 2221)
+	.  reduce 145 (src line 2336)
 
 
 state 339
 	expression:  expressionEntry.PLUS expressionEntry 
 	expression:  expressionEntry.SUBTRACT expressionEntry 
 	expression:  expressionEntry.STAR expressionEntry 
-	expression:  expressionEntry STAR expressionEntry.    (145)
+	expression:  expressionEntry STAR expressionEntry.    (146)
 	expression:  expressionEntry.DIVISION expressionEntry 
 	expression:  expressionEntry.CONCATENATION expressionEntry 
 
-	.  reduce 145 (src line 2230)
+	.  reduce 146 (src line 2345)
 
 
 state 340
@@ -3104,10 +3104,10 @@ state 340
 	expression:  expressionEntry.SUBTRACT expressionEntry 
 	expression:  expressionEntry.STAR expressionEntry 
 	expression:  expressionEntry.DIVISION expressionEntry 
-	expression:  expressionEntry DIVISION expressionEntry.    (146)
+	expression:  expressionEntry DIVISION expressionEntry.    (147)
 	expression:  expressionEntry.CONCATENATION expressionEntry 
 
-	.  reduce 146 (src line 2239)
+	.  reduce 147 (src line 2354)
 
 
 state 341
@@ -3116,15 +3116,15 @@ state 341
 	expression:  expressionEntry.STAR expressionEntry 
 	expression:  expressionEntry.DIVISION expressionEntry 
 	expression:  expressionEntry.CONCATENATION expressionEntry 
-	expression:  expressionEntry CONCATENATION expressionEntry.    (147)
+	expression:  expressionEntry CONCATENATION expressionEntry.    (148)
 
-	.  reduce 147 (src line 2248)
+	.  reduce 148 (src line 2363)
 
 
 state 342
-	expressionEntry:  LPAREN expression RPAREN.    (152)
+	expressionEntry:  LPAREN expression RPAREN.    (153)
 
-	.  reduce 152 (src line 2297)
+	.  reduce 153 (src line 2412)
 
 
 state 343
@@ -3210,9 +3210,9 @@ state 353
 
 
 state 354
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON.    (53)
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList RPAREN SEMICOLON.    (54)
 
-	.  reduce 53 (src line 1024)
+	.  reduce 54 (src line 1139)
 
 
 state 355
@@ -3226,21 +3226,21 @@ state 355
 
 
 state 356
-	attributeDeclarationList:  attributeDeclarationList COMMA attributeDeclaration.    (56)
+	attributeDeclarationList:  attributeDeclarationList COMMA attributeDeclaration.    (57)
 
-	.  reduce 56 (src line 1067)
+	.  reduce 57 (src line 1182)
 
 
 state 357
-	constraintList:  constraintWithName.    (168)
+	constraintList:  constraintWithName.    (169)
 
-	.  reduce 168 (src line 2519)
+	.  reduce 169 (src line 2634)
 
 
 state 358
-	constraintList:  constraint.    (169)
+	constraintList:  constraint.    (170)
 
-	.  reduce 169 (src line 2525)
+	.  reduce 170 (src line 2640)
 
 
 state 359
@@ -3273,7 +3273,7 @@ state 362
 
 
 state 363
-	attributeDeclaration:  ID domain constraintAfterAttributeList.    (58)
+	attributeDeclaration:  ID domain constraintAfterAttributeList.    (59)
 	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttributeWithName 
 	constraintAfterAttributeList:  constraintAfterAttributeList.constraintAfterAttribute 
 
@@ -3283,21 +3283,21 @@ state 363
 	REFERENCES  shift 371
 	CONSTRAINT  shift 366
 	NOT  shift 370
-	.  reduce 58 (src line 1084)
+	.  reduce 59 (src line 1199)
 
 	constraintAfterAttribute  goto 462
 	constraintAfterAttributeWithName  goto 461
 
 state 364
-	constraintAfterAttributeList:  constraintAfterAttributeWithName.    (164)
+	constraintAfterAttributeList:  constraintAfterAttributeWithName.    (165)
 
-	.  reduce 164 (src line 2497)
+	.  reduce 165 (src line 2612)
 
 
 state 365
-	constraintAfterAttributeList:  constraintAfterAttribute.    (165)
+	constraintAfterAttributeList:  constraintAfterAttribute.    (166)
 
-	.  reduce 165 (src line 2503)
+	.  reduce 166 (src line 2618)
 
 
 state 366
@@ -3319,15 +3319,15 @@ state 367
 	elementaryValue  goto 464
 
 state 368
-	constraintAfterAttribute:  UNIQUE.    (180)
+	constraintAfterAttribute:  UNIQUE.    (181)
 
-	.  reduce 180 (src line 2635)
+	.  reduce 181 (src line 2750)
 
 
 state 369
-	constraintAfterAttribute:  PRIMARYKEY.    (181)
+	constraintAfterAttribute:  PRIMARYKEY.    (182)
 
-	.  reduce 181 (src line 2643)
+	.  reduce 182 (src line 2758)
 
 
 state 370
@@ -3418,19 +3418,19 @@ state 380
 
 
 state 381
-	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerWhenCondition triggerExecStmt.    (72)
+	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt triggerForEachEnum triggerWhenCondition triggerExecStmt.    (73)
 
-	.  reduce 72 (src line 1392)
+	.  reduce 73 (src line 1507)
 
 
 state 382
-	triggerWhenCondition:  WHEN condition.    (95)
+	triggerWhenCondition:  WHEN condition.    (96)
 	condition:  condition.AND condition 
 	condition:  condition.OR condition 
 
 	AND  shift 304
 	OR  shift 305
-	.  reduce 95 (src line 1622)
+	.  reduce 96 (src line 1737)
 
 
 state 383
@@ -3449,27 +3449,27 @@ state 383
 	updateStmt  goto 21
 
 state 384
-	dmlList:  dml.    (97)
+	dmlList:  dml.    (98)
 
-	.  reduce 97 (src line 1636)
+	.  reduce 98 (src line 1751)
 
 
 state 385
-	triggerForEachEnum:  FOR EACH ROW.    (93)
+	triggerForEachEnum:  FOR EACH ROW.    (94)
 
-	.  reduce 93 (src line 1608)
+	.  reduce 94 (src line 1723)
 
 
 state 386
-	triggerForEachEnum:  FOR EACH STATEMENT.    (94)
+	triggerForEachEnum:  FOR EACH STATEMENT.    (95)
 
-	.  reduce 94 (src line 1614)
+	.  reduce 95 (src line 1729)
 
 
 state 387
-	triggerBeforeAfterStmt:  BEFORE UPDATE ON ID.    (75)
+	triggerBeforeAfterStmt:  BEFORE UPDATE ON ID.    (76)
 
-	.  reduce 75 (src line 1454)
+	.  reduce 76 (src line 1569)
 
 
 state 388
@@ -3480,21 +3480,21 @@ state 388
 
 
 state 389
-	triggerBeforeAfterStmt:  BEFORE INSERT ON ID.    (81)
+	triggerBeforeAfterStmt:  BEFORE INSERT ON ID.    (82)
 
-	.  reduce 81 (src line 1506)
+	.  reduce 82 (src line 1621)
 
 
 state 390
-	triggerBeforeAfterStmt:  BEFORE DELETE ON ID.    (84)
+	triggerBeforeAfterStmt:  BEFORE DELETE ON ID.    (85)
 
-	.  reduce 84 (src line 1530)
+	.  reduce 85 (src line 1645)
 
 
 state 391
-	triggerBeforeAfterStmt:  AFTER UPDATE ON ID.    (77)
+	triggerBeforeAfterStmt:  AFTER UPDATE ON ID.    (78)
 
-	.  reduce 77 (src line 1472)
+	.  reduce 78 (src line 1587)
 
 
 state 392
@@ -3505,15 +3505,15 @@ state 392
 
 
 state 393
-	triggerBeforeAfterStmt:  AFTER INSERT ON ID.    (82)
+	triggerBeforeAfterStmt:  AFTER INSERT ON ID.    (83)
 
-	.  reduce 82 (src line 1514)
+	.  reduce 83 (src line 1629)
 
 
 state 394
-	triggerBeforeAfterStmt:  AFTER DELETE ON ID.    (85)
+	triggerBeforeAfterStmt:  AFTER DELETE ON ID.    (86)
 
-	.  reduce 85 (src line 1538)
+	.  reduce 86 (src line 1653)
 
 
 state 395
@@ -3556,45 +3556,45 @@ state 399
 	psmBody  goto 485
 
 state 400
-	createPsmStmt:  CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody.    (101)
+	createPsmStmt:  CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmBody.    (102)
 
-	.  reduce 101 (src line 1751)
+	.  reduce 102 (src line 1866)
 
 
 state 401
-	psmParameterList:  psmParameterList COMMA psmParameterEntry.    (108)
+	psmParameterList:  psmParameterList COMMA psmParameterEntry.    (109)
 
-	.  reduce 108 (src line 1837)
+	.  reduce 109 (src line 1952)
 
 
 state 402
-	psmParameterEntry:  IN ID domain.    (110)
+	psmParameterEntry:  IN ID domain.    (111)
 
-	.  reduce 110 (src line 1851)
+	.  reduce 111 (src line 1966)
 
 
 state 403
-	psmParameterEntry:  OUT ID domain.    (111)
+	psmParameterEntry:  OUT ID domain.    (112)
 
-	.  reduce 111 (src line 1863)
+	.  reduce 112 (src line 1978)
 
 
 state 404
-	psmParameterEntry:  INOUT ID domain.    (112)
+	psmParameterEntry:  INOUT ID domain.    (113)
 
-	.  reduce 112 (src line 1872)
+	.  reduce 113 (src line 1987)
 
 
 state 405
-	psmBody:  BEGINTOKEN psmExecList END SEMICOLON.    (116)
+	psmBody:  BEGINTOKEN psmExecList END SEMICOLON.    (117)
 
-	.  reduce 116 (src line 1910)
+	.  reduce 117 (src line 2025)
 
 
 state 406
-	psmExecEntry:  RETURN psmValue SEMICOLON.    (119)
+	psmExecEntry:  RETURN psmValue SEMICOLON.    (120)
 
-	.  reduce 119 (src line 1932)
+	.  reduce 120 (src line 2047)
 
 
 state 407
@@ -3654,9 +3654,9 @@ state 409
 	psmBranch  goto 191
 
 state 410
-	psmLocalDeclarationEntry:  DECLARE ID domain SEMICOLON.    (115)
+	psmLocalDeclarationEntry:  DECLARE ID domain SEMICOLON.    (116)
 
-	.  reduce 115 (src line 1898)
+	.  reduce 116 (src line 2013)
 
 
 state 411
@@ -3682,9 +3682,9 @@ state 411
 	domain  goto 489
 
 state 412
-	createPsmStmt:  CREATE FUNCTION ID RETURNS domain psmLocalDeclarationList psmBody.    (106)
+	createPsmStmt:  CREATE FUNCTION ID RETURNS domain psmLocalDeclarationList psmBody.    (107)
 
-	.  reduce 106 (src line 1811)
+	.  reduce 107 (src line 1926)
 
 
 state 413
@@ -3716,44 +3716,44 @@ state 416
 
 
 state 417
-	domain:  NUMERIC LPAREN INTVALUE.COMMA INTVALUE RPAREN $$251 DATE 
+	domain:  NUMERIC LPAREN INTVALUE.COMMA INTVALUE RPAREN $$252 DATE 
 
 	COMMA  shift 494
 	.  error
 
 
 state 418
-	constraintWithName:  CONSTRAINT ID constraint.    (172)
+	constraintWithName:  CONSTRAINT ID constraint.    (173)
 
-	.  reduce 172 (src line 2541)
+	.  reduce 173 (src line 2656)
 
 
 state 419
-	alterTableDropStmt:  ALTER TABLE ID DROP CONSTRAINT ID SEMICOLON.    (63)
+	alterTableDropStmt:  ALTER TABLE ID DROP CONSTRAINT ID SEMICOLON.    (64)
 
-	.  reduce 63 (src line 1185)
+	.  reduce 64 (src line 1300)
 
 
 state 420
 	condition:  condition.AND condition 
-	condition:  condition AND condition.    (209)
+	condition:  condition AND condition.    (210)
 	condition:  condition.OR condition 
 
-	.  reduce 209 (src line 2936)
+	.  reduce 210 (src line 3051)
 
 
 state 421
 	condition:  condition.AND condition 
 	condition:  condition.OR condition 
-	condition:  condition OR condition.    (210)
+	condition:  condition OR condition.    (211)
 
-	.  reduce 210 (src line 2945)
+	.  reduce 211 (src line 3060)
 
 
 state 422
-	condition:  LPAREN condition RPAREN.    (208)
+	condition:  LPAREN condition RPAREN.    (209)
 
-	.  reduce 208 (src line 2933)
+	.  reduce 209 (src line 3048)
 
 
 state 423
@@ -3776,9 +3776,9 @@ state 424
 	attriNameOptionTableName  goto 497
 
 state 425
-	predicate:  attriNameOptionTableName compareMark elementaryValue.    (211)
+	predicate:  attriNameOptionTableName compareMark elementaryValue.    (212)
 
-	.  reduce 211 (src line 2995)
+	.  reduce 212 (src line 3110)
 
 
 state 426
@@ -3802,21 +3802,21 @@ state 427
 	subQuery  goto 500
 
 state 428
-	predicate:  attriNameOptionTableName LIKE STRINGVALUE.    (212)
+	predicate:  attriNameOptionTableName LIKE STRINGVALUE.    (213)
 
-	.  reduce 212 (src line 3007)
+	.  reduce 213 (src line 3122)
 
 
 state 429
-	predicate:  attriNameOptionTableName IN subQuery.    (213)
+	predicate:  attriNameOptionTableName IN subQuery.    (214)
 
-	.  reduce 213 (src line 3019)
+	.  reduce 214 (src line 3134)
 
 
 state 430
-	predicate:  attriNameOptionTableName IN ID.    (215)
+	predicate:  attriNameOptionTableName IN ID.    (216)
 
-	.  reduce 215 (src line 3039)
+	.  reduce 216 (src line 3154)
 
 
 state 431
@@ -3830,9 +3830,9 @@ state 431
 	subQuery  goto 502
 
 state 432
-	predicate:  attriNameOptionTableName IS NULLMARK.    (225)
+	predicate:  attriNameOptionTableName IS NULLMARK.    (226)
 
-	.  reduce 225 (src line 3147)
+	.  reduce 226 (src line 3262)
 
 
 state 433
@@ -3854,21 +3854,21 @@ state 434
 
 
 state 435
-	predicate:  NOT EXISTS subQuery.    (232)
+	predicate:  NOT EXISTS subQuery.    (233)
 
-	.  reduce 232 (src line 3214)
+	.  reduce 233 (src line 3329)
 
 
 state 436
-	insertStmt:  INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON.    (43)
+	insertStmt:  INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON.    (44)
 
-	.  reduce 43 (src line 888)
+	.  reduce 44 (src line 1003)
 
 
 state 437
-	elementaryValueList:  elementaryValueList COMMA elementaryValue.    (46)
+	elementaryValueList:  elementaryValueList COMMA elementaryValue.    (47)
 
-	.  reduce 46 (src line 926)
+	.  reduce 47 (src line 1041)
 
 
 state 438
@@ -3891,27 +3891,27 @@ state 439
 	elementaryValue  goto 226
 
 state 440
-	updateStmt:  UPDATE ID SET updateList WHERE condition SEMICOLON.    (48)
+	updateStmt:  UPDATE ID SET updateList WHERE condition SEMICOLON.    (49)
 
-	.  reduce 48 (src line 957)
+	.  reduce 49 (src line 1072)
 
 
 state 441
-	logUserStmt:  CONNECT AS USER ID PASSWORD PASSWORDS SEMICOLON.    (38)
+	logUserStmt:  CONNECT AS USER ID PASSWORD PASSWORDS SEMICOLON.    (39)
 
-	.  reduce 38 (src line 810)
+	.  reduce 39 (src line 925)
 
 
 state 442
-	logUserStmt:  CONNECT AS USER ID PASSWORD ID SEMICOLON.    (39)
+	logUserStmt:  CONNECT AS USER ID PASSWORD ID SEMICOLON.    (40)
 
-	.  reduce 39 (src line 820)
+	.  reduce 40 (src line 935)
 
 
 state 443
-	logUserStmt:  CONNECT AS USER ID PASSWORD INTVALUE SEMICOLON.    (40)
+	logUserStmt:  CONNECT AS USER ID PASSWORD INTVALUE SEMICOLON.    (41)
 
-	.  reduce 40 (src line 829)
+	.  reduce 41 (src line 944)
 
 
 state 444
@@ -3922,9 +3922,9 @@ state 444
 
 
 state 445
-	aggregation:  SUM LPAREN attriNameOptionTableName RPAREN.    (154)
+	aggregation:  SUM LPAREN attriNameOptionTableName RPAREN.    (155)
 
-	.  reduce 154 (src line 2336)
+	.  reduce 155 (src line 2451)
 
 
 state 446
@@ -3935,9 +3935,9 @@ state 446
 
 
 state 447
-	aggregation:  AVG LPAREN attriNameOptionTableName RPAREN.    (156)
+	aggregation:  AVG LPAREN attriNameOptionTableName RPAREN.    (157)
 
-	.  reduce 156 (src line 2354)
+	.  reduce 157 (src line 2469)
 
 
 state 448
@@ -3948,9 +3948,9 @@ state 448
 
 
 state 449
-	aggregation:  MIN LPAREN attriNameOptionTableName RPAREN.    (158)
+	aggregation:  MIN LPAREN attriNameOptionTableName RPAREN.    (159)
 
-	.  reduce 158 (src line 2372)
+	.  reduce 159 (src line 2487)
 
 
 state 450
@@ -3961,9 +3961,9 @@ state 450
 
 
 state 451
-	aggregation:  MAX LPAREN attriNameOptionTableName RPAREN.    (160)
+	aggregation:  MAX LPAREN attriNameOptionTableName RPAREN.    (161)
 
-	.  reduce 160 (src line 2390)
+	.  reduce 161 (src line 2505)
 
 
 state 452
@@ -3974,15 +3974,15 @@ state 452
 
 
 state 453
-	aggregation:  COUNT LPAREN attriNameOptionTableName RPAREN.    (162)
+	aggregation:  COUNT LPAREN attriNameOptionTableName RPAREN.    (163)
 
-	.  reduce 162 (src line 2408)
+	.  reduce 163 (src line 2523)
 
 
 state 454
-	aggregation:  COUNT LPAREN STAR RPAREN.    (163)
+	aggregation:  COUNT LPAREN STAR RPAREN.    (164)
 
-	.  reduce 163 (src line 2417)
+	.  reduce 164 (src line 2532)
 
 
 state 455
@@ -4044,15 +4044,15 @@ state 460
 
 
 state 461
-	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (166)
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttributeWithName.    (167)
 
-	.  reduce 166 (src line 2508)
+	.  reduce 167 (src line 2623)
 
 
 state 462
-	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (167)
+	constraintAfterAttributeList:  constraintAfterAttributeList constraintAfterAttribute.    (168)
 
-	.  reduce 167 (src line 2512)
+	.  reduce 168 (src line 2627)
 
 
 state 463
@@ -4068,15 +4068,15 @@ state 463
 	constraintAfterAttribute  goto 521
 
 state 464
-	constraintAfterAttribute:  DEFAULT elementaryValue.    (179)
+	constraintAfterAttribute:  DEFAULT elementaryValue.    (180)
 
-	.  reduce 179 (src line 2625)
+	.  reduce 180 (src line 2740)
 
 
 state 465
-	constraintAfterAttribute:  NOT NULLMARK.    (182)
+	constraintAfterAttribute:  NOT NULLMARK.    (183)
 
-	.  reduce 182 (src line 2651)
+	.  reduce 183 (src line 2766)
 
 
 state 466
@@ -4088,9 +4088,9 @@ state 466
 
 
 state 467
-	createAssertStmt:  CREATE ASSERTION ID CHECK LPAREN condition RPAREN SEMICOLON.    (64)
+	createAssertStmt:  CREATE ASSERTION ID CHECK LPAREN condition RPAREN SEMICOLON.    (65)
 
-	.  reduce 64 (src line 1203)
+	.  reduce 65 (src line 1318)
 
 
 state 468
@@ -4116,15 +4116,15 @@ state 470
 	triggerExecStmt  goto 525
 
 state 471
-	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerExecStmt.    (73)
+	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerExecStmt.    (74)
 
-	.  reduce 73 (src line 1412)
+	.  reduce 74 (src line 1527)
 
 
 state 472
-	triggerOldNewList:  triggerOldNewList COMMA oldNewEntry.    (88)
+	triggerOldNewList:  triggerOldNewList COMMA oldNewEntry.    (89)
 
-	.  reduce 88 (src line 1564)
+	.  reduce 89 (src line 1679)
 
 
 state 473
@@ -4163,9 +4163,9 @@ state 477
 
 
 state 478
-	dmlList:  dmlList dml.    (98)
+	dmlList:  dmlList dml.    (99)
 
-	.  reduce 98 (src line 1643)
+	.  reduce 99 (src line 1758)
 
 
 state 479
@@ -4183,9 +4183,9 @@ state 480
 
 
 state 481
-	triggerBeforeAfterStmt:  INSTEAD OF UPDATE ON ID.    (79)
+	triggerBeforeAfterStmt:  INSTEAD OF UPDATE ON ID.    (80)
 
-	.  reduce 79 (src line 1489)
+	.  reduce 80 (src line 1604)
 
 
 state 482
@@ -4196,21 +4196,21 @@ state 482
 
 
 state 483
-	triggerBeforeAfterStmt:  INSTEAD OF INSERT ON ID.    (83)
+	triggerBeforeAfterStmt:  INSTEAD OF INSERT ON ID.    (84)
 
-	.  reduce 83 (src line 1522)
+	.  reduce 84 (src line 1637)
 
 
 state 484
-	triggerBeforeAfterStmt:  INSTEAD OF DELETE ON ID.    (86)
+	triggerBeforeAfterStmt:  INSTEAD OF DELETE ON ID.    (87)
 
-	.  reduce 86 (src line 1546)
+	.  reduce 87 (src line 1661)
 
 
 state 485
-	createPsmStmt:  CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody.    (100)
+	createPsmStmt:  CREATE PROCEDURE ID LPAREN psmParameterList RPAREN psmLocalDeclarationList psmBody.    (101)
 
-	.  reduce 100 (src line 1736)
+	.  reduce 101 (src line 1851)
 
 
 state 486
@@ -4269,21 +4269,21 @@ state 489
 	psmBody  goto 542
 
 state 490
-	domain:  VARCHAR LPAREN INTVALUE RPAREN.    (240)
+	domain:  VARCHAR LPAREN INTVALUE RPAREN.    (241)
 
-	.  reduce 240 (src line 3289)
+	.  reduce 241 (src line 3404)
 
 
 state 491
-	domain:  BIT LPAREN INTVALUE RPAREN.    (241)
+	domain:  BIT LPAREN INTVALUE RPAREN.    (242)
 
-	.  reduce 241 (src line 3297)
+	.  reduce 242 (src line 3412)
 
 
 state 492
-	domain:  BITVARYING LPAREN INTVALUE RPAREN.    (242)
+	domain:  BITVARYING LPAREN INTVALUE RPAREN.    (243)
 
-	.  reduce 242 (src line 3305)
+	.  reduce 243 (src line 3420)
 
 
 state 493
@@ -4294,7 +4294,7 @@ state 493
 
 
 state 494
-	domain:  NUMERIC LPAREN INTVALUE COMMA.INTVALUE RPAREN $$251 DATE 
+	domain:  NUMERIC LPAREN INTVALUE COMMA.INTVALUE RPAREN $$252 DATE 
 
 	INTVALUE  shift 544
 	.  error
@@ -4321,49 +4321,49 @@ state 496
 state 497
 	attriNameOptionTableNameList:  attriNameOptionTableNameList COMMA attriNameOptionTableName.    (263)
 
-	.  reduce 263 (src line 3507)
+	.  reduce 263 (src line 3606)
 
 
 state 498
-	predicate:  attriNameOptionTableName compareMark ALL subQuery.    (217)
+	predicate:  attriNameOptionTableName compareMark ALL subQuery.    (218)
 
-	.  reduce 217 (src line 3059)
+	.  reduce 218 (src line 3174)
 
 
 state 499
-	predicate:  attriNameOptionTableName compareMark ALL ID.    (221)
+	predicate:  attriNameOptionTableName compareMark ALL ID.    (222)
 
-	.  reduce 221 (src line 3103)
+	.  reduce 222 (src line 3218)
 
 
 state 500
-	predicate:  attriNameOptionTableName compareMark ANY subQuery.    (219)
+	predicate:  attriNameOptionTableName compareMark ANY subQuery.    (220)
 
-	.  reduce 219 (src line 3081)
+	.  reduce 220 (src line 3196)
 
 
 state 501
-	predicate:  attriNameOptionTableName compareMark ANY ID.    (223)
+	predicate:  attriNameOptionTableName compareMark ANY ID.    (224)
 
-	.  reduce 223 (src line 3125)
+	.  reduce 224 (src line 3240)
 
 
 state 502
-	predicate:  attriNameOptionTableName NOT IN subQuery.    (214)
+	predicate:  attriNameOptionTableName NOT IN subQuery.    (215)
 
-	.  reduce 214 (src line 3029)
+	.  reduce 215 (src line 3144)
 
 
 state 503
-	predicate:  attriNameOptionTableName NOT IN ID.    (216)
+	predicate:  attriNameOptionTableName NOT IN ID.    (217)
 
-	.  reduce 216 (src line 3049)
+	.  reduce 217 (src line 3164)
 
 
 state 504
-	predicate:  attriNameOptionTableName IS NOT NULLMARK.    (226)
+	predicate:  attriNameOptionTableName IS NOT NULLMARK.    (227)
 
-	.  reduce 226 (src line 3156)
+	.  reduce 227 (src line 3271)
 
 
 state 505
@@ -4387,9 +4387,9 @@ state 506
 	subQuery  goto 550
 
 state 507
-	insertStmt:  INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON.    (44)
+	insertStmt:  INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON.    (45)
 
-	.  reduce 44 (src line 899)
+	.  reduce 45 (src line 1014)
 
 
 state 508
@@ -4402,51 +4402,51 @@ state 508
 
 
 state 509
-	aggregation:  SUM LPAREN DISTINCT attriNameOptionTableName RPAREN.    (153)
+	aggregation:  SUM LPAREN DISTINCT attriNameOptionTableName RPAREN.    (154)
 
-	.  reduce 153 (src line 2326)
+	.  reduce 154 (src line 2441)
 
 
 state 510
-	aggregation:  AVG LPAREN DISTINCT attriNameOptionTableName RPAREN.    (155)
+	aggregation:  AVG LPAREN DISTINCT attriNameOptionTableName RPAREN.    (156)
 
-	.  reduce 155 (src line 2345)
+	.  reduce 156 (src line 2460)
 
 
 state 511
-	aggregation:  MIN LPAREN DISTINCT attriNameOptionTableName RPAREN.    (157)
+	aggregation:  MIN LPAREN DISTINCT attriNameOptionTableName RPAREN.    (158)
 
-	.  reduce 157 (src line 2363)
+	.  reduce 158 (src line 2478)
 
 
 state 512
-	aggregation:  MAX LPAREN DISTINCT attriNameOptionTableName RPAREN.    (159)
+	aggregation:  MAX LPAREN DISTINCT attriNameOptionTableName RPAREN.    (160)
 
-	.  reduce 159 (src line 2381)
+	.  reduce 160 (src line 2496)
 
 
 state 513
-	aggregation:  COUNT LPAREN DISTINCT attriNameOptionTableName RPAREN.    (161)
+	aggregation:  COUNT LPAREN DISTINCT attriNameOptionTableName RPAREN.    (162)
 
-	.  reduce 161 (src line 2399)
+	.  reduce 162 (src line 2514)
 
 
 state 514
-	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON.    (54)
+	createTableStmt:  CREATE TABLE ID LPAREN attributeDeclarationList COMMA constraintList RPAREN SEMICOLON.    (55)
 
-	.  reduce 54 (src line 1040)
+	.  reduce 55 (src line 1155)
 
 
 state 515
-	constraintList:  constraintList COMMA constraintWithName.    (170)
+	constraintList:  constraintList COMMA constraintWithName.    (171)
 
-	.  reduce 170 (src line 2530)
+	.  reduce 171 (src line 2645)
 
 
 state 516
-	constraintList:  constraintList COMMA constraint.    (171)
+	constraintList:  constraintList COMMA constraint.    (172)
 
-	.  reduce 171 (src line 2534)
+	.  reduce 172 (src line 2649)
 
 
 state 517
@@ -4487,9 +4487,9 @@ state 520
 
 
 state 521
-	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (178)
+	constraintAfterAttributeWithName:  CONSTRAINT ID constraintAfterAttribute.    (179)
 
-	.  reduce 178 (src line 2616)
+	.  reduce 179 (src line 2731)
 
 
 state 522
@@ -4501,63 +4501,63 @@ state 522
 
 
 state 523
-	createViewStmt:  CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON.    (67)
+	createViewStmt:  CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON.    (68)
 
-	.  reduce 67 (src line 1251)
+	.  reduce 68 (src line 1366)
 
 
 state 524
-	createIndexStmt:  CREATE INDEX ID ON ID LPAREN attriNameList RPAREN SEMICOLON.    (69)
+	createIndexStmt:  CREATE INDEX ID ON ID LPAREN attriNameList RPAREN SEMICOLON.    (70)
 
-	.  reduce 69 (src line 1289)
+	.  reduce 70 (src line 1404)
 
 
 state 525
-	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerWhenCondition triggerExecStmt.    (71)
+	createTriggerStmt:  CREATE TRIGGER ID triggerBeforeAfterStmt REFERENCING triggerOldNewList triggerForEachEnum triggerWhenCondition triggerExecStmt.    (72)
 
-	.  reduce 71 (src line 1370)
+	.  reduce 72 (src line 1485)
 
 
 state 526
-	oldNewEntry:  OLD ROW AS ID.    (89)
+	oldNewEntry:  OLD ROW AS ID.    (90)
 
-	.  reduce 89 (src line 1572)
+	.  reduce 90 (src line 1687)
 
 
 state 527
-	oldNewEntry:  OLD TABLE AS ID.    (91)
+	oldNewEntry:  OLD TABLE AS ID.    (92)
 
-	.  reduce 91 (src line 1589)
+	.  reduce 92 (src line 1704)
 
 
 state 528
-	oldNewEntry:  NEW ROW AS ID.    (90)
+	oldNewEntry:  NEW ROW AS ID.    (91)
 
-	.  reduce 90 (src line 1581)
+	.  reduce 91 (src line 1696)
 
 
 state 529
-	oldNewEntry:  NEW TABLE AS ID.    (92)
+	oldNewEntry:  NEW TABLE AS ID.    (93)
 
-	.  reduce 92 (src line 1597)
+	.  reduce 93 (src line 1712)
 
 
 state 530
-	triggerExecStmt:  BEGINTOKEN dmlList END SEMICOLON.    (96)
+	triggerExecStmt:  BEGINTOKEN dmlList END SEMICOLON.    (97)
 
-	.  reduce 96 (src line 1629)
+	.  reduce 97 (src line 1744)
 
 
 state 531
-	triggerBeforeAfterStmt:  BEFORE UPDATE OF ID ON ID.    (76)
+	triggerBeforeAfterStmt:  BEFORE UPDATE OF ID ON ID.    (77)
 
-	.  reduce 76 (src line 1463)
+	.  reduce 77 (src line 1578)
 
 
 state 532
-	triggerBeforeAfterStmt:  AFTER UPDATE OF ID ON ID.    (78)
+	triggerBeforeAfterStmt:  AFTER UPDATE OF ID ON ID.    (79)
 
-	.  reduce 78 (src line 1480)
+	.  reduce 79 (src line 1595)
 
 
 state 533
@@ -4568,9 +4568,9 @@ state 533
 
 
 state 534
-	psmExecEntry:  SET ID EQUAL psmValue SEMICOLON.    (120)
+	psmExecEntry:  SET ID EQUAL psmValue SEMICOLON.    (121)
 
-	.  reduce 120 (src line 1941)
+	.  reduce 121 (src line 2056)
 
 
 state 535
@@ -4621,9 +4621,9 @@ state 538
 
 
 state 539
-	psmElseifList:  psmElseifEntry.    (130)
+	psmElseifList:  psmElseifEntry.    (131)
 
-	.  reduce 130 (src line 2048)
+	.  reduce 131 (src line 2163)
 
 
 state 540
@@ -4651,9 +4651,9 @@ state 541
 	psmBody  goto 566
 
 state 542
-	createPsmStmt:  CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmBody.    (105)
+	createPsmStmt:  CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmBody.    (106)
 
-	.  reduce 105 (src line 1799)
+	.  reduce 106 (src line 1914)
 
 
 state 543
@@ -4664,22 +4664,22 @@ state 543
 
 
 state 544
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE.RPAREN $$251 DATE 
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE.RPAREN $$252 DATE 
 
 	RPAREN  shift 568
 	.  error
 
 
 state 545
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN subQuery.    (227)
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN subQuery.    (228)
 
-	.  reduce 227 (src line 3165)
+	.  reduce 228 (src line 3280)
 
 
 state 546
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN ID.    (229)
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN IN ID.    (230)
 
-	.  reduce 229 (src line 3185)
+	.  reduce 230 (src line 3300)
 
 
 state 547
@@ -4693,27 +4693,27 @@ state 547
 	subQuery  goto 569
 
 state 548
-	predicate:  NOT attriNameOptionTableName compareMark ALL subQuery.    (218)
+	predicate:  NOT attriNameOptionTableName compareMark ALL subQuery.    (219)
 
-	.  reduce 218 (src line 3070)
+	.  reduce 219 (src line 3185)
 
 
 state 549
-	predicate:  NOT attriNameOptionTableName compareMark ALL ID.    (222)
+	predicate:  NOT attriNameOptionTableName compareMark ALL ID.    (223)
 
-	.  reduce 222 (src line 3114)
+	.  reduce 223 (src line 3229)
 
 
 state 550
-	predicate:  NOT attriNameOptionTableName compareMark ANY subQuery.    (220)
+	predicate:  NOT attriNameOptionTableName compareMark ANY subQuery.    (221)
 
-	.  reduce 220 (src line 3092)
+	.  reduce 221 (src line 3207)
 
 
 state 551
-	predicate:  NOT attriNameOptionTableName compareMark ANY ID.    (224)
+	predicate:  NOT attriNameOptionTableName compareMark ANY ID.    (225)
 
-	.  reduce 224 (src line 3136)
+	.  reduce 225 (src line 3251)
 
 
 state 552
@@ -4724,21 +4724,21 @@ state 552
 
 
 state 553
-	constraint:  UNIQUE LPAREN attriNameList RPAREN.    (173)
+	constraint:  UNIQUE LPAREN attriNameList RPAREN.    (174)
 
-	.  reduce 173 (src line 2550)
+	.  reduce 174 (src line 2665)
 
 
 state 554
-	constraint:  PRIMARYKEY LPAREN attriNameList RPAREN.    (174)
+	constraint:  PRIMARYKEY LPAREN attriNameList RPAREN.    (175)
 
-	.  reduce 174 (src line 2560)
+	.  reduce 175 (src line 2675)
 
 
 state 555
-	constraint:  CHECK LPAREN condition RPAREN.    (175)
+	constraint:  CHECK LPAREN condition RPAREN.    (176)
 
-	.  reduce 175 (src line 2569)
+	.  reduce 176 (src line 2684)
 
 
 state 556
@@ -4758,9 +4758,9 @@ state 557
 
 
 state 558
-	triggerBeforeAfterStmt:  INSTEAD OF UPDATE OF ID ON ID.    (80)
+	triggerBeforeAfterStmt:  INSTEAD OF UPDATE OF ID ON ID.    (81)
 
-	.  reduce 80 (src line 1497)
+	.  reduce 81 (src line 1612)
 
 
 state 559
@@ -4800,9 +4800,9 @@ state 561
 
 
 state 562
-	psmElseifList:  psmElseifList psmElseifEntry.    (129)
+	psmElseifList:  psmElseifList psmElseifEntry.    (130)
 
-	.  reduce 129 (src line 2043)
+	.  reduce 130 (src line 2158)
 
 
 state 563
@@ -4846,41 +4846,41 @@ state 565
 
 
 state 566
-	createPsmStmt:  CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmLocalDeclarationList psmBody.    (104)
+	createPsmStmt:  CREATE FUNCTION ID LPAREN psmParameterList RPAREN RETURNS domain psmLocalDeclarationList psmBody.    (105)
 
-	.  reduce 104 (src line 1786)
+	.  reduce 105 (src line 1901)
 
 
 state 567
-	domain:  DECIMAL LPAREN INTVALUE COMMA INTVALUE RPAREN.    (250)
+	domain:  DECIMAL LPAREN INTVALUE COMMA INTVALUE RPAREN.    (251)
 
-	.  reduce 250 (src line 3362)
+	.  reduce 251 (src line 3477)
 
 
 state 568
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN.$$251 DATE 
-	$$251: .    (251)
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN.$$252 DATE 
+	$$252: .    (252)
 
-	.  reduce 251 (src line 3371)
+	.  reduce 252 (src line 3486)
 
-	$$251  goto 580
+	$$252  goto 580
 
 state 569
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery.    (228)
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery.    (229)
 
-	.  reduce 228 (src line 3175)
+	.  reduce 229 (src line 3290)
 
 
 state 570
-	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN ID.    (230)
+	predicate:  LPAREN attriNameOptionTableNameList RPAREN NOT IN ID.    (231)
 
-	.  reduce 230 (src line 3195)
+	.  reduce 231 (src line 3310)
 
 
 state 571
-	insertStmt:  INSERTINTO ID LPAREN attriNameList RPAREN VALUES LPAREN elementaryValueList RPAREN SEMICOLON.    (45)
+	insertStmt:  INSERTINTO ID LPAREN attriNameList RPAREN VALUES LPAREN elementaryValueList RPAREN SEMICOLON.    (46)
 
-	.  reduce 45 (src line 911)
+	.  reduce 46 (src line 1026)
 
 
 state 572
@@ -4892,7 +4892,7 @@ state 572
 
 
 state 573
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.    (183)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.    (184)
 	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN.foreignKeyParameter 
 
 	NOT_DEFERRABLE  shift 586
@@ -4902,7 +4902,7 @@ state 573
 	UPDATE_CASCADE  shift 590
 	DELETE_NULL  shift 591
 	DELETE_CASCADE  shift 592
-	.  reduce 183 (src line 2659)
+	.  reduce 184 (src line 2774)
 
 	setDeferrable  goto 583
 	onUpdateSet  goto 584
@@ -4953,9 +4953,9 @@ state 577
 
 
 state 578
-	psmBranch:  IF condition THEN psmExecList END IF SEMICOLON.    (128)
+	psmBranch:  IF condition THEN psmExecList END IF SEMICOLON.    (129)
 
-	.  reduce 128 (src line 2029)
+	.  reduce 129 (src line 2144)
 
 
 state 579
@@ -4980,7 +4980,7 @@ state 579
 	psmBranch  goto 191
 
 state 580
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$251.DATE 
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$252.DATE 
 
 	DATE  shift 598
 	.  error
@@ -4995,13 +4995,13 @@ state 581
 
 
 state 582
-	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN foreignKeyParameter.    (184)
+	constraintAfterAttribute:  REFERENCES ID LPAREN ID RPAREN foreignKeyParameter.    (185)
 
-	.  reduce 184 (src line 2669)
+	.  reduce 185 (src line 2784)
 
 
 state 583
-	foreignKeyParameter:  setDeferrable.    (185)
+	foreignKeyParameter:  setDeferrable.    (186)
 	foreignKeyParameter:  setDeferrable.onUpdateSet 
 	foreignKeyParameter:  setDeferrable.onDeleteSet 
 	foreignKeyParameter:  setDeferrable.onUpdateSet onDeleteSet 
@@ -5011,13 +5011,13 @@ state 583
 	UPDATE_CASCADE  shift 590
 	DELETE_NULL  shift 591
 	DELETE_CASCADE  shift 592
-	.  reduce 185 (src line 2695)
+	.  reduce 186 (src line 2810)
 
 	onUpdateSet  goto 600
 	onDeleteSet  goto 601
 
 state 584
-	foreignKeyParameter:  onUpdateSet.    (186)
+	foreignKeyParameter:  onUpdateSet.    (187)
 	foreignKeyParameter:  onUpdateSet.setDeferrable 
 	foreignKeyParameter:  onUpdateSet.onDeleteSet 
 	foreignKeyParameter:  onUpdateSet.setDeferrable onDeleteSet 
@@ -5028,13 +5028,13 @@ state 584
 	IMMEDIATE_DEFERRABLE  shift 588
 	DELETE_NULL  shift 591
 	DELETE_CASCADE  shift 592
-	.  reduce 186 (src line 2706)
+	.  reduce 187 (src line 2821)
 
 	setDeferrable  goto 602
 	onDeleteSet  goto 603
 
 state 585
-	foreignKeyParameter:  onDeleteSet.    (187)
+	foreignKeyParameter:  onDeleteSet.    (188)
 	foreignKeyParameter:  onDeleteSet.setDeferrable 
 	foreignKeyParameter:  onDeleteSet.onUpdateSet 
 	foreignKeyParameter:  onDeleteSet.setDeferrable onUpdateSet 
@@ -5045,51 +5045,51 @@ state 585
 	IMMEDIATE_DEFERRABLE  shift 588
 	UPDATE_NULL  shift 589
 	UPDATE_CASCADE  shift 590
-	.  reduce 187 (src line 2716)
+	.  reduce 188 (src line 2831)
 
 	setDeferrable  goto 604
 	onUpdateSet  goto 605
 
 state 586
-	setDeferrable:  NOT_DEFERRABLE.    (200)
+	setDeferrable:  NOT_DEFERRABLE.    (201)
 
-	.  reduce 200 (src line 2867)
+	.  reduce 201 (src line 2982)
 
 
 state 587
-	setDeferrable:  DEFERED_DEFERRABLE.    (201)
+	setDeferrable:  DEFERED_DEFERRABLE.    (202)
 
-	.  reduce 201 (src line 2873)
+	.  reduce 202 (src line 2988)
 
 
 state 588
-	setDeferrable:  IMMEDIATE_DEFERRABLE.    (202)
+	setDeferrable:  IMMEDIATE_DEFERRABLE.    (203)
 
-	.  reduce 202 (src line 2878)
+	.  reduce 203 (src line 2993)
 
 
 state 589
-	onUpdateSet:  UPDATE_NULL.    (203)
+	onUpdateSet:  UPDATE_NULL.    (204)
 
-	.  reduce 203 (src line 2886)
+	.  reduce 204 (src line 3001)
 
 
 state 590
-	onUpdateSet:  UPDATE_CASCADE.    (204)
+	onUpdateSet:  UPDATE_CASCADE.    (205)
 
-	.  reduce 204 (src line 2892)
+	.  reduce 205 (src line 3007)
 
 
 state 591
-	onDeleteSet:  DELETE_NULL.    (205)
+	onDeleteSet:  DELETE_NULL.    (206)
 
-	.  reduce 205 (src line 2900)
+	.  reduce 206 (src line 3015)
 
 
 state 592
-	onDeleteSet:  DELETE_CASCADE.    (206)
+	onDeleteSet:  DELETE_CASCADE.    (207)
 
-	.  reduce 206 (src line 2906)
+	.  reduce 207 (src line 3021)
 
 
 state 593
@@ -5121,9 +5121,9 @@ state 594
 
 
 state 595
-	psmBranch:  IF condition THEN psmExecList psmElseifList END IF SEMICOLON.    (126)
+	psmBranch:  IF condition THEN psmExecList psmElseifList END IF SEMICOLON.    (127)
 
-	.  reduce 126 (src line 2005)
+	.  reduce 127 (src line 2120)
 
 
 state 596
@@ -5135,7 +5135,7 @@ state 596
 
 state 597
 	psmExecList:  psmExecList.psmExecEntry 
-	psmElseifEntry:  ELSEIF condition THEN psmExecList.    (131)
+	psmElseifEntry:  ELSEIF condition THEN psmExecList.    (132)
 
 	INSERTINTO  shift 34
 	UPDATE  shift 35
@@ -5144,7 +5144,7 @@ state 597
 	IF  shift 194
 	RETURN  shift 188
 	SET  shift 189
-	.  reduce 131 (src line 2057)
+	.  reduce 132 (src line 2172)
 
 	dml  goto 192
 	deleteStmt  goto 19
@@ -5155,9 +5155,9 @@ state 597
 	psmBranch  goto 191
 
 state 598
-	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$251 DATE.    (252)
+	domain:  NUMERIC LPAREN INTVALUE COMMA INTVALUE RPAREN $$252 DATE.    (253)
 
-	.  reduce 252 (src line 3380)
+	.  reduce 253 (src line 3495)
 
 
 state 599
@@ -5169,64 +5169,64 @@ state 599
 
 
 state 600
-	foreignKeyParameter:  setDeferrable onUpdateSet.    (188)
+	foreignKeyParameter:  setDeferrable onUpdateSet.    (189)
 	foreignKeyParameter:  setDeferrable onUpdateSet.onDeleteSet 
 
 	DELETE_NULL  shift 591
 	DELETE_CASCADE  shift 592
-	.  reduce 188 (src line 2726)
+	.  reduce 189 (src line 2841)
 
 	onDeleteSet  goto 610
 
 state 601
-	foreignKeyParameter:  setDeferrable onDeleteSet.    (190)
+	foreignKeyParameter:  setDeferrable onDeleteSet.    (191)
 	foreignKeyParameter:  setDeferrable onDeleteSet.onUpdateSet 
 
 	UPDATE_NULL  shift 589
 	UPDATE_CASCADE  shift 590
-	.  reduce 190 (src line 2748)
+	.  reduce 191 (src line 2863)
 
 	onUpdateSet  goto 611
 
 state 602
-	foreignKeyParameter:  onUpdateSet setDeferrable.    (189)
+	foreignKeyParameter:  onUpdateSet setDeferrable.    (190)
 	foreignKeyParameter:  onUpdateSet setDeferrable.onDeleteSet 
 
 	DELETE_NULL  shift 591
 	DELETE_CASCADE  shift 592
-	.  reduce 189 (src line 2737)
+	.  reduce 190 (src line 2852)
 
 	onDeleteSet  goto 612
 
 state 603
-	foreignKeyParameter:  onUpdateSet onDeleteSet.    (192)
+	foreignKeyParameter:  onUpdateSet onDeleteSet.    (193)
 	foreignKeyParameter:  onUpdateSet onDeleteSet.setDeferrable 
 
 	NOT_DEFERRABLE  shift 586
 	DEFERED_DEFERRABLE  shift 587
 	IMMEDIATE_DEFERRABLE  shift 588
-	.  reduce 192 (src line 2770)
+	.  reduce 193 (src line 2885)
 
 	setDeferrable  goto 613
 
 state 604
-	foreignKeyParameter:  onDeleteSet setDeferrable.    (191)
+	foreignKeyParameter:  onDeleteSet setDeferrable.    (192)
 	foreignKeyParameter:  onDeleteSet setDeferrable.onUpdateSet 
 
 	UPDATE_NULL  shift 589
 	UPDATE_CASCADE  shift 590
-	.  reduce 191 (src line 2759)
+	.  reduce 192 (src line 2874)
 
 	onUpdateSet  goto 614
 
 state 605
-	foreignKeyParameter:  onDeleteSet onUpdateSet.    (193)
+	foreignKeyParameter:  onDeleteSet onUpdateSet.    (194)
 	foreignKeyParameter:  onDeleteSet onUpdateSet.setDeferrable 
 
 	NOT_DEFERRABLE  shift 586
 	DEFERED_DEFERRABLE  shift 587
 	IMMEDIATE_DEFERRABLE  shift 588
-	.  reduce 193 (src line 2781)
+	.  reduce 194 (src line 2896)
 
 	setDeferrable  goto 615
 
@@ -5260,9 +5260,9 @@ state 607
 
 
 state 608
-	psmBranch:  IF condition THEN psmExecList ELSE psmExecList END IF SEMICOLON.    (127)
+	psmBranch:  IF condition THEN psmExecList ELSE psmExecList END IF SEMICOLON.    (128)
 
-	.  reduce 127 (src line 2017)
+	.  reduce 128 (src line 2132)
 
 
 state 609
@@ -5274,39 +5274,39 @@ state 609
 
 
 state 610
-	foreignKeyParameter:  setDeferrable onUpdateSet onDeleteSet.    (194)
+	foreignKeyParameter:  setDeferrable onUpdateSet onDeleteSet.    (195)
 
-	.  reduce 194 (src line 2792)
+	.  reduce 195 (src line 2907)
 
 
 state 611
-	foreignKeyParameter:  setDeferrable onDeleteSet onUpdateSet.    (195)
+	foreignKeyParameter:  setDeferrable onDeleteSet onUpdateSet.    (196)
 
-	.  reduce 195 (src line 2804)
+	.  reduce 196 (src line 2919)
 
 
 state 612
-	foreignKeyParameter:  onUpdateSet setDeferrable onDeleteSet.    (196)
+	foreignKeyParameter:  onUpdateSet setDeferrable onDeleteSet.    (197)
 
-	.  reduce 196 (src line 2816)
+	.  reduce 197 (src line 2931)
 
 
 state 613
-	foreignKeyParameter:  onUpdateSet onDeleteSet setDeferrable.    (197)
+	foreignKeyParameter:  onUpdateSet onDeleteSet setDeferrable.    (198)
 
-	.  reduce 197 (src line 2828)
+	.  reduce 198 (src line 2943)
 
 
 state 614
-	foreignKeyParameter:  onDeleteSet setDeferrable onUpdateSet.    (198)
+	foreignKeyParameter:  onDeleteSet setDeferrable onUpdateSet.    (199)
 
-	.  reduce 198 (src line 2840)
+	.  reduce 199 (src line 2955)
 
 
 state 615
-	foreignKeyParameter:  onDeleteSet onUpdateSet setDeferrable.    (199)
+	foreignKeyParameter:  onDeleteSet onUpdateSet setDeferrable.    (200)
 
-	.  reduce 199 (src line 2852)
+	.  reduce 200 (src line 2967)
 
 
 state 616
@@ -5317,13 +5317,13 @@ state 616
 
 
 state 617
-	psmBranch:  IF condition THEN psmExecList psmElseifList ELSE psmExecList END IF SEMICOLON.    (125)
+	psmBranch:  IF condition THEN psmExecList psmElseifList ELSE psmExecList END IF SEMICOLON.    (126)
 
-	.  reduce 125 (src line 1991)
+	.  reduce 126 (src line 2106)
 
 
 state 618
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.    (176)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.    (177)
 	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN.foreignKeyParameter 
 
 	NOT_DEFERRABLE  shift 586
@@ -5333,7 +5333,7 @@ state 618
 	UPDATE_CASCADE  shift 590
 	DELETE_NULL  shift 591
 	DELETE_CASCADE  shift 592
-	.  reduce 176 (src line 2578)
+	.  reduce 177 (src line 2693)
 
 	setDeferrable  goto 583
 	onUpdateSet  goto 584
@@ -5348,15 +5348,15 @@ state 619
 
 
 state 620
-	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN foreignKeyParameter.    (177)
+	constraint:  FOREIGNKEY LPAREN ID RPAREN REFERENCES ID LPAREN ID RPAREN foreignKeyParameter.    (178)
 
-	.  reduce 177 (src line 2589)
+	.  reduce 178 (src line 2704)
 
 
 state 621
-	psmForLoop:  FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON.    (124)
+	psmForLoop:  FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON.    (125)
 
-	.  reduce 124 (src line 1977)
+	.  reduce 125 (src line 2092)
 
 
 134 terminals, 74 nonterminals
