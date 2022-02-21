@@ -3,7 +3,6 @@ package parser
 
 import (
     "strconv"
-    "fmt"
 )
 
 // -------------------- Node --------------------
@@ -179,6 +178,7 @@ type Node struct {
 
 
 /* dql */
+    DqlEntry         *DQLNode
     Query            *QueryNode
     SelectListEntry  *SelectListEntryNode
     FromListEntry    *FromListEntryNode
@@ -306,6 +306,10 @@ type SelectStmtNode struct {
 %type <NodePt> dml
 
 // dql
+%type <NodePt> dql
+%type <NodePt> dqlEntry
+%type <NodePt> subQuery
+%type <NodePt> query
 %type <NodePt> selectStmt
 %type <List> selectList
 %type <NodePt> selectListEntry
@@ -318,6 +322,8 @@ type SelectStmtNode struct {
 %type <List> orderByList
 %type <NodePt> orderByListEntry
 %token ASC DESC CROSS JOIN NATURAL FULL OUTER LEFT RIGHT SELECT
+%token GROUPBY HAVING ORDERBY LIMIT UNION DIFFERENCE INTERSECTION
+%left UNION DIFFERENCE INTERSECTION
 
 // delete
 %type <NodePt> deleteStmt
@@ -431,9 +437,6 @@ type SelectStmtNode struct {
 %type <NodePt> attriNameOptionTableName
 %token DOT
 
-// query
-%type <NodePt> query
-
 // elementaryValue
 %type <NodePt> elementaryValue
 %token <Int> INTVALUE 
@@ -514,35 +517,15 @@ ast
 
         GetInstance().AST = $$.Ast
     }
-    |DOT orderByList {
-        // TODO
-        fmt.Println("orderByList")
+    |dql {
         $$ = &Node{}
         $$.Type = AST_NODE
 
         $$.Ast = &ASTNode{}
+        $$.Ast.Type = AST_DQL
+        $$.Ast.Dql = $1.Dql
 
         GetInstance().AST = $$.Ast
-    }
-    |fromStmt {
-        // TODO
-        fmt.Println("fromStmt")
-        $$ = &Node{}
-        $$.Type = AST_NODE
-
-        $$.Ast = &ASTNode{}
-
-        GetInstance().AST = $$.Ast
-    }
-    |selectStmt {
-        // TODO
-        fmt.Println("selectStmt")
-        $$ = &Node{}
-        $$.Type = AST_NODE
-
-        $$.Ast = &ASTNode{}
-
-        GetInstance().AST = $$.Ast     
     }
     ;
 
@@ -724,17 +707,73 @@ dml
     --------------------------------------------------------------------------------
 
         dql
-            query UNION query SEMICOLON
-            query DIFFERENCE query SEMICOLON
-            query INTERSECTION query SEMICOLON
-            query SEMICOLON
+            dqlEntry SEMICOLON
+        
+        dqlEntry
+            dqlEntry UNION dqlEntry
+            dqlEntry DIFFERENCE dqlEntry
+            dqlEntry INTERSECTION dqlEntry
+            LPAREN dqlEntry RPAREN
+            query
         
     -------------------------------------------------------------------------------- */
 
+/*  -------------------------------------- dql ------------------------------------- */
+dql
+    :dqlEntry SEMICOLON {
+        $$ = $1
+    }
+    ;
+
+/*  ------------------------------------ dqlEntry ---------------------------------- */
+dqlEntry
+    :dqlEntry UNION dqlEntry {
+        $$ = &Node{}
+        $$.Type = DQL_NODE
+
+        $$.Dql = &DQLNode{}
+        $$.Dql.Type = DQL_UNION
+        $$.Dql.DqlL = $1.Dql
+        $$.Dql.DqlR = $3.Dql
+
+    }
+    |dqlEntry DIFFERENCE dqlEntry {
+        $$ = &Node{}
+        $$.Type = DQL_NODE
+
+        $$.Dql = &DQLNode{}
+        $$.Dql.Type = DQL_DIFFERENCE
+        $$.Dql.DqlL = $1.Dql
+        $$.Dql.DqlR = $3.Dql
+    }
+    |dqlEntry INTERSECTION dqlEntry {
+        $$ = &Node{}
+        $$.Type = DQL_NODE
+
+        $$.Dql = &DQLNode{}
+        $$.Dql.Type = DQL_INTERSECTION
+        $$.Dql.DqlL = $1.Dql
+        $$.Dql.DqlR = $3.Dql
+    }
+    |LPAREN dqlEntry RPAREN {
+        $$ = $2
+    }
+    |query {
+        $$ = &Node{}
+        $$.Type = DQL_NODE
+
+        $$.Dql = &DQLNode{}
+        $$.Dql.Type = DQL_SINGLE_QUERY
+        $$.Dql.Query = $1.Query
+    }
+    ;
 
 /*  --------------------------------------------------------------------------------
     |                                      query                                   |
     --------------------------------------------------------------------------------
+
+        subQuery
+            LPAREN query RPAREN
 
         query
             selectStmt fromStmt
@@ -809,9 +848,9 @@ dml
             ID
             ID ID
             ID AS ID
-            query
-            query ID
-            query AS ID
+            subQuery
+            subQuery ID
+            subQuery AS ID
 
         orderByList
             orderByList COMMA orderByListEntry
@@ -827,15 +866,761 @@ dml
 
    -------------------------------------------------------------------------------- */
 
+/* ------------------------------------ subQuery ---------------------------------- */   
+subQuery
+    :LPAREN query RPAREN {
+        $$ = $2
+    }
+
 /* ------------------------------------- query ------------------------------------ */
-// TODO
 query
-    :DOT {
+    :selectStmt fromStmt {
         $$ = &Node{}
-        $$.Type = SUBQUERY_NODE
+        $$.Type = QUERY_NODE
+
         $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt WHERE condition {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $6.Condition
+
+        $$.Query.OrderByValid = false
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $8.Condition
+
+        $$.Query.OrderByValid = false
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt ORDERBY orderByList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $4.OrderByList
+
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt WHERE condition ORDERBY orderByList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $6.OrderByList
+
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList ORDERBY orderByList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $6.OrderByList
+
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $6.Condition
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $8.OrderByList
+
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList ORDERBY orderByList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $8.OrderByList
+
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $8.Condition
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $10.OrderByList
+
+        $$.Query.LimitValid = false
+    }
+    |selectStmt fromStmt LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $4
+        $$.Query.OffsetPos = $6
+    }
+    |selectStmt fromStmt WHERE condition LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $6
+        $$.Query.OffsetPos = $8
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $6
+        $$.Query.OffsetPos = $8
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $6.Condition
+
+        $$.Query.OrderByValid = false
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $8
+        $$.Query.OffsetPos = $10
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+        $$.Query.OrderByValid = false
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $8
+        $$.Query.OffsetPos = $10
+
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $8.Condition
+
+        $$.Query.OrderByValid = false
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $10
+        $$.Query.OffsetPos = $12
+
+    }
+    |selectStmt fromStmt ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $4.OrderByList
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $6
+        $$.Query.OffsetPos = $8
+
+    }
+    |selectStmt fromStmt WHERE condition ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = false
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $6.OrderByList
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $8
+        $$.Query.OffsetPos = $10
+
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $6.OrderByList
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $8
+        $$.Query.OffsetPos = $10
+    }
+    |selectStmt fromStmt GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = false
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $4.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $6.Condition
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $8.OrderByList
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $10
+        $$.Query.OffsetPos = $12
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = false
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $8.OrderByList
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $10
+        $$.Query.OffsetPos = $12
+    }
+    |selectStmt fromStmt WHERE condition GROUPBY attriNameOptionTableNameList HAVING condition ORDERBY orderByList LIMIT INTVALUE COMMA INTVALUE {
+        $$ = &Node{}
+        $$.Type = QUERY_NODE
+
+        $$.Query = &QueryNode{}
+
+        $$.Query.StarValid = $1.SelectStmt.StarValid
+        if $1.SelectStmt.StarValid == false {
+            $$.Query.DistinctValid = $1.SelectStmt.DistinctValid
+            $$.Query.SelectList = $1.SelectStmt.SelectList
+        }
+
+        $$.Query.FromListValid = $2.FromStmt.FromListValid
+        if $2.FromStmt.FromListValid {
+            $$.Query.FromList = $2.FromStmt.FromList
+        } else {
+            $$.Query.Join = $2.FromStmt.Join
+        }
+
+        $$.Query.WhereValid = true
+        $$.Query.WhereCondition = $4.Condition
+
+        $$.Query.GroupByValid = true
+        $$.Query.GroupByList = $6.AttriNameOptionTableNameList
+
+        $$.Query.HavingValid = true
+        $$.Query.HavingCondition = $8.Condition
+
+        $$.Query.OrderByValid = true
+        $$.Query.OrderByList = $10.OrderByList
+
+        $$.Query.LimitValid = true
+        $$.Query.InitialPos = $12
+        $$.Query.OffsetPos = $14
     }
     ;
+
 /* --------------------------------- selectStmt ----------------------------------- */
 selectStmt
     :SELECT STAR {
@@ -1122,7 +1907,7 @@ fromListEntry
         $$.FromListEntry.AliasValid = true
         $$.FromListEntry.Alias = $3
     }
-    |query {
+    |subQuery {
         $$ = &Node{}
         $$.Type = FROM_LIST_ENTRY
 
@@ -1131,7 +1916,7 @@ fromListEntry
         $$.FromListEntry.Query = $1.Query
         $$.FromListEntry.AliasValid = false
     }
-    |query ID {
+    |subQuery ID {
         $$ = &Node{}
         $$.Type = FROM_LIST_ENTRY
 
@@ -1141,7 +1926,7 @@ fromListEntry
         $$.FromListEntry.AliasValid = true
         $$.FromListEntry.Alias = $2
     }
-    |query AS ID {
+    |subQuery AS ID {
         $$ = &Node{}
         $$.Type = FROM_LIST_ENTRY
 
@@ -1438,9 +2223,9 @@ deleteStmt
     --------------------------------------------------------------------------------
 
         insertStmt
-			INSERTINTO ID VALUES query SEMICOLON
+			INSERTINTO ID VALUES subQuery SEMICOLON
 			INSERTINTO ID VALUES LPAREN elementaryValueList RPAREN SEMICOLON
-			INSERTINTO ID LPAREN attriNameList RPAREN VALUES query SEMICOLON
+			INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON
 			INSERTINTO ID LPAREN attriNameList RPAREN VALUES LPAREN elementaryValueList RPAREN SEMICOLON
 
         elementaryValueList
@@ -1451,7 +2236,7 @@ deleteStmt
 
 /*  ---------------------------------- insertStmt ---------------------------------- */
 insertStmt
-    :INSERTINTO ID VALUES query SEMICOLON {
+    :INSERTINTO ID VALUES subQuery SEMICOLON {
         $$ = &Node{}
         $$.Type = INSERT_NODE
 
@@ -1473,7 +2258,7 @@ insertStmt
         $$.Insert.AttriNameListValid = false
         $$.Insert.ElementaryValueList = $5.ElementaryValueList
     }
-    |INSERTINTO ID LPAREN attriNameList RPAREN VALUES query SEMICOLON {
+    |INSERTINTO ID LPAREN attriNameList RPAREN VALUES subQuery SEMICOLON {
         $$ = &Node{}
         $$.Type = INSERT_NODE
 
@@ -1811,12 +2596,12 @@ dropAssertStmt
     --------------------------------------------------------------------------------
 
         createViewStmt
-            CREATE VIEW ID AS query SEMICOLON
-			CREATE VIEW ID LPAREN attriNameList RPAREN AS query SEMICOLON
+            CREATE VIEW ID AS subQuery SEMICOLON
+			CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON
 
     -------------------------------------------------------------------------------- */
 createViewStmt
-    :CREATE VIEW ID AS query SEMICOLON {
+    :CREATE VIEW ID AS subQuery SEMICOLON {
         $$ = &Node{}
         $$.Type = VIEW_NODE
 
@@ -1825,7 +2610,7 @@ createViewStmt
         $$.View.Query = $5.Query
         $$.View.AttributeNameListValid = false
     }
-	|CREATE VIEW ID LPAREN attriNameList RPAREN AS query SEMICOLON {
+	|CREATE VIEW ID LPAREN attriNameList RPAREN AS subQuery SEMICOLON {
         $$ = &Node{}
         $$.Type = VIEW_NODE
 
@@ -2286,7 +3071,7 @@ dropTriggerStmt
             dml
 
         psmForLoop
-            FOR ID AS ID CURSOR FOR query DO psmExecList END FOR SEMICOLON
+            FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON
 
         psmBranch
             IF condition THEN psmExecList psmElseifList ELSE psmExecList END IF SEMICOLON
@@ -2552,7 +3337,7 @@ psmExecEntry
 
 /*  ---------------------------------- psmForLoop ---------------------------------- */
 psmForLoop
-    :FOR ID AS ID CURSOR FOR query DO psmExecList END FOR SEMICOLON {
+    :FOR ID AS ID CURSOR FOR subQuery DO psmExecList END FOR SEMICOLON {
         $$ = &Node{}
         $$.Type = PSM_FOR_LOOP_NODE
 
@@ -3537,26 +4322,26 @@ condition
         predicate
 			attriNameOptionTableName compareMark elementaryValue
 			attriNameOptionTableName LIKE STRINGVALUE
-			attriNameOptionTableName IN query
-			attriNameOptionTableName NOT IN query
+			attriNameOptionTableName IN subQuery
+			attriNameOptionTableName NOT IN subQuery
 			attriNameOptionTableName IN ID
 			attriNameOptionTableName NOT IN ID
-			attriNameOptionTableName compareMark ALL query
-			NOT attriNameOptionTableName compareMark ALL query
-			attriNameOptionTableName compareMark ANY query
-			NOT attriNameOptionTableName compareMark ANY query
+			attriNameOptionTableName compareMark ALL subQuery
+			NOT attriNameOptionTableName compareMark ALL subQuery
+			attriNameOptionTableName compareMark ANY subQuery
+			NOT attriNameOptionTableName compareMark ANY subQuery
 			attriNameOptionTableName compareMark ALL ID
 			NOT attriNameOptionTableName compareMark ALL ID
 			attriNameOptionTableName compareMark ANY ID
 			NOT attriNameOptionTableName compareMark ANY ID
 			attriNameOptionTableName IS NULLMARK
 			attriNameOptionTableName IS NOT NULLMARK
-			LPAREN attriNameOptionTableNameList RPAREN IN query
-			LPAREN attriNameOptionTableNameList RPAREN NOT IN query
+			LPAREN attriNameOptionTableNameList RPAREN IN subQuery
+			LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery
 			LPAREN attriNameOptionTableNameList RPAREN IN ID
 			LPAREN attriNameOptionTableNameList RPAREN NOT IN ID
-			EXISTS query
-			NOT EXISTS query
+			EXISTS subQuery
+			NOT EXISTS subQuery
 
         compareMark
 			EQUAL
@@ -3593,7 +4378,7 @@ predicate
         $$.Predicate.ElementaryValue.Type = ELEMENTARY_VALUE_STRING
         $$.Predicate.ElementaryValue.StringValue = $3
     }
-	|attriNameOptionTableName IN query {
+	|attriNameOptionTableName IN subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3603,7 +4388,7 @@ predicate
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
         $$.Predicate.Query = $3.Query
     }
-	|attriNameOptionTableName NOT IN query {
+	|attriNameOptionTableName NOT IN subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3633,7 +4418,7 @@ predicate
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
         $$.Predicate.TableName = $4
     }
-	|attriNameOptionTableName compareMark ALL query {
+	|attriNameOptionTableName compareMark ALL subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3644,7 +4429,7 @@ predicate
         $$.Predicate.CompareMark = $2.CompareMark
         $$.Predicate.Query = $4.Query
     }
-	|NOT attriNameOptionTableName compareMark ALL query {
+	|NOT attriNameOptionTableName compareMark ALL subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3655,7 +4440,7 @@ predicate
         $$.Predicate.CompareMark = $3.CompareMark
         $$.Predicate.Query = $5.Query
     }
-	|attriNameOptionTableName compareMark ANY query {
+	|attriNameOptionTableName compareMark ANY subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3666,7 +4451,7 @@ predicate
         $$.Predicate.CompareMark = $2.CompareMark
         $$.Predicate.Query = $4.Query
     }
-	|NOT attriNameOptionTableName compareMark ANY query {
+	|NOT attriNameOptionTableName compareMark ANY subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3739,7 +4524,7 @@ predicate
 
         $$.Predicate.AttriNameWithTableNameL = $1.AttriNameOptionTableName
     }
-	|LPAREN attriNameOptionTableNameList RPAREN IN query {
+	|LPAREN attriNameOptionTableNameList RPAREN IN subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3749,7 +4534,7 @@ predicate
         $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
         $$.Predicate.Query = $5.Query
     }
-	|LPAREN attriNameOptionTableNameList RPAREN NOT IN query {
+	|LPAREN attriNameOptionTableNameList RPAREN NOT IN subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3779,7 +4564,7 @@ predicate
         $$.Predicate.AttriNameOptionTableNameList = $2.AttriNameOptionTableNameList
         $$.Predicate.TableName = $6
     }
-	|EXISTS query {
+	|EXISTS subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         
@@ -3788,7 +4573,7 @@ predicate
 
         $$.Predicate.Query = $2.Query
     }
-	|NOT EXISTS query {
+	|NOT EXISTS subQuery {
         $$ = &Node{}
         $$.Type = PREDICATE_NODE
         

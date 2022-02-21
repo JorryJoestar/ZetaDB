@@ -351,6 +351,20 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return RIGHT
 	case C.SELECT:
 		return SELECT
+	case C.GROUPBY:
+		return GROUPBY
+	case C.HAVING:
+		return HAVING
+	case C.ORDERBY:
+		return ORDERBY
+	case C.LIMIT:
+		return LIMIT
+	case C.UNION:
+		return UNION
+	case C.DIFFERENCE:
+		return DIFFERENCE
+	case C.INTERSECTION:
+		return INTERSECTION
 
 	//public
 	case C.LPAREN:

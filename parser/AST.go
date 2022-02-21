@@ -249,16 +249,17 @@ type PsmValueNode struct {
 type DQLEnum uint8
 
 const (
-	DQL_SINGLE_QUERY DQLEnum = 1 //use only QueryL
+	DQL_SINGLE_QUERY DQLEnum = 1
 	DQL_UNION        DQLEnum = 2
 	DQL_DIFFERENCE   DQLEnum = 3
 	DQL_INTERSECTION DQLEnum = 4
 )
 
 type DQLNode struct {
-	Type   DQLEnum
-	QueryL *QueryNode
-	QueryR *QueryNode
+	Type  DQLEnum
+	DqlL  *DQLNode
+	DqlR  *DQLNode
+	Query *QueryNode
 }
 
 //query

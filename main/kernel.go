@@ -26,7 +26,7 @@ func GetInstance() *Kernel {
 func main() {
 	kernel := GetInstance()
 
-	s := "select distinct a+m"
+	s := "select a from b UNION ( select x from m INTERSECTION select name from student);"
 
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))

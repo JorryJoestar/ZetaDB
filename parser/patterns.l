@@ -151,6 +151,13 @@
 [Ll][Ee][Ff][Tt]                                                {return LEFT;}
 [Rr][Ii][Gg][Hh][Tt]                                            {return RIGHT;}
 [Ss][Ee][Ll][Ee][Cc][Tt]                                        {return SELECT;}
+[Gg][Rr][Oo][Uu][Pp][ ][Bb][Yy]                                 {return GROUPBY;}
+[Hh][Aa][Vv][Ii][Nn][Gg]                                        {return HAVING;}
+[Oo][Rr][Dd][Ee][Rr][ ][Bb][Yy]                                 {return ORDERBY;}
+[Ll][Ii][Mm][Ii][Tt]                                            {return LIMIT;}
+[Uu][Nn][Ii][Oo][Nn]                                            {return UNION;}
+[Dd][Ii][Ff][Ff][Ee][Rr][Ee][Nn][Cc][Ee]                        {return DIFFERENCE;}
+[Ii][Nn][Tt][Ee][Rr][Ss][Ee][Cc][Tt][Ii][Oo][Nn]                {return INTERSECTION;}
 
 [1-9]+[0-9]*|[0]|-[1-9]+[0-9]*                                  {return INTVALUE;}
 [1-9]+[0-9]*[.][0-9]+|0[.][0-9]+                                {return FLOATVALUE;}

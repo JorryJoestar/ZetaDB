@@ -77,6 +77,7 @@ enum {
     ALL             = 254,
     ANY             = 255,
     IS              = 256,
+    EXISTS          = 277,
 
 //expression
     SUBTRACT        = 271,  //-
@@ -171,6 +172,13 @@ enum {
     OUTER           = 269,
     CROSS           = 270,
     SELECT          = 240,
+    GROUPBY         = 236,  //GROUP BY
+    HAVING          = 237,
+    ORDERBY         = 238,  //ORDER BY
+    LIMIT           = 700,
+    UNION           = 701,
+    DIFFERENCE      = 702,
+    INTERSECTION    = 703,
 
 //public
     NULLMARK          = 257,  //NULL
@@ -180,48 +188,4 @@ enum {
     COMMA             = 203,  //,
     ID                = 207,  //begin with non-number character
     TABLEDOTATTRIBUTE = 209, //tableName.attributeName
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-    GROUPBY         = 236,  //GROUP BY
-    HAVING          = 237,
-    ORDERBY         = 238,  //ORDER BY
-
-
-
-    EXISTS          = 277,
-
-
-    TO              = 320,
-    AUTHORIZATION   = 321,
-    DISCONNECT      = 322,
-    CONNECTION      = 323,
-
-    CONDITION       = 558,
-    SQLSTATE        = 559,
-
-    OPEN            = 562,
-    CLOSE           = 563,
-    COLON           = 564,  //:
-    LOOP            = 565,
-    LEAVE           = 566,
-    FETCH           = 567,
-    INTO            = 568,
-
-    CONTINUE        = 570,
-    EXIT            = 571,
-    UNDO            = 572,
-    HANDLER         = 573,
 };
