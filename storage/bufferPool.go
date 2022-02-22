@@ -8,10 +8,8 @@ const (
 )
 
 type bufferPool struct {
-	pageSize    int
-	dataBuffer  *dataBuffer
-	logBuffer   *logBuffer
-	indexBuffer *indexBuffer
+	pageSize int
+	buffer   []*page
 }
 
 //use GetBufferPool to get the unique bufferPool
@@ -38,32 +36,12 @@ func (bf *bufferPool) GetPageSize() int {
 	return bf.pageSize
 }
 
-//fetch the corresponding page from dataBuffer, if the page is not buffered, fetch it from disk
-func (bf *bufferPool) GetDataPage(pageId uint32) *dataPage {
-	dp := &dataPage{}
-	return dp
+//fetch the corresponding page from buffer, if the page is not buffered, fetch it from disk
+func (bf *bufferPool) GetPage(pageId uint32) *page {
+	p := &page{}
+	return p
 }
 
-//swap a page to get empty slot in dataBuffer
+//swap a page to get empty slot in buffer
 func (bf *bufferPool) EvictDataPage() {
-}
-
-//fetch the corresponding page from logBuffer, if the page is not buffered, fetch it from disk
-func (bf *bufferPool) GetLogPage(pageId uint32) *logPage {
-	lp := &logPage{}
-	return lp
-}
-
-//swap a page to get empty slot in logBuffer
-func (bf *bufferPool) EvictLogPage() {
-}
-
-//fetch the corresponding page from indexBuffer, if the page is not buffered, fetch it from disk
-func (bf *bufferPool) GetIndexPage(pageId uint32) *indexPage {
-	ip := &indexPage{}
-	return ip
-}
-
-//swap a page to get empty slot in indexBuffer
-func (bf *bufferPool) EvictIndexPage() {
 }
