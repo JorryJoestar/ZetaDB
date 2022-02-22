@@ -2,6 +2,7 @@ package main
 
 import (
 	"ZetaDB/parser"
+	"ZetaDB/storage"
 	"fmt"
 	"sync"
 )
@@ -30,4 +31,8 @@ func main() {
 
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
+
+	bf := storage.GetBufferPool()
+	bf.GetPageSize()
+
 }
