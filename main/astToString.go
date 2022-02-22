@@ -217,8 +217,27 @@ func DCLToString(dcl *parser.DCLNode, tabs string) string {
 }
 
 func DQLToString(dql *parser.DQLNode, tabs string) string {
-	//TODO
-	s := ""
+	s := tabs + "DQLNode\n"
+	switch dql.Type {
+	case parser.DQL_DIFFERENCE:
+		s += tabs + "Type: DQL_DIFFERENCE\n"
+	case parser.DQL_INTERSECTION:
+		s += tabs + "Type: DQL_INTERSECTION\n"
+	case parser.DQL_UNION:
+		s += tabs + "Type: DQL_UNION\n"
+	case parser.DQL_SINGLE_QUERY:
+		s += tabs + "Type: DQL_SINGLE_QUERY\n"
+	}
+	if dql.Type == parser.DQL_SINGLE_QUERY {
+		s += tabs + "Query:\n"
+		s += QueryToString(dql.Query, tabs+"\t")
+	} else {
+		s += tabs + "DqlL:\n"
+		s += DQLToString(dql.DqlL, tabs+"\t")
+		s += tabs + "DqlR:\n"
+		s += DQLToString(dql.DqlR, tabs+"\t")
+	}
+	s += "\n"
 	return s
 }
 
@@ -1156,9 +1175,183 @@ func CompareMarkToString(compareMark parser.CompareMarkEnum) string {
 }
 
 func QueryToString(query *parser.QueryNode, tabs string) string {
-	//TODO
-	s := tabs
-	s += "QueryToString TODO\n"
+	s := tabs + "QueryNode\n"
+	if query.StarValid {
+		s += tabs + "StarValid\n"
+	} else {
+		if query.DistinctValid {
+			s += tabs + "DistinctValid\n"
+		}
+		s += tabs + "SelectList:\n"
+		for _, v := range query.SelectList {
+			s += SelectListEntryToString(v, tabs+"\t")
+		}
+	}
+
+	if query.FromListValid {
+		s += tabs + "FromList:\n"
+		for _, v := range query.FromList {
+			s += FromListEntryToString(v, tabs+"\t")
+		}
+	} else {
+		s += tabs + "Join:\n"
+		s += JoinToString(query.Join, tabs+"\t")
+	}
+
+	if query.WhereValid {
+		s += tabs + "WhereCondition:\n"
+		s += ConditionToString(query.WhereCondition, tabs+"\t")
+	}
+
+	if query.GroupByValid {
+		s += tabs + "GroupByList:\n"
+		for _, v := range query.GroupByList {
+			s += AttriNameOptionTableNameToString(v, tabs+"\t")
+		}
+	}
+
+	if query.HavingValid {
+		s += tabs + "HavingCondition:\n"
+		s += ConditionToString(query.HavingCondition, tabs+"\t")
+	}
+
+	if query.OrderByValid {
+		s += tabs + "OrderByList\n"
+		for _, v := range query.OrderByList {
+			s += OrderByListEntryToString(v, tabs+"\t")
+		}
+	}
+
+	if query.LimitValid {
+		s += tabs + "InitialPos: " + strconv.Itoa(query.InitialPos) + "\n"
+		s += tabs + "OffsetPos: " + strconv.Itoa(query.OffsetPos) + "\n"
+	}
+
+	return s
+}
+
+func OrderByListEntryToString(entry *parser.OrderByListEntryNode, tabs string) string {
+	s := tabs + "OrderByListEntryNode\n"
+	switch entry.Type {
+	case parser.ORDER_BY_LIST_ENTRY_EXPRESSION:
+		s += "Type: ORDER_BY_LIST_ENTRY_EXPRESSION\n"
+		s += "Expression:\n"
+		s += ExpressionToString(entry.Expression, tabs+"\t")
+	case parser.ORDER_BY_LIST_ENTRY_ATTRIBUTE:
+		s += "Type: ORDER_BY_LIST_ENTRY_ATTRIBUTE\n"
+		s += AttriNameOptionTableNameToString(entry.AttriNameOptionTableName, tabs+"\t")
+	}
+
+	switch entry.Trend {
+	case parser.ORDER_BY_LIST_ENTRY_ASC:
+		s += tabs + "Trend: ORDER_BY_LIST_ENTRY_ASC\n"
+	case parser.ORDER_BY_LIST_ENTRY_DESC:
+		s += tabs + "Trend: ORDER_BY_LIST_ENTRY_DESC\n"
+	}
+
+	return s
+}
+
+func JoinToString(join *parser.JoinNode, tabs string) string {
+	s := tabs + "JoinNode\n"
+	s += tabs + "JoinTableNameL: " + join.JoinTableNameL + "\n"
+	s += tabs + "JoinTableNameR: " + join.JoinTableNameR + "\n"
+
+	switch join.Type {
+	case parser.CROSS_JOIN:
+		s += tabs + "Type: CROSS_JOIN\n"
+	case parser.JOIN_ON:
+		s += tabs + "Type: JOIN_ON\n"
+		s += tabs + "OnList:\n"
+		for _, v := range join.OnList {
+			s += OnListEntryToString(v, tabs+"\t")
+		}
+
+	case parser.NATURAL_JOIN:
+		s += tabs + "Type: NATURAL_JOIN\n"
+	case parser.NATURAL_FULL_OUTER_JOIN:
+		s += tabs + "Type: NATURAL_FULL_OUTER_JOIN\n"
+	case parser.NATURAL_LEFT_OUTER_JOIN:
+		s += tabs + "Type: NATURAL_LEFT_OUTER_JOIN\n"
+	case parser.NATURAL_RIGHT_OUTER_JOIN:
+		s += tabs + "Type: NATURAL_RIGHT_OUTER_JOIN\n"
+	case parser.FULL_OUTER_JOIN_ON:
+		s += tabs + "Type: FULL_OUTER_JOIN_ON\n"
+		s += tabs + "OnList:\n"
+		for _, v := range join.OnList {
+			s += OnListEntryToString(v, tabs+"\t")
+		}
+
+	case parser.LEFT_OUTER_JOIN_ON:
+		s += tabs + "Type: LEFT_OUTER_JOIN_ON\n"
+		s += tabs + "OnList:\n"
+		for _, v := range join.OnList {
+			s += OnListEntryToString(v, tabs+"\t")
+		}
+
+	case parser.RIGHT_OUTER_JOIN_ON:
+		s += tabs + "Type: RIGHT_OUTER_JOIN_ON\n"
+		s += tabs + "OnList:\n"
+		for _, v := range join.OnList {
+			s += OnListEntryToString(v, tabs+"\t")
+		}
+
+	}
+
+	return s
+}
+
+func OnListEntryToString(entry *parser.OnListEntryNode, tabs string) string {
+	s := tabs + "OnListEntryNode\n"
+
+	s += tabs + "AttriNameWithTableNameL:\n"
+	s += AttriNameOptionTableNameToString(entry.AttriNameWithTableNameL, tabs+"\t")
+
+	s += tabs + "AttriNameWithTableNameR:\n"
+	s += AttriNameOptionTableNameToString(entry.AttriNameWithTableNameR, tabs+"\t")
+
+	return s
+}
+
+func FromListEntryToString(entry *parser.FromListEntryNode, tabs string) string {
+	s := tabs + "FromListEntryNode\n"
+	switch entry.Type {
+	case parser.FROM_LIST_ENTRY_SUBQUERY:
+		s += tabs + "Type: FROM_LIST_ENTRY_SUBQUERY\n"
+		s += tabs + "Query:\n"
+		s += QueryToString(entry.Query, tabs+"\t")
+	case parser.FROM_LIST_ENTRY_TABLE:
+		s += tabs + "Type: FROM_LIST_ENTRY_TABLE\n"
+		s += tabs + "TableName: " + entry.TableName + "\t"
+	}
+
+	if entry.AliasValid {
+		s += tabs + "Alias: " + entry.Alias
+	}
+	return s
+}
+
+func SelectListEntryToString(entry *parser.SelectListEntryNode, tabs string) string {
+	s := tabs + "SelectListEntryNode\n"
+	switch entry.Type {
+	case parser.SELECT_LIST_ENTRY_ATTRIBUTE_NAME:
+		s += tabs + "Type: SELECT_LIST_ENTRY_ATTRIBUTE_NAME\n"
+		s += tabs + "AttriNameOptionTableName:\n"
+		s += AttriNameOptionTableNameToString(entry.AttriNameOptionTableName, tabs+"\t")
+	case parser.SELECT_LIST_ENTRY_AGGREGATION:
+		s += tabs + "Type: SELECT_LIST_ENTRY_AGGREGATION\n"
+		s += tabs + "Aggregation:\n"
+		s += AggregationToString(entry.Aggregation, tabs+"\t")
+	case parser.SELECT_LIST_ENTRY_EXPRESSION:
+		s += tabs + "Type: SELECT_LIST_ENTRY_EXPRESSION\n"
+		s += tabs + "Expression:\n"
+		s += ExpressionToString(entry.Expression, tabs+"\t")
+	}
+
+	if entry.AliasValid {
+		s += tabs + "Alias: " + entry.Alias + "\n"
+	}
+
 	return s
 }
 
