@@ -77,9 +77,9 @@ func (d *domain) DomainSizeInBytes() int {
 			return int(d.n)/2 + 1
 		}
 	case DATE:
-		return 8
+		return 4
 	case TIME:
-		return 8
+		return 4
 	}
 	return -1
 }
