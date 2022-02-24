@@ -21,7 +21,29 @@ type dataPage struct {
 
 	//number of tuples in this page
 	tupleNum uint32
+
+	//tuples in this page
+	tuples []tuple
 }
 
-func (dataPage *dataPage) ToBitStram() {
-}
+func (dataPage *dataPage) ToBytes() {}
+
+func (dataPage *dataPage) SizeInByte() int { return 0 }
+
+func (dataPage *dataPage) VacantByteNum() int { return 0 }
+
+func (dataPage *dataPage) InsertTuple() {}
+
+func (dataPage *dataPage) DeleteTuple() {}
+
+func (dataPage *dataPage) IsHeadPage() {}
+
+func (dataPage *dataPage) IsTailPage() {}
+
+func (dataPage *dataPage) GetPageId() {}
+
+func (dataPage *dataPage) GetTableId() {}
+
+func (dataPage *dataPage) GetPriorPageId() {}
+
+func (dataPage *dataPage) GetNextPageId() {}

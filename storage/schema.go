@@ -1,11 +1,24 @@
 package storage
 
 type schema struct {
-	tableName  string
-	domainList []domain
+	tableName   string
+	domains     []domain
+	constraints []constraint
 }
 
-//return sizes of this schema in bytes
-func (schema *schema) SchemaSizeInBytes() int {
-	return 0
+//number of domains whose size is not fixed
+func (s *schema) UnfixedDomainNum() int {
+	num := 0
+
+	for _, v := range s.domains {
+		if v.DomainSizeUnfixed() {
+			num++
+		}
+	}
+
+	return num
+}
+
+func (s *schema) GetDomains() []domain {
+	return s.domains
 }

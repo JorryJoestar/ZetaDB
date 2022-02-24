@@ -1,56 +1,24 @@
 package storage
 
-//CHAR
-type charField struct {
-	data rune
-}
-
-//VARCHAR(n)
-type varcharField struct {
-	n    uint32
-	data []rune
-}
-
-//BIT(n) & BITVARYING(n)
-//little endian
-type bitField struct {
-	n    uint32
+//store data of a particular field within a field
+//fields compose a tuple
+type field struct {
 	data []byte
 }
 
-//BOOLEAN
-type booleanField struct {
-	data bool
+//generate a field from a series of bytes
+func BytesToField(bytes []byte) field {
+	f := field{
+		data: bytes}
+
+	return f
 }
 
-//INT & INTEGER
-type intField struct {
-	data int32
+//length of field in bytes
+func (f *field) FieldLen() int {
+	return len(f.data)
 }
 
-//SHORTINT
-type shortintField struct {
-	data int16
-}
-
-//FLOAT
-type floatField struct {
-	data float64
-}
-
-//REAL & DOUBLEPRECISION
-type doubleField struct {
-	
-}
-
-//DECIMAL(n,d) & NUMERIC(n,d)
-type decimalField struct {
-}
-
-//DATE
-type dateField struct {
-}
-
-//TIME
-type timeField struct {
+func (f *field) GetData() []byte {
+	return f.data
 }
