@@ -3,7 +3,8 @@ package storage
 import "sync"
 
 type storageEngine struct {
-	fileLocation string
+	dataFileLocation string
+	logFileLocation  string
 }
 
 //use GetStorageEngine to get the unique storageEngine
@@ -17,13 +18,24 @@ func GetStorageEngine() *storageEngine {
 	return seInstance
 }
 
-//fetch page from disk
-func FetchPage(pageId uint32) *page {
-	p := &page{}
-	return p
+//fetch data page from disk
+func FetchDataPage(pageId uint32) *dataPage {
+	dp := &dataPage{}
+	return dp
 }
 
-//swap page into disk
-func SwapPage(dp *page) {
-	
+//swap data page into disk
+func SwapLogPage(dp *dataPage) {
+
+}
+
+//fetch log page from disk
+func FetchLogPage(pageId uint32) *dataPage {
+	dp := &dataPage{}
+	return dp
+}
+
+//swap log page into disk
+func SwapDataPage(dp *dataPage) {
+
 }
