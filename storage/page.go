@@ -5,6 +5,7 @@ type page struct {
 	tableId     uint32
 	priorPageId uint32
 	nextPageId  uint32
+	
 }
 
 func (page *page) ToBitStram() {
