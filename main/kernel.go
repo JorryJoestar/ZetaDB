@@ -64,12 +64,8 @@ func main() {
 
 	fmt.Println("aaa")
 
-	ss := "m"
-	bbb := []byte(ss)
-	var c byte = 0b00111100
-	fmt.Println(c)
-	var bs []byte
-	bs = append(bs, c)
-	fmt.Println(BytesToChar(bbb))
+	ss := "simeon"
+
+	fmt.Println(VARCHARToBytes(ss))
 
 }
