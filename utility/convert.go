@@ -56,6 +56,8 @@ func BytesToVARCHAR(bytes []byte) (string, error) {
 	return string(bytes), nil
 }
 
+//convert VARCHAR(string) to byte slice
+//error if any one character of VARCHAR out of range of ascii
 func VARCHARToBytes(s string) ([]byte, error) {
 	bytes := []byte(s)
 	for _, b := range bytes {
@@ -64,4 +66,24 @@ func VARCHARToBytes(s string) ([]byte, error) {
 		}
 	}
 	return bytes, nil
+}
+
+//convert a byte to bool
+//if byte is 0, return false, else return true
+func ByteToBOOLEAN(b byte) bool {
+	if b == 0b00000000 {
+		return false
+	} else {
+		return true
+
+	}
+}
+
+//convert bool type to a byte
+func BOOLEANToByte(b bool) byte {
+	if b {
+		return 0b00000001
+	} else {
+		return 0b00000000
+	}
 }

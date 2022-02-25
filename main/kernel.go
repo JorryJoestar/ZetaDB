@@ -64,8 +64,5 @@ func main() {
 
 	fmt.Println("aaa")
 
-	ss := "simeon"
-
-	fmt.Println(VARCHARToBytes(ss))
-
+	fmt.Println(ByteToBOOLEAN(0b00000000))
 }
