@@ -3,6 +3,7 @@ package main
 import (
 	"ZetaDB/parser"
 	"ZetaDB/storage"
+	. "ZetaDB/utility"
 	"fmt"
 	"os"
 	"sync"
@@ -60,5 +61,15 @@ func main() {
 	n, err := f.ReadAt(buffer, 1)
 	fmt.Println(n)
 	fmt.Println(buffer)
+
+	fmt.Println("aaa")
+
+	ss := "m"
+	bbb := []byte(ss)
+	var c byte = 0b00111100
+	fmt.Println(c)
+	var bs []byte
+	bs = append(bs, c)
+	fmt.Println(BytesToChar(bbb))
 
 }
