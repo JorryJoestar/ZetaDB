@@ -139,7 +139,7 @@ func SHORTINTToBytes(i int16) []byte {
 	return bytes
 }
 
-//convert 4 bytes to a float32, little-endian
+//convert 4 bytes to FLOAT(float32), little-endian
 func BytesToFLOAT(bytes []byte) (float32, error) {
 	if len(bytes) != 4 {
 		return 0, errors.New("length of byte slice invalid")
@@ -148,10 +148,140 @@ func BytesToFLOAT(bytes []byte) (float32, error) {
 	return math.Float32frombits(bits), nil
 }
 
-//convert a float32 to 4 bytes, little-endian
+//convert FLOAT(float32) to 4 bytes, little-endian
 func FLOATToBytes(f float32) []byte {
 	bits := math.Float32bits(f)
 	bytes := make([]byte, 4)
 	binary.LittleEndian.PutUint32(bytes, bits)
 	return bytes
+}
+
+//convert 4 bytes to REAL(float32), little-endian
+func BytesToREAL(bytes []byte) (float32, error) {
+	return BytesToFLOAT(bytes)
+}
+
+//convert REAL(float32) to 4 bytes, little-endian
+func REALToBytes(f float32) []byte {
+	return FLOATToBytes(f)
+}
+
+//convert 8 bytes to DOUBLEPRECISION(float64), little-endian
+//error if byte slice length is not 8
+func BytesToDOUBLEPRECISION(bytes []byte) (float64, error) {
+	if len(bytes) != 8 {
+		return 0, errors.New("length of byte slice invalid")
+	}
+	bits := binary.LittleEndian.Uint64(bytes)
+	return math.Float64frombits(bits), nil
+}
+
+//convert DOUBLEPRECISION(float64) to 8 bytes, little-endian
+func DOUBLEPRECISIONToBytes(f float64) []byte {
+	bits := math.Float64bits(f)
+	bytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bytes, bits)
+	return bytes
+}
+
+//convert bytes to DECIMAL(float64), sign byte at head
+func BytesToDECIMAL(bytes []byte, n int, d int) (float64, error) {
+	if n < d || n < 1 || d < 0 {
+		return 0, errors.New("n or d invalid")
+	}
+
+	//byteNum is the number of bytes to store n digits plus a sign
+	byteNum := 1 //sign byte
+	if n%2 == 0 {
+		byteNum += n / 2
+	} else {
+		byteNum += n/2 + 1
+	}
+	if len(bytes) != byteNum {
+		return 0, errors.New("length of byte slice invalid")
+	}
+
+	//identify sign(+/-), if signByte is 0, sign is +
+	signByte := bytes[0]
+	bytes = bytes[1:]
+	negtive := true
+	if signByte == 0 {
+		negtive = false
+	} else {
+		negtive = true
+	}
+
+	var f float64 = 0
+	for i, b := range bytes {
+		nLow := int(b & 0b00001111)
+		nHigh := int((b & 0b11110000) >> 4)
+		if nLow >= 10 || nHigh >= 10 {
+			return 0, errors.New("byte content invalid")
+		}
+		base := math.Pow(100, float64(i))
+		f += base * float64(nLow+10*nHigh)
+	}
+
+	decimal := math.Pow(0.1, float64(d))
+	f *= decimal
+
+	if negtive {
+		f = -f
+	}
+
+	return f, nil
+}
+
+//convert DECIMAL(float64) to byte slice
+func DECIMALToBytes(f float64, n int, d int) ([]byte, error) {
+	if n < d || n < 1 || d < 0 {
+		return nil, errors.New("n or d invalid")
+	}
+
+	//byteNum is the number of bytes to store n digits plus a sign
+	byteNum := 1 //sign byte
+	if n%2 == 0 {
+		byteNum += n / 2
+	} else {
+		byteNum += n/2 + 1
+	}
+	bytes := make([]byte, byteNum)
+
+	//assign sign byte
+	if f >= 0 {
+		bytes[0] = 0b00000000
+	} else {
+		bytes[0] = 0b00000001
+	}
+
+	//fetch value
+	for i := 0; i < d; i++ {
+		f *= 10
+	}
+	if f < 0 {
+		f = -f
+	}
+	var value int = int(f)
+
+	for i := 1; i < byteNum; i++ {
+		nLow := value % 10
+		value = value / 10
+		nHigh := value % 10
+		value = value / 10
+		b := (byte(nHigh) << 4) | byte(nLow)
+
+		bytes[i] = b
+	}
+
+	return bytes, nil
+}
+
+//convert bytes to NUMERIC(float64)
+func BytesToNUMERIC(bytes []byte, n int, d int) (float64, error) {
+	return BytesToDECIMAL(bytes, n, d)
+}
+
+//convert NUMERIC(float64) to bytes
+func NUMERICToBytes(f float64, n int, d int) ([]byte, error) {
+	return DECIMALToBytes(f, n, d)
 }

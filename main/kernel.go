@@ -64,8 +64,7 @@ func main() {
 
 	fmt.Println("aaa")
 
-	var ff float32 = 12.312
-	bb := FLOATToBytes(ff)
-	fmt.Println(BytesToFLOAT(bb))
+	var ff float64 = -76493.24218
+	fmt.Println(DECIMALToBytes(ff, 10, 5))
 
 }

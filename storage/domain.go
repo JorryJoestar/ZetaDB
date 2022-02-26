@@ -65,16 +65,16 @@ func (d *domain) DomainSizeInBytes() int {
 	case DOUBLEPRECISION:
 		return 8
 	case DECIMAL:
-		if int(d.n)%2 == 0 {
-			return int(d.n) / 2
-		} else {
+		if int(d.n)%2 == 0 { //add the sign(+/-) byte
 			return int(d.n)/2 + 1
+		} else {
+			return int(d.n)/2 + 2
 		}
 	case NUMERIC:
 		if int(d.n)%2 == 0 {
-			return int(d.n) / 2
-		} else {
 			return int(d.n)/2 + 1
+		} else {
+			return int(d.n)/2 + 2
 		}
 	case DATE:
 		return 4
