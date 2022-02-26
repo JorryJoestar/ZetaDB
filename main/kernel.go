@@ -64,5 +64,8 @@ func main() {
 
 	fmt.Println("aaa")
 
-	fmt.Println(ByteToBOOLEAN(0b00000000))
+	var ff float32 = 12.312
+	bb := FLOATToBytes(ff)
+	fmt.Println(BytesToFLOAT(bb))
+
 }
