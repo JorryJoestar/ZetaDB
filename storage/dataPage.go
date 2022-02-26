@@ -1,6 +1,14 @@
 package storage
 
+import (
+	. "ZetaDB/utility"
+	"errors"
+)
+
 type dataPage struct {
+	//if this page is modified since it is fetched from file
+	modified bool
+
 	//slot number in data.zdb
 	pageId uint32
 
@@ -15,10 +23,6 @@ type dataPage struct {
 	//if nextPageId == pageId, this page is a tail page
 	nextPageId uint32
 
-	//the id of first tuple in this page
-	//tuple id is unique within a table
-	beginTupleId uint32
-
 	//number of tuples in this page
 	tupleNum uint32
 
@@ -26,24 +30,105 @@ type dataPage struct {
 	tuples []tuple
 }
 
-func (dataPage *dataPage) ToBytes() {}
+//convert this dataPage into byte slice, ready to insert into file
+func (dataPage *dataPage) ToBytes() []byte {
+	var bytes []byte
 
-func (dataPage *dataPage) SizeInByte() int { return 0 }
+	//pageId
+	bytes = append(bytes, Uint32ToBytes(dataPage.pageId)...)
 
-func (dataPage *dataPage) VacantByteNum() int { return 0 }
+	//tableId
+	bytes = append(bytes, Uint32ToBytes(dataPage.tableId)...)
 
-func (dataPage *dataPage) InsertTuple() {}
+	//priorPageId
+	bytes = append(bytes, Uint32ToBytes(dataPage.priorPageId)...)
 
-func (dataPage *dataPage) DeleteTuple() {}
+	//nextPageId
+	bytes = append(bytes, Uint32ToBytes(dataPage.nextPageId)...)
 
-func (dataPage *dataPage) IsHeadPage() {}
+	//tupleNum
+	bytes = append(bytes, Uint32ToBytes(dataPage.tupleNum)...)
 
-func (dataPage *dataPage) IsTailPage() {}
+	//tuples
+	for _, tup := range dataPage.tuples {
+		bytes = append(bytes, tup.TupleToBytes()...)
+	}
 
-func (dataPage *dataPage) GetPageId() {}
+	return bytes
+}
 
-func (dataPage *dataPage) GetTableId() {}
+func (dataPage *dataPage) SizeInByte() int {
+	size := 0
 
-func (dataPage *dataPage) GetPriorPageId() {}
+	//five fields in header, each 4 bytes
+	size += 4 * 5
 
-func (dataPage *dataPage) GetNextPageId() {}
+	//add size of each tuples within this page
+	for _, tup := range dataPage.tuples {
+		size += tup.TupleSizeInBytes()
+	}
+
+	return size
+}
+
+//return vacant byte number within this page
+func (dataPage *dataPage) VacantByteNum() int {
+	return DEFAULT_DATAPAGE_SIZE - dataPage.SizeInByte()
+}
+
+func (dataPage *dataPage) InsertTuple(tup tuple) error {
+
+	//check if there is enough space to insert
+	if tup.TupleSizeInBytes() > dataPage.VacantByteNum() {
+		return errors.New("not enough space to insert this tuple into this dataPage")
+	}
+
+	//change pageId of this tuple
+	tup.SetPageId(dataPage.pageId)
+
+	//insert into tuples
+	dataPage.tuples = append(dataPage.tuples, tup)
+
+	//marked as modified
+	dataPage.modified = true
+
+	return nil
+}
+
+//delete a tuple from this page according to its tupleId
+func (dataPage *dataPage) DeleteTuple(tupleId uint32) bool {
+	for i, tup := range dataPage.tuples {
+		if tup.GetTupleId() == tupleId {
+			oldTuples := dataPage.tuples
+			dataPage.tuples = append(oldTuples[:i], oldTuples[i+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
+//check if this page is a head page
+func (dataPage *dataPage) IsHeadPage() bool {
+	return dataPage.pageId == dataPage.priorPageId
+}
+
+//check if this page is a tail page
+func (dataPage *dataPage) IsTailPage() bool {
+	return dataPage.pageId == dataPage.nextPageId
+}
+
+func (dataPage *dataPage) GetPageId() uint32 {
+	return dataPage.pageId
+}
+
+func (dataPage *dataPage) GetTableId() uint32 {
+	return dataPage.tableId
+}
+
+func (dataPage *dataPage) GetPriorPageId() uint32 {
+	return dataPage.priorPageId
+}
+
+func (dataPage *dataPage) GetNextPageId() uint32 {
+	return dataPage.nextPageId
+}

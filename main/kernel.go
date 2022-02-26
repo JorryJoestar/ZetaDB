@@ -64,9 +64,8 @@ func main() {
 
 	fmt.Println("aaa")
 
-	ss := "16:59:43.01"
+	var x uint32 = 1231
 
-	bb, _ := TIMEToBytes(ss)
-
-	fmt.Println(BytesToTIME(bb))
+	bb := Uint32ToBytes(x)
+	fmt.Println(BytesToUint32(bb))
 }

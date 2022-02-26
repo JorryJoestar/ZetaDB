@@ -153,3 +153,11 @@ func BytesToTuple(bytes []byte, s *schema) tuple {
 
 	return t
 }
+
+func (t *tuple) GetTupleId() uint32 {
+	return t.tupleId
+}
+
+func (t *tuple) SetPageId(id uint32) {
+	t.pageId = id
+}

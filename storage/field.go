@@ -1,7 +1,5 @@
 package storage
 
-import "errors"
-
 //store data of a particular field within a field
 //fields compose a tuple
 type field struct {
@@ -19,26 +17,25 @@ func BytesToField(bytes []byte) field {
 
 //length of field in bytes
 func (f *field) FieldLen() int {
-	return len(f.data)
+	if f.isNull {
+		return 0
+	} else {
+		return len(f.data)
+	}
 }
 
 func (f *field) GetFieldData() []byte {
-	return f.data
-}
-
-//convert field data into CHAR (string)
-func (f *field) FieldToChar() (string, error) {
 	if f.isNull {
-		return "", errors.New("storage.field.go: field data is NULL")
+		return nil
+	} else {
+		return f.data
 	}
-
-	if f.FieldLen() != 1 {
-		return "", errors.New("storage.field.go: field data length mismatch")
-	}
-
-	return string(f.data), nil
 }
 
 func (f *field) IsNull() bool {
 	return f.isNull
+}
+
+func (f *field) SetNull(b bool) {
+	f.isNull = b
 }

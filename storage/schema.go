@@ -3,7 +3,7 @@ package storage
 type schema struct {
 	tableName   string
 	domains     []domain
-	constraints []constraint //TODO
+	constraints []constraint
 }
 
 //number of domains whose size is not fixed

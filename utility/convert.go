@@ -404,3 +404,24 @@ func TIMEToBytes(s string) ([]byte, error) {
 	return bytes, nil
 
 }
+
+//convert 4 bytes to uint32, little-endian
+func BytesToUint32(bytes []byte) (uint32, error) {
+	if len(bytes) != 4 {
+		return 0, errors.New("length of byte slice invalid")
+	}
+
+	var result uint32 = uint32(bytes[0]) + uint32(bytes[1])<<8 + uint32(bytes[2])<<16 + uint32(bytes[3])<<24
+
+	return result, nil
+}
+
+//convert uint32 to 4 bytes, little-endian
+func Uint32ToBytes(i uint32) []byte {
+	bytes := make([]byte, 4)
+	bytes[0] = byte(i)
+	bytes[1] = byte(i >> 8)
+	bytes[2] = byte(i >> 16)
+	bytes[3] = byte(i >> 24)
+	return bytes
+}
