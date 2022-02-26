@@ -64,7 +64,9 @@ func main() {
 
 	fmt.Println("aaa")
 
-	var ff float64 = -76493.24218
-	fmt.Println(DECIMALToBytes(ff, 10, 5))
+	ss := "1997-11-12"
 
+	bb, _ := DATEToBytes(ss)
+
+	fmt.Println(BytesToDATE(bb))
 }

@@ -285,3 +285,61 @@ func BytesToNUMERIC(bytes []byte, n int, d int) (float64, error) {
 func NUMERICToBytes(f float64, n int, d int) ([]byte, error) {
 	return DECIMALToBytes(f, n, d)
 }
+
+//convert 4 bytes to DATE(string) YYYY-MM-DD
+func BytesToDATE(bytes []byte) (string, error) {
+	if len(bytes) != 4 {
+		return "", errors.New("length of byte slice invalid")
+	}
+
+	s := ""
+
+	for i := 0; i < 4; i++ {
+		nLow := bytes[i] & 0b00001111
+		nHigh := (bytes[i] & 0b11110000) >> 4
+		if nLow > 9 || nHigh > 9 {
+			return "", errors.New("byte content invalid")
+		}
+
+		var bs []byte
+		bs = append(bs, '0'+nHigh)
+		bs = append(bs, '0'+nLow)
+
+		if i == 0 || i == 1 { //year
+			s += string(bs)
+		} else if i == 2 { //month
+			s += "-"
+			s += string(bs)
+		} else if i == 3 { //day
+			s += "-"
+			s += string(bs)
+		}
+	}
+	return s, nil
+}
+
+//convert DATE(string) to 4 bytes
+func DATEToBytes(s string) ([]byte, error) {
+	if len(s) != 10 { //YYYY-MM-DD
+		return nil, errors.New("length of string invalid")
+	}
+
+	for i := 0; i < 10; i++ {
+		if (i == 4 || i == 7) && s[i] != '-' {
+			return nil, errors.New("string content invalid")
+		}
+		if (i != 4 && i != 7) && (s[i] > '9' || s[i] < '0') {
+			return nil, errors.New("string content invalid")
+		}
+	}
+
+	bytes := make([]byte, 4)
+	sSlice := []byte(s)
+	bytes[0] = (sSlice[0]-'0')<<4 | (sSlice[1] - '0')
+	bytes[1] = (sSlice[2]-'0')<<4 | (sSlice[3] - '0')
+	bytes[2] = (sSlice[5]-'0')<<4 | (sSlice[6] - '0')
+	bytes[3] = (sSlice[8]-'0')<<4 | (sSlice[9] - '0')
+
+	return bytes, nil
+}
+
