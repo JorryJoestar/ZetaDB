@@ -343,3 +343,64 @@ func DATEToBytes(s string) ([]byte, error) {
 	return bytes, nil
 }
 
+//convert 4 byte to TIME(string) hh:mm:ss.nn
+func BytesToTIME(bytes []byte) (string, error) {
+	if len(bytes) != 4 {
+		return "", errors.New("length of byte slice invalid")
+	}
+
+	s := ""
+
+	for i := 0; i < 4; i++ {
+		nLow := bytes[i] & 0b00001111
+		nHigh := (bytes[i] & 0b11110000) >> 4
+		if nLow > 9 || nHigh > 9 {
+			return "", errors.New("byte content invalid")
+		}
+
+		var bs []byte
+		bs = append(bs, '0'+nHigh)
+		bs = append(bs, '0'+nLow)
+
+		if i == 0 {
+			s += string(bs)
+		} else if i == 1 || i == 2 {
+			s += ":"
+			s += string(bs)
+		} else if i == 3 {
+			s += "."
+			s += string(bs)
+		}
+	}
+
+	return s, nil
+}
+
+//convert TIME(string) to 4 bytes hh:mm:ss.nn
+func TIMEToBytes(s string) ([]byte, error) {
+	if len(s) != 11 {
+		return nil, errors.New("length of string invalid")
+	}
+
+	for i := 0; i < 11; i++ {
+		if (i == 2 || i == 5) && s[i] != ':' {
+			return nil, errors.New("string content invalid")
+		}
+		if (i == 8) && s[i] != '.' {
+			return nil, errors.New("string content invalid")
+		}
+		if (i != 2 && i != 5 && i != 8) && (s[i] > '9' || s[i] < '0') {
+			return nil, errors.New("string content invalid")
+		}
+	}
+
+	bytes := make([]byte, 4)
+	sSlice := []byte(s)
+	bytes[0] = (sSlice[0]-'0')<<4 | (sSlice[1] - '0')
+	bytes[1] = (sSlice[3]-'0')<<4 | (sSlice[4] - '0')
+	bytes[2] = (sSlice[6]-'0')<<4 | (sSlice[7] - '0')
+	bytes[3] = (sSlice[9]-'0')<<4 | (sSlice[10] - '0')
+
+	return bytes, nil
+
+}

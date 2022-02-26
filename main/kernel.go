@@ -64,9 +64,9 @@ func main() {
 
 	fmt.Println("aaa")
 
-	ss := "1997-11-12"
+	ss := "16:59:43.01"
 
-	bb, _ := DATEToBytes(ss)
+	bb, _ := TIMEToBytes(ss)
 
-	fmt.Println(BytesToDATE(bb))
+	fmt.Println(BytesToTIME(bb))
 }
