@@ -5,7 +5,6 @@ import (
 	"ZetaDB/storage"
 	. "ZetaDB/utility"
 	"fmt"
-	"os"
 	"sync"
 )
 
@@ -35,37 +34,11 @@ func main() {
 	fmt.Println(ASTToString(ast))
 
 	bf := storage.GetBufferPool()
-	bf.GetPageSize()
+	bf.GetDataPageSize()
 
-	///
-	var bytes []byte
-	s1 := "hello simeon kkkkkkkk abc ddd"
-	b := []byte(s1)
-	bytes = append(bytes, b...)
-	bytes[0] = 11
-	bytes[1] = 27
-	bytes[2] = 19
-	bytes[3] = 64
-	bytes[4] = 8
-	bytes[5] = 4
+	birth := "1997-11-12"
+	bytes, _ := DATEToBytes(birth)
 
-	f, err := os.Create(fileLocation)
-	if err != nil {
-		fmt.Println(fileLocation, err)
-		return
-	}
+	storage.BytesToFile(bytes, 12, DEFAULT_DATAFILE_LOCATION)
 
-	f.Write(bytes)
-
-	buffer := make([]byte, 2)
-	n, err := f.ReadAt(buffer, 1)
-	fmt.Println(n)
-	fmt.Println(buffer)
-
-	fmt.Println("aaa")
-
-	var x uint32 = 1231
-
-	bb := Uint32ToBytes(x)
-	fmt.Println(BytesToUint32(bb))
 }

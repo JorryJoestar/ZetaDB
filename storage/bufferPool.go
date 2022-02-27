@@ -1,22 +1,11 @@
 package storage
 
-import "sync"
-
-const (
-	//bytes per page
-	DEFAULT_PAGE_SIZE = 4096
-
-	//page number in dataBuffer
-	DEFAULT_DATA_BUFFER_SIZE = 500
-
-	//page number in indexBuffer
-	DEFAULT_INDEX_BUFFER_SIZE = 100
+import (
+	. "ZetaDB/utility"
+	"sync"
 )
 
 type bufferPool struct {
-
-	//bytes per page in this bufferpool
-	pageSize int
 
 	//head pages of 16 key tables, should be loaded into bufferpool when this bufferpool is initialised //
 	//k_userId_userName(userId INT PRIMARY KEY, userName VARCHAR(20))
@@ -87,6 +76,9 @@ type bufferPool struct {
 	//head page number 16, tableId 16
 	headPage_k_log dataPage
 
+	//bytes per page in this bufferpool
+	dataPageSize int
+
 	buffer []dataPage
 }
 
@@ -105,13 +97,13 @@ func GetBufferPool() *bufferPool {
 func InitialiseBufferPool() {
 	bp := GetBufferPool()
 
-	//assign page size
-	bp.pageSize = DEFAULT_PAGE_SIZE
+	//assign data page size
+	bp.dataPageSize = DEFAULT_DATAPAGE_SIZE
 }
 
 //pageSize getter
-func (bf *bufferPool) GetPageSize() int {
-	return bf.pageSize
+func (bf *bufferPool) GetDataPageSize() int {
+	return bf.dataPageSize
 }
 
 //fetch the corresponding page from buffer, if the page is not buffered, fetch it from disk
