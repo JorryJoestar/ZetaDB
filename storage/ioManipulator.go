@@ -124,3 +124,27 @@ func (ioM *IOManipulator) BytesFromIndexFile(pos uint32, len int) ([]byte, error
 
 	return bytes, nil
 }
+
+//make data file empty
+func (ioM *IOManipulator) EmptyDataFile() error {
+
+	//if data file already exists, empty it
+	f, err := os.Create(ioM.dataFileLocation)
+	if err != nil {
+		return err
+	}
+	ioM.dataFile = f
+	return nil
+}
+
+//make index file empty
+func (ioM *IOManipulator) EmptyIndexFile() error {
+
+	//if index file already exists, empty it
+	f, err := os.Create(ioM.indexFileLocation)
+	if err != nil {
+		return err
+	}
+	ioM.indexFile = f
+	return nil
+}

@@ -53,7 +53,7 @@ func main() {
 
 	iom.BytesToIndexFile(bytes, 10)
 
-	bytes, err = iom.BytesFromIndexFile(33, 1)
+	bytes, err = iom.BytesFromIndexFile(16, 1)
 
 	fmt.Println(bytes, err)
 
