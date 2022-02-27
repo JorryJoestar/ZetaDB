@@ -36,9 +36,25 @@ func main() {
 	bf := storage.GetBufferPool()
 	bf.GetDataPageSize()
 
-	birth := "1997-11-12"
-	bytes, _ := DATEToBytes(birth)
+	iom, err := storage.GetIOManipulator(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	storage.BytesToFile(bytes, 12, DEFAULT_DATAFILE_LOCATION)
+	ch := "k"
+	bytes, err := CHARToBytes(ch)
+
+	iom.BytesToIndexFile(bytes, 5)
+
+	ss := "this is woozie speaking"
+	bytes, err = VARCHARToBytes(ss)
+
+	fmt.Println(bytes)
+
+	iom.BytesToIndexFile(bytes, 10)
+
+	bytes, err = iom.BytesFromIndexFile(33, 1)
+
+	fmt.Println(bytes, err)
 
 }
