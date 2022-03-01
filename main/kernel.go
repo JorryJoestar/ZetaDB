@@ -56,5 +56,4 @@ func main() {
 	bytes, err = iom.BytesFromIndexFile(16, 1)
 
 	fmt.Println(bytes, err)
-
 }

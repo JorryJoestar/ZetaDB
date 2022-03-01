@@ -6,6 +6,9 @@ import (
 )
 
 type dataPage struct {
+	//mark used for evict policy
+	mark bool
+
 	//if this page is modified since it is fetched from file
 	modified bool
 
@@ -30,8 +33,24 @@ type dataPage struct {
 	tuples []tuple
 }
 
+//generate a new page from a byte slice
+//TODO
+func NewDataPageFromBytes(bytes []byte) (*dataPage, error) {
+	return nil, nil
+}
+
+//set mark to true
+func (dataPage *dataPage) MarkDataPage() {
+	dataPage.mark = true
+}
+
+//set mark to false
+func (dataPage *dataPage) UnmarkDataPage() {
+	dataPage.mark = false
+}
+
 //convert this dataPage into byte slice, ready to insert into file
-func (dataPage *dataPage) ToBytes() []byte {
+func (dataPage *dataPage) DataPageToBytes() []byte {
 	var bytes []byte
 
 	//pageId
