@@ -1,6 +1,6 @@
 package storage
 
-type tuple struct {
+type Tuple struct {
 	tableId uint32
 	pageId  uint32
 	tupleId uint32
@@ -9,7 +9,7 @@ type tuple struct {
 }
 
 //size of this tuple in bytes
-func (t *tuple) TupleSizeInBytes() int {
+func (t *Tuple) TupleSizeInBytes() int {
 	size := 4 //tupleId occupies 4 bytes
 
 	//byte number for isNull info
@@ -31,7 +31,7 @@ func (t *tuple) TupleSizeInBytes() int {
 }
 
 //convert this tuple into a series of bytes, ready to push into disk
-func (t *tuple) TupleToBytes() []byte {
+func (t *Tuple) TupleToBytes() []byte {
 
 	//slice to return
 	var bytes []byte
@@ -96,9 +96,9 @@ func (t *tuple) TupleToBytes() []byte {
 }
 
 //generate a tuple from bytes, need to know the schema
-func BytesToTuple(bytes []byte, s *schema) tuple {
+func BytesToTuple(bytes []byte, s *schema) Tuple {
 
-	t := tuple{}
+	t := Tuple{}
 	t.schema = s
 
 	//fetch tupleId
@@ -154,10 +154,10 @@ func BytesToTuple(bytes []byte, s *schema) tuple {
 	return t
 }
 
-func (t *tuple) GetTupleId() uint32 {
+func (t *Tuple) GetTupleId() uint32 {
 	return t.tupleId
 }
 
-func (t *tuple) SetPageId(id uint32) {
+func (t *Tuple) SetPageId(id uint32) {
 	t.pageId = id
 }

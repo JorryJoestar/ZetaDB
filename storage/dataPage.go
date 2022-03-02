@@ -1,6 +1,7 @@
 package storage
 
 import (
+	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
 )
@@ -30,7 +31,7 @@ type dataPage struct {
 	tupleNum uint32
 
 	//tuples in this page
-	tuples []tuple
+	tuples []Tuple
 }
 
 //generate a new page from a byte slice
@@ -95,7 +96,7 @@ func (dataPage *dataPage) VacantByteNum() int {
 	return DEFAULT_DATAPAGE_SIZE - dataPage.SizeInByte()
 }
 
-func (dataPage *dataPage) InsertTuple(tup tuple) error {
+func (dataPage *dataPage) InsertTuple(tup Tuple) error {
 
 	//check if there is enough space to insert
 	if tup.TupleSizeInBytes() > dataPage.VacantByteNum() {

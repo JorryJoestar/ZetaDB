@@ -20,13 +20,15 @@ type dataBuffer struct {
 	//fetch from systemParameter.go when this buffer is initiallized
 	dataBufferSize int
 
-	//
+	//fetch from systemParameter.go when this buffer is initiallized
 	dataPageSize int
 }
 
 //in order to fetch a dataBuffer, call this function
 func GetDataBuffer() *dataBuffer {
 	db := &dataBuffer{}
+	db.buffer = make(map[int]*dataPage)
+	db.mapper = make(map[uint32]int)
 	db.dataBufferSize = DEFAULT_DATA_BUFFER_SIZE
 	db.dataPageSize = DEFAULT_DATAPAGE_SIZE
 
@@ -38,7 +40,7 @@ func GetDataBuffer() *dataBuffer {
 	return db
 }
 
-//fetch a data page from data buffer by its pageId
+//fetch a data page from data buffer by its pageId, if it is not in buffer, fetch it from disk and buffer it
 //TODO
 func (db *dataBuffer) GetDataPageByPageId(pageId uint32, ioM *IOManipulator) (*dataPage, error) {
 
@@ -54,7 +56,7 @@ func (db *dataBuffer) GetDataPageByPageId(pageId uint32, ioM *IOManipulator) (*d
 		if newPageError != nil {
 			return nil, newPageError
 		}
-		db.InsertDataPage(newPage)
+		//db.InsertDataPage(newPage)
 		return newPage, nil
 	}
 
@@ -70,9 +72,9 @@ func (db *dataBuffer) GetDataPageByPageId(pageId uint32, ioM *IOManipulator) (*d
 //fetch a data page from data buffer by its bufferId
 func (db *dataBuffer) GetDataPageByBufferId(bufferId int) (*dataPage, error) {
 
-	page := db.buffer[bufferId]
+	page, err := db.buffer[bufferId]
 
-	if page == nil { //can not find corresponding page from buffer
+	if !err { //can not find corresponding page from buffer
 		return nil, errors.New("bufferId invalid")
 	}
 
@@ -82,8 +84,13 @@ func (db *dataBuffer) GetDataPageByBufferId(bufferId int) (*dataPage, error) {
 	return page, nil
 }
 
-//insert a data page into the buffer, then recording the mapping relation between pageId and buffer index
+//insert a data page into the buffer, notice the page is newly created so it need to be pushed into disk
 func (db *dataBuffer) InsertDataPage(*dataPage) error {
+	return nil
+}
+
+//delete a data page from the buffer, also delete it from the disk
+func (db *dataBuffer) DeleteDataPage() error {
 	return nil
 }
 

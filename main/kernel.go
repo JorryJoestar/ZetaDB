@@ -3,7 +3,8 @@ package main
 import (
 	"ZetaDB/parser"
 	"ZetaDB/storage"
-	. "ZetaDB/utility"
+
+	// . "ZetaDB/utility"
 	"fmt"
 	"sync"
 )
@@ -36,24 +37,4 @@ func main() {
 	bf := storage.GetBufferPool()
 	bf.GetDataPageSize()
 
-	iom, err := storage.GetIOManipulator(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	ch := "k"
-	bytes, err := CHARToBytes(ch)
-
-	iom.BytesToIndexFile(bytes, 5)
-
-	ss := "this is woozie speaking"
-	bytes, err = VARCHARToBytes(ss)
-
-	fmt.Println(bytes)
-
-	iom.BytesToIndexFile(bytes, 10)
-
-	bytes, err = iom.BytesFromIndexFile(16, 1)
-
-	fmt.Println(bytes, err)
 }
