@@ -30,7 +30,7 @@ func GetDataBuffer() *dataBuffer {
 	db.buffer = make(map[int]*dataPage)
 	db.mapper = make(map[uint32]int)
 	db.dataBufferSize = DEFAULT_DATA_BUFFER_SIZE
-	db.dataPageSize = DEFAULT_DATAPAGE_SIZE
+	db.dataPageSize = DEFAULT_PAGE_SIZE
 
 	//initialize the bufferSlots
 	for i := 1; i <= db.dataBufferSize; i++ {

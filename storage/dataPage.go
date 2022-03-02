@@ -93,7 +93,7 @@ func (dataPage *dataPage) SizeInByte() int {
 
 //return vacant byte number within this page
 func (dataPage *dataPage) VacantByteNum() int {
-	return DEFAULT_DATAPAGE_SIZE - dataPage.SizeInByte()
+	return DEFAULT_PAGE_SIZE - dataPage.SizeInByte()
 }
 
 func (dataPage *dataPage) InsertTuple(tup Tuple) error {
