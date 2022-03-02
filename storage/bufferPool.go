@@ -1,7 +1,6 @@
 package storage
 
 import (
-	. "ZetaDB/utility"
 	"sync"
 )
 
@@ -93,25 +92,83 @@ func GetBufferPool() *bufferPool {
 	return bpInstance
 }
 
-//initialise bufferpool before use after system boot
-func InitialiseBufferPool() {
-	bp := GetBufferPool()
-
-	//assign data page size
-	bp.dataPageSize = DEFAULT_DATAPAGE_SIZE
+//TODO
+//get a data page according to its pageId
+//if this page is modified, remember to swap it
+func (bp *bufferPool) GetDataPage(pageId uint32) (*dataPage, error) {
+	return nil, nil
 }
 
-//pageSize getter
-func (bf *bufferPool) GetDataPageSize() int {
-	return bf.dataPageSize
+//TODO
+//insert a newly created data page into buffer, but not swapped into disk
+//remember to swap it
+func (bp *bufferPool) InsertDataPage(*dataPage) error {
+	return nil
 }
 
-//fetch the corresponding page from buffer, if the page is not buffered, fetch it from disk
-func (bf *bufferPool) GetDataPage(pageId uint32) *dataPage {
-	p := &dataPage{}
-	return p
+//TODO
+//delete a data page according to its pageId, related page not swapped into disk
+//remember to swap related pages
+func (bp *bufferPool) DeleteDataPage(pageId uint32) error {
+	return nil
 }
 
-//swap a page to get empty slot in buffer
-func (bf *bufferPool) EvictDataPage() {
+//TODO
+//swap a data page into disk according to its pageId
+func (bp *bufferPool) SwapDataPage(pageId uint32) error {
+	return nil
+}
+
+//TODO
+//get an index page according to its pageId
+//if this page is modified, remember to swap it
+func (bp *bufferPool) GetIndexPage(pageId uint32) (*indexPage, error) {
+	return nil, nil
+}
+
+//TODO
+//insert a newly created index page into buffer, but not swapped into disk
+//remember to swap it
+func (bp *bufferPool) InsertIndexPage(*indexPage) error {
+	return nil
+}
+
+//TODO
+//delete an index page according to its pageId, related page not swapped into disk
+//remember to swap related pages
+func (bp *bufferPool) DeleteIndexPage(pageId uint32) error {
+	return nil
+}
+
+//TODO
+//swap an index page into disk according to its pageId
+func (bp *bufferPool) SwapIndexPage(pageId uint32) error {
+	return nil
+}
+
+//TODO
+//get a log page according to its pageId
+//if this page is modified, remember to swap it
+func (bp *bufferPool) GetLogPage(pageId uint32) (*logPage, error) {
+	return nil, nil
+}
+
+//TODO
+//insert a newly created log page into buffer, but not swapped into disk
+//remember to swap it
+func (bp *bufferPool) InsertLogPage(*logPage) error {
+	return nil
+}
+
+//TODO
+//delete a log page according to its pageId, related page not swapped into disk
+//remember to swap related pages
+func (bp *bufferPool) DeleteLogPage(pageId uint32) error {
+	return nil
+}
+
+//TODO
+//swap a log page into disk according to its pageId
+func (bp *bufferPool) SwapLogPage(pageId uint32) error {
+	return nil
 }
