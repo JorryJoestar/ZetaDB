@@ -140,7 +140,7 @@ func BytesToTuple(bytes []byte, s *Schema) Tuple {
 		}
 
 		//generate field from the first l bytes
-		f := BytesToField(bytes[:l])
+		f := NewFieldFromBytes(bytes[:l])
 
 		//update f isNull
 		if nullBytes[i/8]>>(i%8) == 1 {
