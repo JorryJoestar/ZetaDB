@@ -4,7 +4,7 @@ type Tuple struct {
 	tableId uint32
 	pageId  uint32
 	tupleId uint32
-	schema  *schema
+	schema  *Schema
 	fields  []field
 }
 
@@ -28,6 +28,11 @@ func (t *Tuple) TupleSizeInBytes() int {
 	}
 
 	return size
+}
+
+//return true if size of this tuple is fixed
+func (t *Tuple) TupleSizeFixed() bool {
+	return t.schema.UnfixedDomainNum() == 0
 }
 
 //convert this tuple into a series of bytes, ready to push into disk
@@ -96,7 +101,7 @@ func (t *Tuple) TupleToBytes() []byte {
 }
 
 //generate a tuple from bytes, need to know the schema
-func BytesToTuple(bytes []byte, s *schema) Tuple {
+func BytesToTuple(bytes []byte, s *Schema) Tuple {
 
 	t := Tuple{}
 	t.schema = s

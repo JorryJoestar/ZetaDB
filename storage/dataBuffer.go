@@ -1,6 +1,7 @@
 package storage
 
 import (
+	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
 )
@@ -42,7 +43,7 @@ func GetDataBuffer() *dataBuffer {
 
 //fetch a data page from data buffer by its pageId, if it is not in buffer, fetch it from disk and buffer it
 //TODO
-func (db *dataBuffer) GetDataPageByPageId(pageId uint32, ioM *IOManipulator) (*dataPage, error) {
+func (db *dataBuffer) GetDataPageByPageId(pageId uint32, schema *Schema, ioM *IOManipulator) (*dataPage, error) {
 
 	//fetch bufferId from mapper
 	bufferId, err1 := db.PageIdToBufferId(pageId)
@@ -52,7 +53,7 @@ func (db *dataBuffer) GetDataPageByPageId(pageId uint32, ioM *IOManipulator) (*d
 		if fileErr != nil {
 			return nil, fileErr
 		}
-		newPage, newPageError := NewDataPageFromBytes(pageBytes)
+		newPage, newPageError := NewDataPageFromBytes(pageBytes, schema)
 		if newPageError != nil {
 			return nil, newPageError
 		}
@@ -132,6 +133,6 @@ func (db *dataBuffer) BufferIdToPageId(bufferId int) (uint32, error) {
 	}
 
 	//get pageId from this dataPage
-	pageId := p.GetPageId()
+	pageId := p.DpGetPageId()
 	return pageId, nil
 }
