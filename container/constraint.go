@@ -11,6 +11,5 @@ const (
 	CONSTRAINT_CHECK       ConstraintEnum = 6
 )
 
-type constraint struct {
-
+type Constraint struct {
 }

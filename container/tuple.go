@@ -5,7 +5,7 @@ type Tuple struct {
 	pageId  uint32
 	tupleId uint32
 	schema  *Schema
-	fields  []field
+	fields  []*Field
 }
 
 //size of this tuple in bytes
@@ -13,10 +13,10 @@ func (t *Tuple) TupleSizeInBytes() int {
 	size := 4 //tupleId occupies 4 bytes
 
 	//byte number for isNull info
-	if t.schema.GetDomainNum()%8 == 0 {
-		size += t.schema.GetDomainNum() / 8
+	if t.schema.GetSchemaDomainNum()%8 == 0 {
+		size += t.schema.GetSchemaDomainNum() / 8
 	} else {
-		size += t.schema.GetDomainNum()/8 + 1
+		size += t.schema.GetSchemaDomainNum()/8 + 1
 	}
 
 	//for each field whose size is not fixed, length of 4 bytes is needed

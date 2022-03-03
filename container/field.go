@@ -4,19 +4,20 @@ import "errors"
 
 //store data of a particular field within a field
 //fields compose a tuple
-type field struct {
+type Field struct {
 	isNull bool
 	data   []byte
 }
 
 //generate a field from a series of bytes
-func NewFieldFromBytes(bytes []byte) (*field, error) {
+//throw error if bytes length is 0
+func NewFieldFromBytes(bytes []byte) (*Field, error) {
 
 	if len(bytes) == 0 {
 		return nil, errors.New("bytes length invalid")
 	}
 
-	f := &field{
+	f := &Field{
 		isNull: false,
 		data:   bytes}
 
@@ -24,9 +25,9 @@ func NewFieldFromBytes(bytes []byte) (*field, error) {
 }
 
 //generate a null field
-func NewNullField() *field {
+func NewNullField() *Field {
 
-	f := &field{
+	f := &Field{
 		isNull: true}
 
 	return f
@@ -34,7 +35,7 @@ func NewNullField() *field {
 }
 
 //length of field in bytes
-func (f *field) FieldLen() int {
+func (f *Field) FieldLen() int {
 
 	if f.isNull {
 		return 0
@@ -44,8 +45,8 @@ func (f *field) FieldLen() int {
 }
 
 //return data bytes that this field holds
-//if this field is null, throw error
-func (f *field) FieldToBytes() ([]byte, error) {
+//throw error if this field is null
+func (f *Field) FieldToBytes() ([]byte, error) {
 
 	if f.isNull {
 		return nil, errors.New("null field")
@@ -55,13 +56,13 @@ func (f *field) FieldToBytes() ([]byte, error) {
 }
 
 //return true if this field is null
-func (f *field) FieldIsNull() bool {
+func (f *Field) FieldIsNull() bool {
 
 	return f.isNull
 }
 
 //set this field to null, delete its data
-func (f *field) SetFieldNull() {
+func (f *Field) SetFieldNull() {
 
 	f.isNull = true
 	f.data = nil
