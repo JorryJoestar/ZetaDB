@@ -7,20 +7,20 @@ import (
 )
 
 /*
-									data page structure
-	-------------------------------------------------------------------------------------
-	|       pageId       |      tableId       |      pageType      |      tupleNum      |
-	-------------------------------------------------------------------------------------
-	|    priorPageId     |     nextPageId     |   linkPrePageId    |   linkNextPageId   |
-	-------------------------------------------------------------------------------------
-	|                    |                    |                    |                    |
-	-------------------------------------------------------------------------------------
-	|                    |                    |                    |                    |
-	-------------------------------------------------------------------------------------
-	|                    |                    |                    |                    |
-	-------------------------------------------------------------------------------------
-	|                    |                    |                    |                    |
-	-------------------------------------------------------------------------------------
+                             data page structure (in pageMode 0)
+	-------------------------------------------------------------------------------------   -
+	|       pageId       |      tableId       |      pageMode      |  tupleNum/dataSize |    | header
+	-------------------------------------------------------------------------------------    | part
+	|    priorPageId     |     nextPageId     |   linkPrePageId    |   linkNextPageId   |    |
+	-------------------------------------------------------------------------------------   -
+	|      length0       |                 tuple0                  |      length1       |    |
+	-------------------------------------------------------------------------------------    |
+	|      tuple1        |      length2       |                  tuple2                 |    | data
+	-------------------------------------------------------------------------------------    | part
+	|                              tuple2                          |         ...        |    |
+	-------------------------------------------------------------------------------------    |
+	|      lengthN       |      tupleN        |               vacant parts              |    |
+	-------------------------------------------------------------------------------------   -
 
 	<-------------------------------------16 bytes-------------------------------------->
 
@@ -31,21 +31,86 @@ import (
 
 	~tableId
 		-uint32, 4 bytes
-		-
+		-denote which table it belongs to
 
-	~pageType
+	~pageMode
+		-uint32, 4 bytes
+		-value 0:
+			-mode 0
+			-normal data pages, contain multiple tuples
+		-value 1:
+			-mode 1
+			-head of a list to store a tuple larger than DEFAULT_PAGE_SIZE - header(32bytes)
+		-value 2:
+			-mode 2
+			-non-head of a list to store a tuple larger than DEFAULT_PAGE_SIZE - header(32bytes)
 
-	~tupleNum
+	~tupleNum/dataSize
+		-int32, 4 bytes
+		-mode 0:
+			as tupleNum, stores tuple number within this page
+		-mode 1:
+			invalid, because data part of mode1 page is always full, but set to DEFAULT_PAGE_SIZE - header(32bytes) for safety
+		-mode 2:
+			as dataSize, stores data byte number in data part
 
 	~priorPageId
+		-uint32, 4 bytes
+		-invalid for mode 2
+		-pageId of prior page within the page
+		-if this.pageId == this.priorPageId, this page is the head page of table
 
 	~nextPageId
+		-uint32, 4 bytes
+		-invalid for mode 2
+		-pageId of next page within the page
+		-if this.pageId == this.nextPageId, this page is the tail page of table
 
 	~linkPrePageId
+		-uint32, 4 bytes
+		-invalid for mode 0
+		-pageId of previous page within the list to denote a large tuple
+		-if this.pageId == this.linkPrePageId, this page is the head page of list, and must be in mode 1
 
 	~linkNextPageId
+		-uint32, 4 bytes
+		-invalid for mode 0
+		-pageId of next page within the list to denote a large tuple
+		-if this.pageId == this.linkNextPageId, this page is the tail page of list, must be in mode 1 or 2
 
+	~data part
+		-mode 0
+			-lengthX
+				-int32, 4 bytes
+				-length of tuple X in bytes
+			-tupleX
+				-arbitary bytes
+				-data from TupleToBytes()
+		-mode 1 or 2
+			-data bytes of a large tuple
 
+	~relationship between pages
+
+		------------------------------------------- table --------------------------------------------->
+
+                   priorPageId            priorPageId           priorPageId                                 |
+		/-------\  <----------  /-------\ <---------- /-------\ <---------- /-------\ ... /-------\         |
+	/--	| mode0 |               | mode0 |             | mode1 |             | mode0 |     | mode0 | --\     |
+	|	\-------/  ---------->  \-------/ ----------> \-------/ ----------> \-------/ ... \-------/   |     |
+	|		/\      nextPageId             nextPageId  /\    |  nextPageId                   /\       |     |
+	\-------/                                          |     |                                \-------/     |
+	priorPageId                          linkPrePageId |     |  linkNextPageId               nextPageId
+                                                       |    \/                                              l
+                                                      /-------\                                             i
+                                                      | mode2 |                                             s
+                                                      \-------/                                             t
+                                           nextPageId  /\    |  nextPageId
+                                                       |     |                                              |
+	                                     linkPrePageId |     |  linkNextPageId                              |
+                                                       |    \/                                              |
+                                                      /-------\                                             |
+                                                      | mode2 |                                             |
+                                                      \-------/                                             \/
 */
 
 type dataPage struct {

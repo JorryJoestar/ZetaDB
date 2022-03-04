@@ -6,7 +6,7 @@ import (
 )
 
 /*
-                                  tuple structure in disk
+                                tuple structure in disk
 	---------------------------------------------------------------------------------
 	|| tupleId || isNull bytes || field1 | field2 | length3 | field3 | ... |fieldN ||
 	---------------------------------------------------------------------------------
