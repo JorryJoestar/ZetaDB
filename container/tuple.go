@@ -26,12 +26,18 @@ import (
 			 7  6  5  4  3  2  1  0        15 14 13 12 11 10 9  8
 		-field x is at byte x/8, index x%8 from low to high
 		-1 means null, 0 means not null
+		-space: see method TupleSizeOfIsNullBytes()
 
 	~fields and lengths
-		-if field length unfixed, length is need, and it is appended in front of the field
-		-
 
+		~length
+			-it is valid if this field is unfixed
+			-it is appended in front of the field data bytes
+			-int32, 4 bytes
 
+		~null fields
+			-length fixed: padding bytes are needed
+			-length unfixed: padding bytes are not needed, but set length to 0
 */
 
 type Tuple struct {
