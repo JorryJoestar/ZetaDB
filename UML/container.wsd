@@ -36,11 +36,30 @@ class Schema{
     +UnfixedDomainNum() int
     +GetSchemaTableName() string
     +GetSchemaDomains() []*Domain
+    +GetSchemaDomain(index int) (*Domain, error)
     +GetSchemaConstraints() []*Constraint
     +GetSchemaDomainNum() int
     +GetSchemaConstraintNum() int
 }
 
+class Tuple{
+    -tableId uint32
+	-pageId uint32
+	-tupleId uint32
+	-schema *Schema
+	-fields []*Field
+
+    +TupleSizeInBytes() int
+    +TupleSizeFixed() bool
+    +TupleToBytes() []byte
+    +BytesToTuple(bytes []byte, s *Schema) *Tuple
+    +GetTupleId() uint32
+    +SetPageId(id uint32)
+
+}
+
 Schema o-- Domain
+Tuple o-- Field
+Tuple *-- Schema
 
 @enduml

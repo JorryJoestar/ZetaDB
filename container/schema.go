@@ -53,6 +53,18 @@ func (s *Schema) GetSchemaDomains() []*Domain {
 	return s.domains
 }
 
+//single domain getter according to index
+//throw error if index is invalid
+func (s *Schema) GetSchemaDomain(index int) (*Domain, error) {
+
+	//throw error if index is invalid
+	if index >= s.GetSchemaDomainNum() {
+		return nil, errors.New("index invalid")
+	}
+
+	return s.domains[index], nil
+}
+
 //constraints getter
 func (s *Schema) GetSchemaConstraints() []*Constraint {
 	return s.constraints
