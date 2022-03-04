@@ -97,7 +97,7 @@ import (
         /-------\  <----------  /-------\ <---------- /-------\ <---------- /-------\ ... /-------\         |
     /--	| mode0 |               | mode0 |             | mode1 |             | mode0 |     | mode0 | --\     |
     |	\-------/  ---------->  \-------/ ----------> \-------/ ----------> \-------/ ... \-------/   |     |
-    |		/\      nextPageId             nextPageId  /\    |  nextPageId                   /\       |     |
+    |       /\      nextPageId             nextPageId  /\    |  nextPageId                   /\       |     |
     \-------/                                          |     |                                \-------/     |
     priorPageId                          linkPrePageId |     |  linkNextPageId               nextPageId
                                                        |    \/                                              l
