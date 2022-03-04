@@ -91,22 +91,22 @@ import (
 
 	~relationship between pages
 
-		------------------------------------------- table --------------------------------------------->
+        ------------------------------------------- table --------------------------------------------->
 
                    priorPageId            priorPageId           priorPageId                                 |
-		/-------\  <----------  /-------\ <---------- /-------\ <---------- /-------\ ... /-------\         |
-	/--	| mode0 |               | mode0 |             | mode1 |             | mode0 |     | mode0 | --\     |
-	|	\-------/  ---------->  \-------/ ----------> \-------/ ----------> \-------/ ... \-------/   |     |
-	|		/\      nextPageId             nextPageId  /\    |  nextPageId                   /\       |     |
-	\-------/                                          |     |                                \-------/     |
-	priorPageId                          linkPrePageId |     |  linkNextPageId               nextPageId
+        /-------\  <----------  /-------\ <---------- /-------\ <---------- /-------\ ... /-------\         |
+    /--	| mode0 |               | mode0 |             | mode1 |             | mode0 |     | mode0 | --\     |
+    |	\-------/  ---------->  \-------/ ----------> \-------/ ----------> \-------/ ... \-------/   |     |
+    |		/\      nextPageId             nextPageId  /\    |  nextPageId                   /\       |     |
+    \-------/                                          |     |                                \-------/     |
+    priorPageId                          linkPrePageId |     |  linkNextPageId               nextPageId
                                                        |    \/                                              l
                                                       /-------\                                             i
                                                       | mode2 |                                             s
                                                       \-------/                                             t
                                            nextPageId  /\    |  nextPageId
                                                        |     |                                              |
-	                                     linkPrePageId |     |  linkNextPageId                              |
+                                         linkPrePageId |     |  linkNextPageId                              |
                                                        |    \/                                              |
                                                       /-------\                                             |
                                                       | mode2 |                                             |
