@@ -6,7 +6,7 @@ import (
 )
 
 /*
-								tuple structure in disk
+                                  tuple structure in disk
 	---------------------------------------------------------------------------------
 	|| tupleId || isNull bytes || field1 | field2 | length3 | field3 | ... |fieldN ||
 	---------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ type Tuple struct {
 	tableId     uint32
 	tupleId     uint32
 	schema      *Schema
-	isNullBytes []byte
+	isNullBytes []byte //should not be used except to/from bytes
 	fields      []*Field
 }
 
@@ -235,6 +235,11 @@ func (t *Tuple) TupleGetTupleId() uint32 {
 	return t.tupleId
 }
 
+//tupleId setter
+func (t *Tuple) TupleSetTupleId(tupId uint32) {
+	t.tupleId = tupId
+}
+
 //tableId getter
 func (t *Tuple) TupleGetTableId() uint32 {
 	return t.tableId
@@ -242,29 +247,56 @@ func (t *Tuple) TupleGetTableId() uint32 {
 
 //get a field according to its index
 //throw error if index invalid
-func (t *Tuple) TupleGetFieldValue(index int) (*Field, error) {
+func (t *Tuple) TupleGetFieldValue(index int) ([]byte, error) {
 
 	//throw error if index invalid
 	if index >= t.schema.GetSchemaDomainNum() {
 		return nil, errors.New("index invalid")
 	}
 
-	return t.fields[index], nil
+	return t.fields[index].data, nil
 }
 
-//TODO
 //set value of a field according to its index
 //throw error if index invalid
 //throw error if input value bytes length is 0
 //throw error if input value bytes length unmatch corresponding domain
 func (t *Tuple) TupleSetFieldValue(data []byte, index int) error {
 
+	//throw error if index invalid
+	if index >= t.schema.GetSchemaDomainNum() {
+		return errors.New("index invalid")
+	}
+
+	//throw error if input value bytes length is 0
+	if len(data) == 0 {
+		return errors.New("data length invalid")
+	}
+
+	//throw error if input value bytes length unmatch corresponding domain
+	domain, _ := t.schema.GetSchemaDomain(index)
+	if !domain.DomainSizeUnfixed() { //domain size is fixed
+		domainSize, _ := domain.DomainSizeInBytes()
+		if domainSize != len(data) {
+			return errors.New("data length invalid")
+		}
+	}
+
+	t.fields[index].data = data
+
+	isNull, _ := t.TupleFieldIsNull(index)
+	if isNull {
+		t.fields[index].isNull = false
+		byteIndex := index / 8
+		inByteIndex := index % 8
+		var mask byte = 1 << inByteIndex
+		t.isNullBytes[byteIndex] = t.isNullBytes[byteIndex] - mask
+	}
 	return nil
 }
 
 //get fields
 func (t *Tuple) TupleGetFields() []*Field {
-	return t.fields
 	return t.fields
 }
 

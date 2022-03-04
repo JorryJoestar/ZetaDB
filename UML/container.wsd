@@ -53,8 +53,9 @@ class Tuple{
     +{static} NewTuple(tableId uint32, tupleId uint32, schema *Schema, fields []*Field) (*Tuple, error)
     +TupleToBytes() ([]byte, error)
     +TupleGetTupleId() uint32
+    +TupleSetTupleId(tupId uint32)
     +TupleGetTableId() uint32
-    +TupleGetFieldValue(index int) (*Field, error)
+    +TupleGetFieldValue(index int) ([]byte, error)
     +TupleSetFieldValue(data []byte, index int) error
     +TupleGetFields() []*Field
     +TupleFieldIsNull(index int) (bool, error)
@@ -64,8 +65,18 @@ class Tuple{
     +TupleSizeFixed() bool
 }
 
+class Table{
+    
+}
+
+class Constraint{
+
+}
+
 Schema o-- Domain
 Tuple o-- Field
 Tuple *-- Schema
+Table o-- Tuple
+Schema o-- Constraint
 
 @enduml
