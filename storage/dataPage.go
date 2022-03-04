@@ -6,6 +6,48 @@ import (
 	"errors"
 )
 
+/*
+									data page structure
+	-------------------------------------------------------------------------------------
+	|       pageId       |      tableId       |      pageType      |      tupleNum      |
+	-------------------------------------------------------------------------------------
+	|    priorPageId     |     nextPageId     |   linkPrePageId    |   linkNextPageId   |
+	-------------------------------------------------------------------------------------
+	|                    |                    |                    |                    |
+	-------------------------------------------------------------------------------------
+	|                    |                    |                    |                    |
+	-------------------------------------------------------------------------------------
+	|                    |                    |                    |                    |
+	-------------------------------------------------------------------------------------
+	|                    |                    |                    |                    |
+	-------------------------------------------------------------------------------------
+
+	<-------------------------------------16 bytes-------------------------------------->
+
+	~pageId
+		-uint32, 4 bytes
+		-unique within data.zdb
+		-physical address in data.zdb is (pageId * DEFAULT_PAGE_SIZE)
+
+	~tableId
+		-uint32, 4 bytes
+		-
+
+	~pageType
+
+	~tupleNum
+
+	~priorPageId
+
+	~nextPageId
+
+	~linkPrePageId
+
+	~linkNextPageId
+
+
+*/
+
 type dataPage struct {
 	//mark used for evict policy
 	//this value would not be saved into disk
@@ -33,7 +75,7 @@ type dataPage struct {
 	tupleNum int32
 
 	//tuples in this page
-	tuples []Tuple
+	tuples []*Tuple
 }
 
 //generate a new page from a byte slice

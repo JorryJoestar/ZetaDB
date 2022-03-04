@@ -1,0 +1,39 @@
+@startuml
+
+class dataPage {
+    -mark bool
+    -modified bool
+    -pageId uint32
+    -tableId uint32
+    -priorPageId uint32
+    -nextPageId uint32
+    -tupleNum int32
+    -tuples []*Tuple
+
+    +NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error)
+    +NewDataPage(pageid uint32, tableid uint32, priorPageid uint32, nextPageid uint32) *dataPage
+    +MarkDataPage()
+    +UnmarkDataPage()
+    +ModifyDataPage()
+    +UnmodifyDataPage()
+    +DataPageToBytes() []byte
+    +DpSizeInByte() int
+    +DpVacantByteNum() int
+    +InsertTuple(tup Tuple) error
+    +DpDeleteTuple(tupleId uint32) bool
+    +DpIsHeadPage() bool
+    +DpIsTailPage() bool
+    +DpGetPageId() uint32
+    +DpSetPageId(pageId uint32)
+    +DpGetDataTableId() uint32
+    +DpSetDataTableId(tableId uint32)
+    +DpGetPriorPageId() uint32
+    +DpSetPriorPageId(priorPageId uint32)
+    +DpGetNextPageId() uint32
+    +DpSetNextPageId(nextPageId uint32)
+    +DpGetTupleNum() int32
+    +DpSetTupleNum(tupleNum int32)
+}
+
+
+@enduml
