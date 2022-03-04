@@ -44,18 +44,24 @@ class Schema{
 
 class Tuple{
     -tableId uint32
-	-pageId uint32
 	-tupleId uint32
 	-schema *Schema
+    -isNullBytes []byte
 	-fields []*Field
 
+    +{static} NewTupleFromBytes(bytes []byte, s *Schema, tableId uint32) (*Tuple, error)
+    +{static} NewTuple(tableId uint32, tupleId uint32, schema *Schema, fields []*Field) (*Tuple, error)
+    +TupleToBytes() ([]byte, error)
+    +TupleGetTupleId() uint32
+    +TupleGetTableId() uint32
+    +TupleGetFieldValue(index int) (*Field, error)
+    +TupleSetFieldValue(data []byte, index int) error
+    +TupleGetFields() []*Field
+    +TupleFieldIsNull(index int) (bool, error)
+    +TupleSetFieldNull(index int) error
+    +TupleSizeOfIsNullBytes() int
     +TupleSizeInBytes() int
     +TupleSizeFixed() bool
-    +TupleToBytes() []byte
-    +BytesToTuple(bytes []byte, s *Schema) *Tuple
-    +GetTupleId() uint32
-    +SetPageId(id uint32)
-
 }
 
 Schema o-- Domain

@@ -246,6 +246,16 @@ func (t *Tuple) TupleGetFieldValue(index int) (*Field, error) {
 	return t.fields[index], nil
 }
 
+//TODO
+//set value of a field according to its index
+//throw error if index invalid
+//throw error if input value bytes length is 0
+//throw error if input value bytes length unmatch corresponding domain
+func (t *Tuple) TupleSetFieldValue(data []byte, index int) error {
+
+	return nil
+}
+
 //get fields
 func (t *Tuple) TupleGetFields() []*Field {
 	return t.fields
