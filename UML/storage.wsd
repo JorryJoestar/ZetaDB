@@ -67,5 +67,19 @@ class IOManipulator {
     +EmptyLogFile() error
 }
 
+class dataBuffer {
+    -buffer map[uint32]*dataPage
+    -mapper map[uint32]uint32
+    -bufferSlots []uint32
+    +{static} NewDataBuffer() *dataBuffer
+    +DataBufferFetchPage(pageId uint32) (*dataPage, error)
+    +DataBufferInsertDataPage(*dataPage) error
+    +DataBufferDeleteDataPage(pageId uint32) error
+    +DataBufferEvictDataPage() (*dataPage, error)
+    +DataBufferIsFull() bool
+    +DataBufferIsEmpty() bool
+}
+
+dataBuffer o-- dataPage
 
 @enduml
