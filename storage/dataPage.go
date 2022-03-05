@@ -448,6 +448,11 @@ func (dataPage *dataPage) UnmarkDataPage() {
 	dataPage.mark = false
 }
 
+//mark getter
+func (dataPage *dataPage) DataPageIsMarked() bool {
+	return dataPage.mark
+}
+
 //set modified to true
 func (dataPage *dataPage) ModifyDataPage() {
 	dataPage.modified = true
@@ -458,6 +463,12 @@ func (dataPage *dataPage) UnmodifyDataPage() {
 	dataPage.modified = false
 }
 
+//modified getter
+func (dataPage *dataPage) DataPageIsModified() bool {
+	return dataPage.modified
+}
+
+//return data page in bytes
 func (dataPage *dataPage) DpSizeInByte() int {
 	size := 0
 

@@ -23,8 +23,10 @@ class dataPage {
     +DataPageMode() uint32
     +MarkDataPage()
     +UnmarkDataPage()
+    +DataPageIsMarked() bool
     +ModifyDataPage()
     +UnmodifyDataPage()
+    +DataPageIsModified() bool
     +DpSizeInByte() int
     +DpVacantByteNum() int
     +InsertTuple(tup *Tuple) error
