@@ -166,12 +166,6 @@ type dataPage struct {
 func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 	dp := &dataPage{}
 
-	//set mark to true
-	dp.MarkDataPage()
-
-	//set page unmodified
-	dp.UnmodifyDataPage()
-
 	//set pageId
 	pageIdBytes := bytes[:4]
 	pageId, pIdErr := BytesToUint32(pageIdBytes)
@@ -286,6 +280,12 @@ func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 	} else if dp.pageMode == 2 { //else if mode = 2, set dataSize bytes to data
 		dp.data = bytes[:dp.dataSize]
 	}
+
+	//set mark to true
+	dp.MarkDataPage()
+
+	//set page unmodified
+	dp.UnmodifyDataPage()
 
 	return dp, nil
 }
@@ -430,11 +430,16 @@ func (dataPage *dataPage) DataPageToBytes() ([]byte, error) {
 
 //return mode
 func (dataPage *dataPage) DataPageMode() uint32 {
+
+	//mark this page
+	dataPage.MarkDataPage()
+
 	return dataPage.pageMode
 }
 
 //set mark to true
 func (dataPage *dataPage) MarkDataPage() {
+
 	dataPage.mark = true
 }
 
@@ -476,11 +481,15 @@ func (dataPage *dataPage) DpSizeInByte() int {
 		size += int(dataPage.dataSize)
 	}
 
+	dataPage.MarkDataPage()
+
 	return size
 }
 
 //return vacant byte number within this page
 func (dataPage *dataPage) DpVacantByteNum() int {
+	dataPage.MarkDataPage()
+
 	return DEFAULT_PAGE_SIZE - dataPage.DpSizeInByte()
 }
 
@@ -561,17 +570,20 @@ func (dataPage *dataPage) DpIsHeadPage() (bool, error) {
 		return false, errors.New("invalid page mode")
 	}
 
+	dataPage.MarkDataPage()
+
 	return dataPage.pageId == dataPage.priorPageId, nil
 }
 
 //check if this page is a tail page
 //throw error if mode is 2
 func (dataPage *dataPage) DpIsTailPage() (bool, error) {
-
 	//if mode is 2, this method is invalid
 	if dataPage.pageMode == 2 {
 		return false, errors.New("invalid page mode")
 	}
+
+	dataPage.MarkDataPage()
 
 	return dataPage.pageId == dataPage.nextPageId, nil
 }
@@ -584,6 +596,8 @@ func (dataPage *dataPage) DpIsListHeadPage() (bool, error) {
 		return false, errors.New("invalid page mode")
 	}
 
+	dataPage.MarkDataPage()
+
 	return dataPage.linkPrePageId == dataPage.pageId, nil
 }
 
@@ -595,17 +609,20 @@ func (dataPage *dataPage) DpIsListTailPage() (bool, error) {
 		return false, errors.New("invalid page mode")
 	}
 
+	dataPage.MarkDataPage()
+
 	return dataPage.linkNextPageId == dataPage.pageId, nil
 }
 
 //pageId getter
 func (dataPage *dataPage) DpGetPageId() uint32 {
+	dataPage.MarkDataPage()
+
 	return dataPage.pageId
 }
 
 //tableId getter
 func (dataPage *dataPage) DpGetTableId() uint32 {
-
 	dataPage.MarkDataPage()
 
 	return dataPage.tableId
@@ -677,6 +694,8 @@ func (dataPage *dataPage) DpGetLinkPrePageId() (uint32, error) {
 		return dataPage.pageId, errors.New("invalid page mode")
 	}
 
+	dataPage.MarkDataPage()
+
 	return dataPage.linkPrePageId, nil
 }
 
@@ -687,6 +706,9 @@ func (dataPage *dataPage) DpSetLinkPrePageId(linkPrePageId uint32) error {
 	if dataPage.pageMode == 0 {
 		return errors.New("invalid page mode")
 	}
+
+	dataPage.MarkDataPage()
+	dataPage.ModifyDataPage()
 
 	dataPage.linkPrePageId = linkPrePageId
 
@@ -701,6 +723,8 @@ func (dataPage *dataPage) DpGetLinkNextPageId() (uint32, error) {
 		return dataPage.pageId, errors.New("invalid page mode")
 	}
 
+	dataPage.MarkDataPage()
+
 	return dataPage.linkNextPageId, nil
 }
 
@@ -711,6 +735,9 @@ func (dataPage *dataPage) DpSetLinkNextPageId(linkNextPageId uint32) error {
 	if dataPage.pageMode == 0 {
 		return errors.New("invalid page mode")
 	}
+
+	dataPage.MarkDataPage()
+	dataPage.ModifyDataPage()
 
 	dataPage.linkNextPageId = linkNextPageId
 	return nil
