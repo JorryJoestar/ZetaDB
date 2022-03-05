@@ -5,10 +5,15 @@ class dataPage {
     -modified bool
     -pageId uint32
     -tableId uint32
+    -pageMode uint32
+    -tupleNum int32
+    -dataSize int32
     -priorPageId uint32
     -nextPageId uint32
-    -tupleNum int32
+    -linkPrePageId uint32
+    -linkNextPageId uint32
     -tuples []*Tuple
+    -data []byte
 
     +NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error)
     +NewDataPage(pageid uint32, tableid uint32, priorPageid uint32, nextPageid uint32) *dataPage
@@ -33,6 +38,27 @@ class dataPage {
     +DpSetNextPageId(nextPageId uint32)
     +DpGetTupleNum() int32
     +DpSetTupleNum(tupleNum int32)
+}
+
+class IOManipulator {
+    -dataFileLocation string
+    -indexFileLocation string
+    -logFileLocation string
+    -dataFile *os.File
+    -indexFile *os.File
+    -logFile *os.File
+
+    +{static} GetIOManipulator(dfl string, ifl string, lfl string) (*IOManipulator, error)
+    +CloseIOM() error
+    +BytesToDataFile(bytes []byte, pos uint32) error
+    +BytesToIndexFile(bytes []byte, pos uint32) error
+    +BytesToLogFile(bytes []byte, pos uint32) error
+    +BytesFromDataFile(pos uint32, len int) ([]byte, error)
+    +BytesFromIndexFile(pos uint32, len int) ([]byte, error)
+    +BytesFromLogFile(pos uint32, len int) ([]byte, error)
+    +EmptyDataFile() error
+    +EmptyIndexFile() error
+    +EmptyLogFile() error
 }
 
 

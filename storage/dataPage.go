@@ -128,23 +128,41 @@ type dataPage struct {
 	//id of table which this page belongs to
 	tableId uint32
 
+	//mode of this page
+	pageMode uint32
+
+	//number of tuples in this page, valid for mode 0
+	tupleNum int32
+
+	//byte number of data in this page, valid for mode 2
+	dataSize int32
+
 	//id of prior page
 	//if priorPageId == pageId, this page is a head page
+	//invalid for mode 2
 	priorPageId uint32
 
 	//id of next page
 	//if nextPageId == pageId, this page is a tail page
+	//invalid for mode 2
 	nextPageId uint32
 
-	//number of tuples in this page
-	tupleNum int32
+	//pageId of previous page within the list to denote a large tuple
+	//invalid for mode 0
+	linkPrePageId uint32
 
-	//tuples in this page
+	//pageId of next page within the list to denote a large tuple
+	//invalid for mode 0
+	linkNextPageId uint32
+
+	//tuples in this page, valid for mode 0
 	tuples []*Tuple
+
+	//part of data bytes of a large tuple, valid for mode 1 and 2
+	data []byte
 }
 
 //generate a new page from a byte slice
-//TODO
 func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 	dp := &dataPage{}
 
@@ -154,7 +172,7 @@ func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 	if pIdErr != nil {
 		return nil, pIdErr
 	}
-	dp.DpSetPageId(pageId)
+	dp.pageId = pageId
 	bytes = bytes[4:]
 
 	//set tableId
@@ -163,48 +181,104 @@ func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 	if tIdErr != nil {
 		return nil, tIdErr
 	}
-	dp.DpSetDataTableId(tableId)
+	dp.tableId = tableId
 	bytes = bytes[4:]
 
-	//set priorPageId
-	priorPageIdBytes := bytes[:4]
-	priorPageId, priErr := BytesToUint32(priorPageIdBytes)
-	if priErr != nil {
-		return nil, priErr
+	//set pageMode
+	pageModeBytes := bytes[:4]
+	pageMode, pmErr := BytesToUint32(pageModeBytes)
+	if pmErr != nil {
+		return nil, pmErr
 	}
-	dp.DpSetPriorPageId(priorPageId)
+	dp.pageMode = pageMode
 	bytes = bytes[4:]
 
-	//set nextPageId
-	nextPageIdBytes := bytes[:4]
-	nextPageId, npiErr := BytesToUint32(nextPageIdBytes)
-	if npiErr != nil {
-		return nil, npiErr
-	}
-	dp.DpSetNextPageId(nextPageId)
-	bytes = bytes[4:]
-
-	//set tupleNum
-	tupleNumBytes := bytes[:4]
-	tupleNum, tupErr := BytesToINT(tupleNumBytes)
-	if tupErr != nil {
-		return nil, tupErr
-	}
-	dp.DpSetTupleNum(tupleNum)
-	bytes = bytes[4:]
-
-	for i := 0; i < int(dp.DpGetTupleNum()); i++ {
-		tupleLenBytes := bytes[:4]
-		bytes = bytes[4:]
-
-		tupleLen, lenErr := BytesToINT(tupleLenBytes)
-		if lenErr != nil {
-			return nil, lenErr
+	//set tupleNum/dataSize
+	if dp.pageMode == 0 { //if mode = 0, set tupleNum
+		tupleNumBytes := bytes[:4]
+		tupleNum, tnErr := BytesToINT(tupleNumBytes)
+		if tnErr != nil {
+			return nil, tnErr
 		}
+		dp.tupleNum = tupleNum
+	} else if dp.pageMode == 2 { //else if mode = 2, set dataSize
+		dataSizeBytes := bytes[:4]
+		dataSize, dsErr := BytesToINT(dataSizeBytes)
+		if dsErr != nil {
+			return nil, dsErr
+		}
+		dp.dataSize = dataSize
+	}
+	bytes = bytes[4:] //no matter which mode, delete 4 bytes
 
-		tupleDataBytes := bytes[:tupleLen]
-		newTuple := BytesToTuple(tupleDataBytes, schema)
-		dp.tuples = append(dp.tuples, newTuple)
+	//if mode != 2, set priorPageId
+	if dp.pageMode != 2 {
+		priorPageIdBytes := bytes[:4]
+		priorPageId, priErr := BytesToUint32(priorPageIdBytes)
+		if priErr != nil {
+			return nil, priErr
+		}
+		dp.DpSetPriorPageId(priorPageId)
+	}
+	bytes = bytes[4:] //no matter which mode, delete 4 bytes
+
+	//if mode != 2, set nextPageId
+	if dp.pageMode != 2 {
+		nextPageIdBytes := bytes[:4]
+		nextPageId, npiErr := BytesToUint32(nextPageIdBytes)
+		if npiErr != nil {
+			return nil, npiErr
+		}
+		dp.DpSetNextPageId(nextPageId)
+	}
+	bytes = bytes[4:] //no matter which mode, delete 4 bytes
+
+	//if mode != 0, set linkPrePageId
+	if dp.pageMode != 0 {
+		linkPrePageIdBytes := bytes[:4]
+		linkPrePageId, lppErr := BytesToUint32(linkPrePageIdBytes)
+		if lppErr != nil {
+			return nil, lppErr
+		}
+		dp.linkPrePageId = linkPrePageId
+
+	}
+	bytes = bytes[4:] //no matter which mode, delete 4 bytes
+
+	//if mode != 0, set linkNextPageId
+	if dp.pageMode != 0 {
+		linkNextPageIdBytes := bytes[:4]
+		linkNextPageId, lnpErr := BytesToUint32(linkNextPageIdBytes)
+		if lnpErr != nil {
+			return nil, lnpErr
+		}
+		dp.linkNextPageId = linkNextPageId
+	}
+	bytes = bytes[4:] //no matter which mode, delete 4 bytes
+
+	//set fields or data
+	if dp.pageMode == 0 { //if mode = 0, set fields
+		for i := 0; i < int(dp.DpGetTupleNum()); i++ {
+			tupleLenBytes := bytes[:4]
+			bytes = bytes[4:]
+
+			tupleLen, lenErr := BytesToINT(tupleLenBytes)
+			if lenErr != nil {
+				return nil, lenErr
+			}
+
+			tupleDataBytes := bytes[:tupleLen]
+			newTuple, ntErr := NewTupleFromBytes(tupleDataBytes, schema, dp.DpGetDataTableId())
+			if ntErr != nil {
+				return nil, ntErr
+			}
+			dp.tuples = append(dp.tuples, newTuple)
+		}
+	} else if dp.pageMode == 1 { //else if mode = 1,set remain bytes to data
+		dp.data = bytes
+
+	} else if dp.pageMode == 2 { //else if mode = 2, set dataSize bytes to data
+		dp.data = bytes[:dp.dataSize]
 	}
 
 	return dp, nil
