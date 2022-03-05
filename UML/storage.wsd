@@ -15,29 +15,35 @@ class dataPage {
     -tuples []*Tuple
     -data []byte
 
-    +NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error)
-    +NewDataPage(pageid uint32, tableid uint32, priorPageid uint32, nextPageid uint32) *dataPage
+    +{static} NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error)
+    +{static} NewDataPageMode0(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32) *dataPage
+    +{static} NewDataPageMode1(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32, linkNextPageId uint32, data []byte) *dataPage
+    +{static} NewDataPageMode2(pageId uint32, tableId uint32, dataSize int32, linkPrePageId uint32, linkNextPageId uint32, data []byte) *dataPage
+    +DataPageToBytes() ([]byte, error)
+    +DataPageMode() uint32
     +MarkDataPage()
     +UnmarkDataPage()
     +ModifyDataPage()
     +UnmodifyDataPage()
-    +DataPageToBytes() []byte
     +DpSizeInByte() int
     +DpVacantByteNum() int
-    +InsertTuple(tup Tuple) error
+    +InsertTuple(tup *Tuple) error
     +DpDeleteTuple(tupleId uint32) bool
-    +DpIsHeadPage() bool
-    +DpIsTailPage() bool
+    +DpIsHeadPage() (bool, error)
+    +DpIsTailPage() (bool, error)
+    +DpIsListHeadPage() (bool, error)
+    +DpIsListTailPage() (bool, error)
     +DpGetPageId() uint32
-    +DpSetPageId(pageId uint32)
-    +DpGetDataTableId() uint32
-    +DpSetDataTableId(tableId uint32)
-    +DpGetPriorPageId() uint32
-    +DpSetPriorPageId(priorPageId uint32)
-    +DpGetNextPageId() uint32
+    +DpGetTableId() uint32
+    +DpGetPriorPageId() (uint32, error)
+    +DpSetPriorPageId(priorPageId uint32) error
+    +DpGetNextPageId() (uint32, error)
     +DpSetNextPageId(nextPageId uint32)
+    +DpGetLinkPrePageId() (uint32, error)
+    +DpSetLinkPrePageId(linkPrePageId uint32) error
+    +DpGetLinkNextPageId() (uint32, error)
+    +DpSetLinkNextPageId(linkNextPageId uint32) error
     +DpGetTupleNum() int32
-    +DpSetTupleNum(tupleNum int32)
 }
 
 class IOManipulator {
