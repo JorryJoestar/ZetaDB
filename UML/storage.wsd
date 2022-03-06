@@ -82,6 +82,41 @@ class dataBuffer {
     +DataBufferIsEmpty() bool
 }
 
-dataBuffer o-- dataPage
+class storageEngine {
+
+}
+
+class indexBuffer {
+
+}
+
+class indexPage {
+
+}
+
+class logPage {
+
+}
+
+class log {
+    -fileMode int32
+	-logPageId uint32
+	-objectPageId uint32
+    +{static} NewLog(fileMode int32, logPageId uint32, objectPageId uint32) *log
+    +{static} NewLogFromBytes(bytes []byte) (*log, error)
+    +LogToBytes() []byte
+    +LogGetFileMode() int32
+    +LogGetlogPageId() uint32
+    +LogGetobjectPageId() uint32
+}
+
+storageEngine *-down- IOManipulator
+storageEngine *-left- dataBuffer
+dataBuffer o-left- dataPage
+storageEngine *-right- indexBuffer
+indexBuffer o-right- indexPage
+logPage o-- log
+
+
 
 @enduml

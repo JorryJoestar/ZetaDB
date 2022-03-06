@@ -163,7 +163,13 @@ type dataPage struct {
 }
 
 //generate a new page from a byte slice
+//throw error if byte slice length invalid
 func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
+	//throw error if byte slice length invalid
+	if len(bytes) != DEFAULT_PAGE_SIZE {
+		return nil, errors.New("bytes length invalid")
+	}
+
 	dp := &dataPage{}
 
 	//set pageId
