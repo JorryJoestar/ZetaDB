@@ -107,17 +107,28 @@ func (db *dataBuffer) DataBufferDeleteDataPage(pageId uint32) error {
 	//delete mapping relation from mapper
 	delete(db.mapper, pageId)
 
-	//delete bufferId from bufferIds
+	//delete bufferId from bufferIds, update evict pointer
 	for i, v := range db.bufferIds {
 		//find the bufferId
 		if v == bufferId {
-			if i == len(db.bufferIds)-1 {
+			//update evictPointer
+			if len(db.bufferIds) == 1 { //after deleting, this buffer is empty
+				db.evictPointer = -1
+			} else if i == db.evictPointer && i == len(db.bufferIds)-1 {
+				//pointer points to the id that ready to delete, and the id is the last one
+				db.evictPointer = 0
+			} else if db.evictPointer > i { //ecivtPointer is affected
+				db.evictPointer = db.evictPointer - 1
+			}
+
+			if i == len(db.bufferIds)-1 { //last one of bufferIds
 				db.bufferIds = db.bufferIds[:i]
-			} else if i == 0 {
+			} else if i == 0 { //first one of bufferIds
 				db.bufferIds = db.bufferIds[1:]
-			} else {
+			} else { //in the middle
 				db.bufferIds = append(db.bufferIds[:i], db.bufferIds[i+1:]...)
 			}
+			break
 		}
 	}
 
@@ -136,53 +147,61 @@ func (db *dataBuffer) DataBufferEvictDataPage() (*dataPage, error) {
 		return nil, errors.New("this buferr is not full")
 	}
 
-	//if this is the first evict since system boost, initialize evictPointer to 0
+	//if this is the first evict since last time the buffer is empty, initialize evictPointer to 0
 	if db.evictPointer == -1 {
 		db.evictPointer = 0
 	}
 
 	//remember turn ending position
-	oldPointer := db.evictPointer
+	endPointer := 0
+	if db.evictPointer == 0 {
+		endPointer = len(db.bufferIds) - 1
+	} else {
+		endPointer = db.evictPointer - 1
+	}
 
 	//first turn, find out the first (unmarked,unmodified), unmark all witnessed (marked,unmodified)
-	db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE
-	for ; oldPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE {
-		if db.buffer[db.evictPointer].DataPageIsMarked() && !db.buffer[db.evictPointer].DataPageIsModified() {
+	for ; endPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds) {
+		page := db.buffer[db.evictPointer]
+		if page.DataPageIsMarked() && !page.DataPageIsModified() {
 			//if current page is (marked,unmodified), unmark it
-			db.buffer[db.evictPointer].MarkDataPage()
-		} else if !db.buffer[db.evictPointer].DataPageIsMarked() && !db.buffer[db.evictPointer].DataPageIsModified() {
+			page.UnmarkDataPage()
+		} else if !page.DataPageIsMarked() && !page.DataPageIsModified() {
 			//find the first (unmarked,unmodified), return it
-			return db.buffer[db.evictPointer], nil
+			return page, nil
 		}
 	}
 
 	//second turn, find out the first (marked,unmodified)
-	db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE
-	for ; oldPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE {
+	db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds)
+	for ; endPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds) {
+		page := db.buffer[db.evictPointer]
 		//(marked,unmodified) are all set to (unmarked,unmodified) in the previous turn
-		if !db.buffer[db.evictPointer].DataPageIsMarked() && !db.buffer[db.evictPointer].DataPageIsModified() {
-			return db.buffer[db.evictPointer], nil
+		if !page.DataPageIsMarked() && !page.DataPageIsModified() {
+			return page, nil
 		}
 	}
 
 	//third turn, find out the first (unmarked, modified), unmark all witnessed (marked, modified)
-	db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE
-	for ; oldPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE {
-		if db.buffer[db.evictPointer].DataPageIsMarked() {
+	db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds)
+	for ; endPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds) {
+		page := db.buffer[db.evictPointer]
+		if page.DataPageIsMarked() {
 			//if current page is (marked,modified), unmark it
-			db.buffer[db.evictPointer].MarkDataPage()
-		} else if !db.buffer[db.evictPointer].DataPageIsMarked() {
+			page.UnmarkDataPage()
+		} else if !page.DataPageIsMarked() {
 			//find the first(unmarked,modified), return it
-			return db.buffer[db.evictPointer], nil
+			return page, nil
 		}
 	}
 
 	//forth turn, find out the first (marked, modified)
-	db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE
-	for ; oldPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % DEFAULT_DATA_BUFFER_SIZE {
+	db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds)
+	for ; endPointer != db.evictPointer; db.evictPointer = (db.evictPointer + 1) % len(db.bufferIds) {
+		page := db.buffer[db.evictPointer]
 		//(marked,modified) are all set to (unmarked,modified) in the previous turn
-		if !db.buffer[db.evictPointer].DataPageIsMarked() {
-			return db.buffer[db.evictPointer], nil
+		if !page.DataPageIsMarked() {
+			return page, nil
 		}
 	}
 

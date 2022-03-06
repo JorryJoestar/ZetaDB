@@ -33,4 +33,8 @@ func main() {
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
 
+	k := make([]int, 0)
+	k = append(k, 1)
+	k = k[1:]
+	fmt.Println(k)
 }
