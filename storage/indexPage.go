@@ -31,15 +31,15 @@ package storage
 	~elementType
 		-type of elements in this page
 		-mapping:        type           elementType           elementLength
-                    CHAR                    1                      1
-                    INT                     2                      4
-                    INTEGER                 3                      4
-                    SHORTINT                4                      2
-                    FLOAT                   5                      4
-                    REAL                    6                      4
-                    DOUBLEPRECISION         7                      8
-                    DATE                    8                      4
-                    TIME                    9                      4
+		            CHAR                    1                      1
+		            INT                     2                      4
+		            INTEGER                 3                      4
+		            SHORTINT                4                      2
+		            FLOAT                   5                      4
+		            REAL                    6                      4
+		            DOUBLEPRECISION         7                      8
+		            DATE                    8                      4
+		            TIME                    9                      4
 
 	~elementNum
 		valid element number in this page at present
