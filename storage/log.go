@@ -29,13 +29,19 @@ type log struct {
 }
 
 //create a new log
-func NewLog(fileMode int32, logPageId uint32, objectPageId uint32) *log {
+//throw error if fileMode is not 1 or 2
+func NewLog(fileMode int32, logPageId uint32, objectPageId uint32) (*log, error) {
+	//throw error if fileMode is not 1 or 2
+	if fileMode != 1 && fileMode != 2 {
+		return nil, errors.New("fileMode invalid")
+	}
+
 	l := &log{
 		fileMode:     fileMode,
 		logPageId:    logPageId,
 		objectPageId: objectPageId}
 
-	return l
+	return l, nil
 }
 
 //create a new log from bytes
