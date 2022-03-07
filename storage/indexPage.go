@@ -1,7 +1,7 @@
 package storage
 
 /*
-                           index page mode 1, internal node
+                             index page mode 1, internal node
    -------------------------------------------------------------------------------------
    |    indexPageId     |        mode        |     elementType    |    elementNum      |
    -------------------------------------------------------------------------------------
@@ -26,9 +26,11 @@ package storage
 		-physical address: indexPageId * DEFAULT_PAGE_SIZE
 
 	~mode
-		1: this is an internal node (could be a root node)
+		-uint32, 4 bytes
+		-1: this is an internal node (could be a root node)
 
 	~elementType
+		-uint32, 4 bytes
 		-type of elements in this page
 		-mapping:        type           elementType           elementLength
 		            CHAR                    1                      1
@@ -42,13 +44,15 @@ package storage
 		            TIME                    9                      4
 
 	~elementNum
-		valid element number in this page at present
+		-int32, 4 bytes
+		-valid element number in this page at present
 
 	~element X
 		value of element X
 
 	~pointerPageId X
-		pointer to an index page whose value >= element X-1 and < element X
+		-uint32, 4 bytes
+		-pointer to an index page whose value >= element X and < element X+1
 
 
                                index page mode 2, leaf node
@@ -76,33 +80,43 @@ package storage
 		pointer to an indexPage mode 3, for duplicated tuples
 
 	~record type X
-		-int32, 4 bytes
+		-uint8, 1 byte
 		1: index/dataPageId X is pointer to an indexPage mode 1
-		2: index/dataPageId X is pointer to a dataPage in data file
 		3: index/dataPageId X is pointer to an indexPage mode 3
+		4: index/dataPageId X is pointer to a dataPage in data file
 
 
                            index page mode 3, duplicated node
    -------------------------------------------------------------------------------------
-   |    indexPageId     |        mode        |     elementType    |    elementNum      |
+   |    indexPageId     |        mode        |     elementType    |   dataPageIdNum    |
    -------------------------------------------------------------------------------------
-   |     element a      |    dataPageNum a   |    dataPageId a0   |   dataPageId a1    |
+   |     prePageId      |     nextPageId     |    dataPageId 0    |   dataPageId 1     |
    -------------------------------------------------------------------------------------
-   |   dataPageId a2    |     element b      |   dataPageNum b    |   dataPageId b0    |
+   |    dataPageId 2    |    dataPageId 3    |    dataPageId 4    |    dataPageId 5    |
+   -------------------------------------------------------------------------------------
+   |    dataPageId 6    |    dataPageId 7    |    dataPageId 8    |    dataPageId 9    |
    -------------------------------------------------------------------------------------
    |                                    . . . . . .                                    |
    -------------------------------------------------------------------------------------
-   |     element x      |   dataPageNum x    |   dataPageId x0    |   dataPageId x1    |
+   |    dataPageId N-1  |                         padding bytes                        |
    -------------------------------------------------------------------------------------
 
 	~mode
 		3: this is a duplicated node
 
-	~dataPageNum x
+	~dataPageIdNum
 		-int32, 4 bytes
-		-number of dataPages that contain element x
+		-pageId number in this node
 
-	~dataPageId xn
+	~prePageId
+		-uint32, 4 bytes
+		-pageId of previous page that is duplicated node containing related tuples
+
+	~nextPageId
+		-uint32, 4 bytes
+		-pageId of next page that is duplicated node containing related tuples
+
+	~dataPageId
 		pageId in data file which contains element x
 
 */
