@@ -73,7 +73,7 @@ package storage
    -------------------------------------------------------------------------------------
 
 	~mode
-		2: this is a leaf node
+		2: this is a leaf node (could be a root node)
 
 	~prePageId
 		-uint32, 4 bytes
@@ -155,43 +155,20 @@ type indexPage struct {
 	dataPageIds   []uint32 //valid for mode 3
 }
 
+//create indexPage
+func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPage, error) {
+	return nil, nil
+}
+
 //create indexPage from bytes
 //throw error if bytes length invalid
 func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 	return nil, nil
 }
 
-//create indexPage
-func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPage, error) {
-	return nil, nil
-}
-
 //convert this index page to byte slice, ready to push into disk
 func (ip *indexPage) IndexPageToBytes() []byte {
 	return nil
-}
-
-//search the next layer, return indexPageId of the corresponding next layer node
-//throw error if this page is not an internal node
-//throw error if elementValue byte length is invalid
-func (ip *indexPage) IndexPageInternalSearch(elementValue []byte) (uint32, error) {
-	return 0, nil
-}
-
-//search related record according to elementValue, return index/dataPageId and recordType
-//throw error if this page is not a leaf node
-//throw error if elementValue byte number is invalid
-//throw error if no element meets requirement
-func (ip *indexPage) IndexPageLeafSearch(elementValue []byte) (uint32, uint8, error) {
-	return 0, 0, nil
-}
-
-//search related dataPageIds
-//return nextPageId
-//if there is a next duplicated page, return true, else return false
-//throw error if this page is not a duplicated node
-func (ip *indexPage) IndexPageDuplicatedSearch() ([]uint32, uint32, bool, error) {
-	return nil, 0, false, nil
 }
 
 //indexPageId getter

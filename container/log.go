@@ -25,7 +25,7 @@ import (
 		-the id where this snapshot page should be stored at
 */
 
-type log struct {
+type Log struct {
 	fileMode     uint8
 	logPageId    uint32
 	objectPageId uint32
@@ -33,13 +33,13 @@ type log struct {
 
 //create a new log
 //throw error if fileMode is not 1 or 2
-func NewLog(fileMode uint8, logPageId uint32, objectPageId uint32) (*log, error) {
+func NewLog(fileMode uint8, logPageId uint32, objectPageId uint32) (*Log, error) {
 	//throw error if fileMode is not 1 or 2
 	if fileMode != 1 && fileMode != 2 {
 		return nil, errors.New("fileMode invalid")
 	}
 
-	l := &log{
+	l := &Log{
 		fileMode:     fileMode,
 		logPageId:    logPageId,
 		objectPageId: objectPageId}
@@ -49,7 +49,7 @@ func NewLog(fileMode uint8, logPageId uint32, objectPageId uint32) (*log, error)
 
 //create a new log from bytes
 //throw error if bytes length is not 9
-func NewLogFromBytes(bytes []byte) (*log, error) {
+func NewLogFromBytes(bytes []byte) (*Log, error) {
 	//throw error if bytes length is not 9
 	if len(bytes) != 9 {
 		return nil, errors.New("byte slice length invalid")
@@ -59,7 +59,7 @@ func NewLogFromBytes(bytes []byte) (*log, error) {
 	logPageId, _ := BytesToUint32(bytes[1:5])
 	objectPageId, _ := BytesToUint32(bytes[5:9])
 
-	l := &log{
+	l := &Log{
 		fileMode:     fileMode,
 		logPageId:    logPageId,
 		objectPageId: objectPageId}
@@ -68,7 +68,7 @@ func NewLogFromBytes(bytes []byte) (*log, error) {
 }
 
 //convert this log to byte slice, ready to push into disk
-func (l *log) LogToBytes() []byte {
+func (l *Log) LogToBytes() []byte {
 	var bytes []byte
 
 	bytes = append(bytes, l.fileMode)
@@ -79,16 +79,16 @@ func (l *log) LogToBytes() []byte {
 }
 
 //fileMode getter
-func (l *log) LogGetFileMode() uint8 {
+func (l *Log) LogGetFileMode() uint8 {
 	return l.fileMode
 }
 
 //logPageId getter
-func (l *log) LogGetlogPageId() uint32 {
+func (l *Log) LogGetlogPageId() uint32 {
 	return l.logPageId
 }
 
 //objectPageId getter
-func (l *log) LogGetobjectPageId() uint32 {
+func (l *Log) LogGetobjectPageId() uint32 {
 	return l.objectPageId
 }

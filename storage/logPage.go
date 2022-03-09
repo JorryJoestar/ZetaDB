@@ -1,6 +1,7 @@
 package storage
 
 import (
+	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
 )
@@ -44,7 +45,7 @@ type logPage struct {
 	logPrePageId  uint32
 	logNextPageId uint32
 	logNum        int32
-	logs          []*log
+	logs          []*Log
 }
 
 //create a new log page
@@ -160,13 +161,13 @@ func (lp *logPage) LogPageGetLogNum() int32 {
 }
 
 //logs getter
-func (lp *logPage) LogPageGetLogs() []*log {
+func (lp *logPage) LogPageGetLogs() []*Log {
 	return lp.logs
 }
 
 //insert a log into this page
 //throw error if no enough space to complete this insertion
-func (lp *logPage) LogPageInsertLog(l *log) error {
+func (lp *logPage) LogPageInsertLog(l *Log) error {
 	//throw error if no enough space to complete this insertion
 	if lp.LogPageVacantByteNum() < 12 {
 		return errors.New("not enough space")
