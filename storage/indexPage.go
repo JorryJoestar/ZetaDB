@@ -3,7 +3,7 @@ package storage
 /*
                              index page mode 1, internal node
    -------------------------------------------------------------------------------------
-   |    indexPageId     |        mode        |     elementType    |    elementNum      |
+   |    indexPageId     |        mode        |     elementType    |    pointerNum      |
    -------------------------------------------------------------------------------------
    |                element 1                |                element 2                |
    -------------------------------------------------------------------------------------
@@ -43,9 +43,9 @@ package storage
 		            DATE                    8                      4
 		            TIME                    9                      4
 
-	~elementNum
+	~pointerNum
 		-int32, 4 bytes
-		-valid element number in this page at present
+		-valid pointer number in this page at present
 
 	~element X
 		value of element X
@@ -59,17 +59,29 @@ package storage
    -------------------------------------------------------------------------------------
    |    indexPageId     |        mode        |     elementType    |    elementNum      |
    -------------------------------------------------------------------------------------
-   |                element 0                | index/dataPageId 0 |   record type 0    |
+   |     prePageId      |     nextPageId     |                element 0                |
    -------------------------------------------------------------------------------------
-   |                element 1                | index/dataPageId 1 |   record type 1    |
+   | index/dataPageId 0 |   record type 0    |                element 1                |
+   -------------------------------------------------------------------------------------
+   | index/dataPageId 1 |   record type 1    |                element 2                |
    -------------------------------------------------------------------------------------
    |                                    . . . . . .                                    |
    -------------------------------------------------------------------------------------
-   |                element N                | index/dataPageId N |   record type N    |
+   |index/dataPageIdN-2 |   record type N-2  |                element N-1              |
+   -------------------------------------------------------------------------------------
+   |index/dataPageIdN-1 |   record type N-1  |              padding bytes              |
    -------------------------------------------------------------------------------------
 
 	~mode
 		2: this is a leaf node
+
+	~prePageId
+		-uint32, 4 bytes
+		-pageId of previous page
+
+	~nextPageId
+		-uint32, 4 bytes
+		-pageId of next page
 
 	~index/dataPageId X
 		-uint32, 4 bytes
@@ -122,16 +134,25 @@ package storage
 */
 
 type indexPage struct {
-	indexPageId      uint32
-	mode             int32
-	elementType      int32
-	elementNum       int32
-	elements         [][]byte
-	pointerPageId    []uint32   //valid for mode 1
-	indexDataPageIds []uint32   //valid for mode 2
-	recordType       []int32    //valid for mode 2
-	dataPageNums     []int32    // valid for mode 3
-	dataPageIds      [][]uint32 // valid for mode 3
+	marked   bool
+	modified bool
+
+	indexPageId uint32
+	mode        uint32
+	elementType uint32
+
+	pointerNum    int32    //valid for mode1
+	elements      [][]byte //valid for mode1&2, for mode 1, elements[0] invalid
+	pointerPageId []uint32 //valid for mode 1
+
+	elementNum       int32    //valid for mode2
+	prePageId        uint32   //valid for mode 2&3
+	nextPageId       uint32   //valid for mode 2&3
+	indexDataPageIds []uint32 //valid for mode 2
+	recordType       []uint8  //valid for mode 2
+
+	dataPageIdNum int32    //valid for mode 3
+	dataPageIds   []uint32 //valid for mode 3
 }
 
 //create indexPage from bytes
@@ -141,7 +162,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 }
 
 //create indexPage
-func NewIndexPage(indexPageId uint32, mode int32, elementType int32) (*indexPage, error) {
+func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPage, error) {
 	return nil, nil
 }
 
@@ -152,7 +173,7 @@ func (ip *indexPage) IndexPageToBytes() []byte {
 
 //search the next layer, return indexPageId of the corresponding next layer node
 //throw error if this page is not an internal node
-//throw error if elementValue byte number is invalid
+//throw error if elementValue byte length is invalid
 func (ip *indexPage) IndexPageInternalSearch(elementValue []byte) (uint32, error) {
 	return 0, nil
 }
@@ -161,29 +182,49 @@ func (ip *indexPage) IndexPageInternalSearch(elementValue []byte) (uint32, error
 //throw error if this page is not a leaf node
 //throw error if elementValue byte number is invalid
 //throw error if no element meets requirement
-func (ip *indexPage) IndexPageLeafSearch(elementValue []byte) (uint32, int32, error) {
+func (ip *indexPage) IndexPageLeafSearch(elementValue []byte) (uint32, uint8, error) {
 	return 0, 0, nil
 }
 
-//search related dataPageIds where tuples whose element value is elementValue
+//search related dataPageIds
+//return nextPageId
+//if there is a next duplicated page, return true, else return false
 //throw error if this page is not a duplicated node
-//throw error if elementValue byte number is invalid
-//throw error if no element meets requirement
-func (ip *indexPage) IndexPageDuplicatedSearch(elementValue []byte) ([]uint32, error) {
-	return nil, nil
+func (ip *indexPage) IndexPageDuplicatedSearch() ([]uint32, uint32, bool, error) {
+	return nil, 0, false, nil
+}
+
+//indexPageId getter
+func (ip *indexPage) IndexPageGetPageId() uint32 {
+	return 0
 }
 
 //mode getter
-func (ip *indexPage) IndexPageGetMode() int32 {
+func (ip *indexPage) IndexPageGetMode() uint32 {
 	return 0
+}
+
+//elementType getter
+func (ip *indexPage) IndexPageGetElementType() uint32 {
+	return 0
+}
+
+//elementNum getter
+//invalid for mode 3
+func (ip *indexPage) IndexPageGetElementNum() (int32, error) {
+	return 0, nil
+}
+
+//dataPageIdNum getter
+//invalid for mode 1&2
+func (ip *indexPage) IndexPageGetDataPageIdNum() (int32, error) {
+	return 0, nil
 }
 
 //return max entry number this page can contain
 //for internal node, it is max number of pointers it can have (M)
 //for leaf node, it is max number of elements it can have (L)
-//throw error if this is a duplicated page
+//for duplicated node, it is max number of dataPageIds this page can hold
 func (ip *indexPage) IndexPageMaxNum() (int32, error) {
 	return 0, nil
 }
-
-//TODO !!! mode 3 structure need to be modified
