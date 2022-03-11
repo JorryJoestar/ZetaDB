@@ -30,3 +30,19 @@ func (ir *IndexRecord) IndexRecordGetIndexDataPageId() uint32 {
 func (ir *IndexRecord) IndexRecordGetRecordType() uint8 {
 	return ir.recordType
 }
+
+//return the length of this record in bytes
+func (ir *IndexRecord) IndexRecordLength() int32 {
+	var size int32
+
+	//elementValue
+	size = int32(len(ir.elementValue))
+
+	//indexDataPageId
+	size += 4
+
+	//recordType
+	size += 1
+
+	return size
+}

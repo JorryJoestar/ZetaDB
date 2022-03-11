@@ -1,5 +1,9 @@
 package storage
 
+import (
+	. "ZetaDB/container"
+)
+
 /*
                              index page mode 1, internal node
    -------------------------------------------------------------------------------------
@@ -57,23 +61,27 @@ package storage
 
                                index page mode 2, leaf node
    -------------------------------------------------------------------------------------
-   |    indexPageId     |        mode        |     elementType    |    elementNum      |
+   |    indexPageId     |        mode        |     elementType    |     recordNum      |
    -------------------------------------------------------------------------------------
-   |     prePageId      |     nextPageId     |                element 0                |
+   |     prePageId      |     nextPageId     |              IndexRecord 0              |
    -------------------------------------------------------------------------------------
-   | index/dataPageId 0 |   record type 0    |                element 1                |
+   |              IndexRecord 1              |              IndexRecord 2              |
    -------------------------------------------------------------------------------------
-   | index/dataPageId 1 |   record type 1    |                element 2                |
+   |              IndexRecord 3              |              IndexRecord 4              |
    -------------------------------------------------------------------------------------
    |                                    . . . . . .                                    |
    -------------------------------------------------------------------------------------
-   |index/dataPageIdN-2 |   record type N-2  |                element N-1              |
+   |             IndexRecord n-3             |             IndexRecord n-2             |
    -------------------------------------------------------------------------------------
-   |index/dataPageIdN-1 |   record type N-1  |              padding bytes              |
+   |             IndexRecord n-1             |              padding bytes              |
    -------------------------------------------------------------------------------------
 
 	~mode
 		2: this is a leaf node (could be a root node)
+
+	~recordNum
+		-int32, 4 bytes
+		-record number within this leaf node
 
 	~prePageId
 		-uint32, 4 bytes
@@ -83,19 +91,8 @@ package storage
 		-uint32, 4 bytes
 		-pageId of next page
 
-	~index/dataPageId X
-		-uint32, 4 bytes
-		pointer to a dataPage which contains tuple with element X
-		or
-		pointer to an indexPage mode 1, for multiple-key indexes
-		or
-		pointer to an indexPage mode 3, for duplicated tuples
-
-	~record type X
-		-uint8, 1 byte
-		1: index/dataPageId X is pointer to an indexPage mode 1
-		3: index/dataPageId X is pointer to an indexPage mode 3
-		4: index/dataPageId X is pointer to a dataPage in data file
+	~IndexRecord
+		see container/indexRecord.go
 
 
                            index page mode 3, duplicated node
@@ -129,7 +126,8 @@ package storage
 		-pageId of next page that is duplicated node containing related tuples
 
 	~dataPageId
-		pageId in data file which contains element x
+		-uint32, 4 bytes
+		-pageId in data file which contains element x
 
 */
 
@@ -142,20 +140,20 @@ type indexPage struct {
 	elementType uint32
 
 	pointerNum    int32    //valid for mode1
-	elements      [][]byte //valid for mode1&2, for mode 1, elements[0] invalid
+	elements      [][]byte //valid for mode1, elements[0] invalid
 	pointerPageId []uint32 //valid for mode 1
 
-	elementNum       int32    //valid for mode2
-	prePageId        uint32   //valid for mode 2&3
-	nextPageId       uint32   //valid for mode 2&3
-	indexDataPageIds []uint32 //valid for mode 2
-	recordType       []uint8  //valid for mode 2
+	prePageId  uint32 //valid for mode 2&3
+	nextPageId uint32 //valid for mode 2&3
+
+	recordNum int32          //valid for mode2
+	records   []*IndexRecord //valid for mode2
 
 	dataPageIdNum int32    //valid for mode 3
 	dataPageIds   []uint32 //valid for mode 3
 }
 
-//create indexPage
+//create empty indexPage
 func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPage, error) {
 	return nil, nil
 }
@@ -186,22 +184,141 @@ func (ip *indexPage) IndexPageGetElementType() uint32 {
 	return 0
 }
 
-//elementNum getter
-//invalid for mode 3
-func (ip *indexPage) IndexPageGetElementNum() (int32, error) {
+//pointerNum getter
+//valid for mode 1
+//throw error, if mode is not 1
+func (ip *indexPage) IndexPageGetPointerNum() (int32, error) {
 	return 0, nil
 }
 
+//pointerNum setter
+//valid for mode 1
+//throw error, if mode is not 1
+//throw error, if pointerNum > IndexPageGetMaxPointerNum()
+func (ip *indexPage) IndexPageSetPointerNum(n int32) error {
+	return nil
+}
+
+//return max pointer number this page can contain
+//throw error if mode is not 1
+func (ip *indexPage) IndexPageGetMaxPointerNum() (int32, error) {
+	return 0, nil
+}
+
+//element getter
+//throw error if i is not in [1, pointerNum-1]
+//throw error if mode is not 1
+func (ip *indexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
+	return nil, nil
+}
+
+//element setter
+//throw error if i is not in [1, IndexPageGetMaxPointerNum()-1]
+//throw error if mode is not 1
+//throw error if bytes length invalid
+func (ip *indexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
+	return nil
+}
+
+//pointerPageId getter
+//throw error if mode is not 1
+//throw error if i is not in [0, pointerNum-1]
+func (ip *indexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
+	return 0, nil
+}
+
+//pointerPageId setter
+//throw error if mode is not 1
+//throw error if i is not in [0, pointerNum-1]
+//throw error if bytes length invalid
+func (ip *indexPage) IndexPageSetPointerPageIdAt(i int32, bytes []byte) error {
+	return nil
+}
+
+//recordNum getter
+//throw error if mode is not 2
+func (ip *indexPage) IndexPageGetRecordNum() (int32, error) {
+	return 0, nil
+}
+
+//recordNum setter
+//throw error if mode is not 2
+func (ip *indexPage) IndexPageSetRecordNum(n int32) error {
+	return nil
+}
+
+//return max record number this page can contain
+//throw error if mode is not 2
+func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
+	return 0, nil
+}
+
+//prePageId getter
+//throw error if mode is not 2 or 3
+func (ip *indexPage) IndexPageGetPrePageId() (uint32, error) {
+	return 0, nil
+}
+
+//prePageId setter
+//throw error if mode is not 2 or 3
+func (ip *indexPage) IndexPageSetPrePageId(pageId uint32) error {
+	return nil
+}
+
+//nextPageId getter
+//throw error if mode is not 2 or 3
+func (ip *indexPage) IndexPageGetNextPageId() (uint32, error) {
+	return 0, nil
+}
+
+//nextPageId setter
+//throw error if mode is not 2 or 3
+func (ip *indexPage) IndexPageSetNextPageId(pageId uint32) error {
+	return nil
+}
+
+//IndexRecord getter
+//throw error if mode is not 2
+//throw error if i is not in [0, recordNum-1]
+func (ip *indexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
+	return nil, nil
+}
+
+//IndexRecord setter
+//throw error if mode is not 2
+//throw error if i is not in [0, recordNum-1]
+func (ip *indexPage) IndexPageSetIndexRecordAt(i int32, ir *IndexRecord) error {
+	return nil
+}
+
 //dataPageIdNum getter
-//invalid for mode 1&2
+//throw error if mode is not 3
 func (ip *indexPage) IndexPageGetDataPageIdNum() (int32, error) {
 	return 0, nil
 }
 
-//return max entry number this page can contain
-//for internal node, it is max number of pointers it can have (M)
-//for leaf node, it is max number of elements it can have (L)
-//for duplicated node, it is max number of dataPageIds this page can hold
-func (ip *indexPage) IndexPageMaxNum() (int32, error) {
+//dataPageIdNum setter
+//throw error if mode is not 3
+func (ip *indexPage) IndexPageSetDataPageIdNum(num int32) error {
+	return nil
+}
+
+//return max dataPageId number this page can contain
+//throw error if mode is not 3
+func (ip *indexPage) IndexPageGetMaxDataPageIdNum() (int32, error) {
 	return 0, nil
+}
+
+//dataPageId getter
+//throw error if modd is not 3
+//throw error if i is not in [0, dataPageIdNum-1]
+func (ip *indexPage) IndexPageGetDataPageIdAt(i int32) (uint32, error) {
+	return 0, nil
+}
+
+//dataPageId setter
+//throw error if modd is not 3
+//throw error if i is not in [0, dataPageIdNum-1]
+func (ip *indexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
+	return nil
 }
