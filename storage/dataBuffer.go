@@ -144,7 +144,7 @@ func (db *dataBuffer) DataBufferDeleteDataPage(pageId uint32) error {
 func (db *dataBuffer) DataBufferEvictDataPage() (*dataPage, error) {
 	//throw error if this buffer is not full
 	if !db.DataBufferIsFull() {
-		return nil, errors.New("this buferr is not full")
+		return nil, errors.New("this buffer is not full")
 	}
 
 	//if this is the first evict since last time the buffer is empty, initialize evictPointer to 0
