@@ -170,8 +170,8 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 	}
 
 	ip := &indexPage{
-		marked:      false,
-		modified:    false,
+		marked:      true,
+		modified:    true,
 		indexPageId: indexPageId,
 		mode:        mode,
 		elementType: elementType}
@@ -247,7 +247,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		}
 
 		ip := &indexPage{
-			marked:        false,
+			marked:        true,
 			modified:      false,
 			indexPageId:   indexPageId,
 			mode:          mode,
@@ -281,7 +281,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		}
 
 		ip := &indexPage{
-			marked:      false,
+			marked:      true,
 			modified:    false,
 			indexPageId: indexPageId,
 			mode:        mode,
@@ -315,7 +315,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		}
 
 		ip := &indexPage{
-			marked:        false,
+			marked:        true,
 			modified:      false,
 			indexPageId:   indexPageId,
 			mode:          mode,
@@ -434,16 +434,19 @@ func (ip *indexPage) IndexPageToBytes() []byte {
 
 //indexPageId getter
 func (ip *indexPage) IndexPageGetPageId() uint32 {
+	ip.IndexPageMark()
 	return ip.indexPageId
 }
 
 //mode getter
 func (ip *indexPage) IndexPageGetMode() uint32 {
+	ip.IndexPageMark()
 	return ip.mode
 }
 
 //elementType getter
 func (ip *indexPage) IndexPageGetElementType() uint32 {
+	ip.IndexPageMark()
 	return ip.elementType
 }
 
@@ -455,6 +458,8 @@ func (ip *indexPage) IndexPageGetPointerNum() (int32, error) {
 	if ip.IndexPageGetMode() != 1 {
 		return 0, errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
 
 	return ip.pointerNum, nil
 }
@@ -475,6 +480,9 @@ func (ip *indexPage) IndexPageSetPointerNum(n int32) error {
 		return errors.New("pointerNum over large")
 	}
 
+	ip.IndexPageMark()
+	ip.IndexPageModify()
+
 	ip.pointerNum = n
 	return nil
 }
@@ -490,6 +498,8 @@ func (ip *indexPage) IndexPageGetMaxPointerNum() (int32, error) {
 	elementLen, _ := IndexPageGetElementLength(ip.elementType)
 	maxNum := (int32(DEFAULT_PAGE_SIZE) - 16 + elementLen) /
 		(elementLen + 4)
+
+	ip.IndexPageMark()
 
 	return maxNum, nil
 
@@ -510,6 +520,8 @@ func (ip *indexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
 		return nil, errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.elements[i], nil
 }
 
@@ -529,6 +541,9 @@ func (ip *indexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
 		return errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+	ip.IndexPageModify()
+
 	ip.elements[i] = bytes
 	return nil
 }
@@ -547,6 +562,8 @@ func (ip *indexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
 		return 0, errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.pointerPageId[i], nil
 }
 
@@ -564,6 +581,9 @@ func (ip *indexPage) IndexPageSetPointerPageIdAt(i int32, pageId uint32) error {
 		return errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+	ip.IndexPageModify()
+
 	ip.pointerPageId[i] = pageId
 	return nil
 }
@@ -576,6 +596,8 @@ func (ip *indexPage) IndexPageGetRecordNum() (int32, error) {
 		return 0, errors.New("mode invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.recordNum, nil
 }
 
@@ -586,6 +608,9 @@ func (ip *indexPage) IndexPageSetRecordNum(n int32) error {
 	if ip.IndexPageGetMode() != 2 {
 		return errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
+	ip.IndexPageModify()
 
 	ip.recordNum = n
 	return nil
@@ -598,6 +623,8 @@ func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
 	if ip.IndexPageGetMode() != 2 {
 		return 0, errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
 
 	elementLen, _ := IndexPageGetElementLength(ip.elementType)
 	recordLen := elementLen + 32 + 8
@@ -613,6 +640,8 @@ func (ip *indexPage) IndexPageGetPrePageId() (uint32, error) {
 		return 0, errors.New("mode invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.prePageId, nil
 }
 
@@ -623,6 +652,9 @@ func (ip *indexPage) IndexPageSetPrePageId(pageId uint32) error {
 	if ip.IndexPageGetMode() == 1 {
 		return errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
+	ip.IndexPageModify()
 
 	ip.prePageId = pageId
 	return nil
@@ -636,6 +668,8 @@ func (ip *indexPage) IndexPageGetNextPageId() (uint32, error) {
 		return 0, errors.New("mode invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.nextPageId, nil
 }
 
@@ -646,6 +680,9 @@ func (ip *indexPage) IndexPageSetNextPageId(pageId uint32) error {
 	if ip.IndexPageGetMode() == 1 {
 		return errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
+	ip.IndexPageModify()
 
 	ip.nextPageId = pageId
 	return nil
@@ -666,6 +703,8 @@ func (ip *indexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
 		return nil, errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.records[i], nil
 }
 
@@ -684,6 +723,9 @@ func (ip *indexPage) IndexPageSetIndexRecordAt(i int32, ir *IndexRecord) error {
 		return errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+	ip.IndexPageModify()
+
 	ip.records[i] = ir
 	return nil
 }
@@ -696,6 +738,8 @@ func (ip *indexPage) IndexPageGetDataPageIdNum() (int32, error) {
 		return 0, errors.New("mode invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.dataPageIdNum, nil
 }
 
@@ -706,6 +750,9 @@ func (ip *indexPage) IndexPageSetDataPageIdNum(num int32) error {
 	if ip.IndexPageGetMode() != 3 {
 		return errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
+	ip.IndexPageModify()
 
 	ip.dataPageIdNum = num
 	return nil
@@ -718,6 +765,8 @@ func (ip *indexPage) IndexPageGetMaxDataPageIdNum() (int32, error) {
 	if ip.IndexPageGetMode() != 3 {
 		return 0, errors.New("mode invalid")
 	}
+
+	ip.IndexPageMark()
 
 	maxNum := (int32(DEFAULT_PAGE_SIZE) - 24) / 4
 	return maxNum, nil
@@ -738,6 +787,8 @@ func (ip *indexPage) IndexPageGetDataPageIdAt(i int32) (uint32, error) {
 		return 0, errors.New("i value invalid")
 	}
 
+	ip.IndexPageMark()
+
 	return ip.dataPageIds[i], nil
 }
 
@@ -755,6 +806,9 @@ func (ip *indexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
 	if i < 0 || i > dataPageIdNum-1 {
 		return errors.New("i value invalid")
 	}
+
+	ip.IndexPageMark()
+	ip.IndexPageModify()
 
 	ip.dataPageIds[i] = pageId
 	return nil
