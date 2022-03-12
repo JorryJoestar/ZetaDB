@@ -195,7 +195,6 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 //throw error if bytes length invalid
 //throw error if mode is not 1, 2, or 3
 //throw error if elementType is not in [1,9]
-//TODO
 func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 	//throw error if bytes length invalid
 	if len(bytes) != DEFAULT_PAGE_SIZE {
@@ -212,7 +211,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 
 	////throw error if mode is not 1, 2, or 3
 	if mode != 1 && mode != 2 && mode != 3 {
-		return nil, errors.New("mode invlaid")
+		return nil, errors.New("mode invalid")
 	}
 
 	//elementType
@@ -221,7 +220,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 
 	//throw error if elementType is not in [1,9]
 	if elementType < 0 || elementType > 9 {
-		return nil, errors.New("elementType invaid")
+		return nil, errors.New("elementType invalid")
 	}
 
 	if mode == 1 { //internal node
@@ -241,7 +240,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		//pointerPageId
 		var pointerPageId []uint32
 		var j int32
-		for j = 1; j < pointerNum; j++ {
+		for j = 0; j < pointerNum; j++ {
 			pointer, _ := BytesToUint32(bytes[:4])
 			pointerPageId = append(pointerPageId, pointer)
 			bytes = bytes[4:]
@@ -287,9 +286,9 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 			indexPageId: indexPageId,
 			mode:        mode,
 			elementType: elementType,
+			recordNum:   recordNum,
 			prePageId:   prePageId,
 			nextPageId:  nextPageId,
-			recordNum:   recordNum,
 			records:     records}
 
 		return ip, nil
