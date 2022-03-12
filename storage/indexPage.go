@@ -193,9 +193,141 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 
 //create indexPage from bytes
 //throw error if bytes length invalid
+//throw error if mode is not 1, 2, or 3
+//throw error if elementType is not in [1,9]
 //TODO
 func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
-	return nil, nil
+	//throw error if bytes length invalid
+	if len(bytes) != DEFAULT_PAGE_SIZE {
+		return nil, errors.New("bytes length invalid")
+	}
+
+	//indexPageId
+	indexPageId, _ := BytesToUint32(bytes[:4])
+	bytes = bytes[4:]
+
+	//mode
+	mode, _ := BytesToUint32(bytes[:4])
+	bytes = bytes[4:]
+
+	////throw error if mode is not 1, 2, or 3
+	if mode != 1 && mode != 2 && mode != 3 {
+		return nil, errors.New("mode invlaid")
+	}
+
+	//elementType
+	elementType, _ := BytesToUint32(bytes[:4])
+	bytes = bytes[4:]
+
+	//throw error if elementType is not in [1,9]
+	if elementType < 0 || elementType > 9 {
+		return nil, errors.New("elementType invaid")
+	}
+
+	if mode == 1 { //internal node
+		//pointerNum
+		pointerNum, _ := BytesToINT(bytes[:4])
+		bytes = bytes[4:]
+
+		//elements
+		elementLen, _ := IndexPageGetElementLength(elementType)
+		var elements [][]byte
+		var i int32
+		for i = 1; i < pointerNum; i++ {
+			elements = append(elements, bytes[:elementLen])
+			bytes = bytes[elementLen:]
+		}
+
+		//pointerPageId
+		var pointerPageId []uint32
+		var j int32
+		for j = 1; j < pointerNum; j++ {
+			pointer, _ := BytesToUint32(bytes[:4])
+			pointerPageId = append(pointerPageId, pointer)
+			bytes = bytes[4:]
+		}
+
+		ip := &indexPage{
+			marked:        false,
+			modified:      false,
+			indexPageId:   indexPageId,
+			mode:          mode,
+			elementType:   elementType,
+			pointerNum:    pointerNum,
+			elements:      elements,
+			pointerPageId: pointerPageId}
+
+		return ip, nil
+	} else if mode == 2 { //leaf node
+		//recordNum
+		recordNum, _ := BytesToINT(bytes[:4])
+		bytes = bytes[4:]
+
+		//prePageId
+		prePageId, _ := BytesToUint32(bytes[:4])
+		bytes = bytes[4:]
+
+		//nextPageId
+		nextPageId, _ := BytesToUint32(bytes[:4])
+		bytes = bytes[4:]
+
+		//records
+		var records []*IndexRecord
+		var i int32
+		for i = 0; i < recordNum; i++ {
+			elementLen, _ := IndexPageGetElementLength(elementType)
+			record, _ := NewIndexRecordFromBytes(bytes[:elementLen+5], elementLen)
+			bytes = bytes[elementLen+5:]
+			records = append(records, record)
+		}
+
+		ip := &indexPage{
+			marked:      false,
+			modified:    false,
+			indexPageId: indexPageId,
+			mode:        mode,
+			elementType: elementType,
+			prePageId:   prePageId,
+			nextPageId:  nextPageId,
+			recordNum:   recordNum,
+			records:     records}
+
+		return ip, nil
+	} else { //duplicated node
+		//dataPageIdNum
+		dataPageIdNum, _ := BytesToINT(bytes[:4])
+		bytes = bytes[4:]
+
+		//prePageId
+		prePageId, _ := BytesToUint32(bytes[:4])
+		bytes = bytes[4:]
+
+		//nextPageId
+		nextPageId, _ := BytesToUint32(bytes[:4])
+		bytes = bytes[4:]
+
+		//dataPageIds
+		var dataPageIds []uint32
+		var i int32
+		for i = 0; i < dataPageIdNum; i++ {
+			dataPageId, _ := BytesToUint32(bytes[:4])
+			bytes = bytes[4:]
+			dataPageIds = append(dataPageIds, dataPageId)
+		}
+
+		ip := &indexPage{
+			marked:        false,
+			modified:      false,
+			indexPageId:   indexPageId,
+			mode:          mode,
+			elementType:   elementType,
+			dataPageIdNum: dataPageIdNum,
+			prePageId:     prePageId,
+			nextPageId:    nextPageId,
+			dataPageIds:   dataPageIds}
+
+		return ip, nil
+	}
 }
 
 //convert this index page to byte slice, ready to push into disk
@@ -356,8 +488,9 @@ func (ip *indexPage) IndexPageGetMaxPointerNum() (int32, error) {
 		return 0, errors.New("mode invalid")
 	}
 
-	maxNum := (int32(DEFAULT_PAGE_SIZE) - 16 + ip.IndexPageGetElementLength()) /
-		(ip.IndexPageGetElementLength() + 4)
+	elementLen, _ := IndexPageGetElementLength(ip.elementType)
+	maxNum := (int32(DEFAULT_PAGE_SIZE) - 16 + elementLen) /
+		(elementLen + 4)
 
 	return maxNum, nil
 
@@ -467,7 +600,7 @@ func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
 		return 0, errors.New("mode invalid")
 	}
 
-	elementLen := ip.IndexPageGetElementLength()
+	elementLen, _ := IndexPageGetElementLength(ip.elementType)
 	recordLen := elementLen + 32 + 8
 	maxRecordNum := (int32(DEFAULT_PAGE_SIZE) - 24) / recordLen
 	return maxRecordNum, nil
@@ -661,15 +794,20 @@ func (ip *indexPage) IndexPageIsModified() bool {
 }
 
 //element length getter
-func (ip *indexPage) IndexPageGetElementLength() int32 {
-	typeValue := ip.IndexPageGetElementType()
-	if typeValue == 1 {
-		return 1
-	} else if typeValue == 4 {
-		return 2
-	} else if typeValue == 7 {
-		return 8
+//throw error if elementType is not in [1,9]
+func IndexPageGetElementLength(elementType uint32) (int32, error) {
+	//throw error if elementType is not in [1,9]
+	if elementType < 1 || elementType > 9 {
+		return 0, errors.New("elementType invalid")
+	}
+
+	if elementType == 1 {
+		return 1, nil
+	} else if elementType == 4 {
+		return 2, nil
+	} else if elementType == 7 {
+		return 8, nil
 	} else {
-		return 4
+		return 4, nil
 	}
 }
