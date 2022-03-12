@@ -1,5 +1,10 @@
 package storage
 
+import (
+	. "ZetaDB/utility"
+	"errors"
+)
+
 type IndexRecord struct {
 	elementValue    []byte
 	indexDataPageId uint32
@@ -14,6 +19,40 @@ func NewIndexRecord(elementValue []byte, indexDataPageId uint32, recordType uint
 		recordType:      recordType}
 
 	return newRecord
+}
+
+//create a new IndexRecord from bytes
+//throw error if bytes length invalid
+func NewIndexRecordFromBytes(bytes []byte, elementLen int32) (*IndexRecord, error) {
+	//throw error if bytes length invalid
+	if int32(len(bytes)) != elementLen+5 {
+		return nil, errors.New("bytes length invalid")
+	}
+
+	elementValue := bytes[:elementLen]
+	indexDataPageId, _ := BytesToUint32(bytes[elementLen : elementLen+4])
+	recordType := bytes[elementLen+4]
+
+	newRecord := &IndexRecord{
+		elementValue:    elementValue,
+		indexDataPageId: indexDataPageId,
+		recordType:      recordType}
+
+	return newRecord, nil
+}
+
+//convert this indexRecord into bytes
+func (ir *IndexRecord) IndexRecordToBytes() []byte {
+	//elementValue
+	bytes := ir.elementValue
+
+	//indexDataPageId
+	bytes = append(bytes, Uint32ToBytes(ir.indexDataPageId)...)
+
+	//recordType
+	bytes = append(bytes, ir.recordType)
+
+	return bytes
 }
 
 //elementValue getter

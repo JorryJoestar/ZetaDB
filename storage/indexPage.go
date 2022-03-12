@@ -201,7 +201,64 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 //convert this index page to byte slice, ready to push into disk
 //TODO
 func (ip *indexPage) IndexPageToBytes() []byte {
-	return nil
+	if ip.IndexPageGetMode() == 1 { //internal node
+		//indexPageId
+		bytes := Uint32ToBytes(ip.IndexPageGetPageId())
+
+		//mode
+		bytes = append(bytes, Uint32ToBytes(ip.IndexPageGetMode())...)
+
+		//elementType
+		bytes = append(bytes, Uint32ToBytes(ip.IndexPageGetElementType())...)
+
+		//pointerNum
+		bytes = append(bytes, INTToBytes(ip.pointerNum)...)
+
+		//elements
+		pointerNum, _ := ip.IndexPageGetPointerNum()
+		var i int32
+		for i = 1; i < pointerNum; i++ {
+			elementBytes, _ := ip.IndexPageGetElementAt(i)
+			bytes = append(bytes, elementBytes...)
+		}
+
+		//pointerPageId
+		for i = 0; i < pointerNum; i++ {
+			bytes = append(bytes, Uint32ToBytes(ip.pointerPageId[i])...)
+		}
+
+		//paddings
+		paddingLen := DEFAULT_PAGE_SIZE - len(bytes)
+		for i = 0; i < int32(paddingLen); i++ {
+			bytes = append(bytes, byte(0))
+		}
+
+		return bytes
+	} else if ip.IndexPageGetMode() == 2 { //leaf ndoe
+		//indexPageId
+		bytes := Uint32ToBytes(ip.IndexPageGetPageId())
+
+		//mode
+		bytes = append(bytes, Uint32ToBytes(ip.IndexPageGetMode())...)
+
+		//elementType
+		bytes = append(bytes, Uint32ToBytes(ip.IndexPageGetElementType())...)
+
+		//recordNum
+		bytes = append(bytes, INTToBytes(ip.recordNum)...)
+
+		//prePageId
+		bytes = append(bytes, Uint32ToBytes(ip.prePageId)...)
+
+		//nextPageId
+		bytes = append(bytes, Uint32ToBytes(ip.nextPageId)...)
+
+		//
+
+		return bytes
+	} else { //duplicated node
+
+	}
 }
 
 //indexPageId getter
