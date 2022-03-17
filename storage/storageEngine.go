@@ -119,21 +119,75 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 //TODO
 //insert a newly created data page into buffer, but not swapped into disk
 //remember to swap it
-func (se *storageEngine) InsertDataPage(*dataPage) error {
+func (se *storageEngine) InsertDataPage(page *dataPage) error {
+
+	//check if dataBuffer is full
+	if se.dBuffer.DataBufferIsFull() { //dataBuffer is full, evict and delete one page
+		evictPage, evictErr := se.dBuffer.DataBufferEvictDataPage()
+		if evictErr != nil {
+			return evictErr
+		}
+
+		//if the evict page is modified, swap it into disk
+		if evictPage.DataPageIsModified() {
+			err3 := se.SwapDataPage(evictPage.DpGetPageId())
+			if err3 != nil {
+				return err3
+			}
+		}
+
+		//delete the evict page from buffer
+		evictPage.UnmodifyDataPage()
+		deleteErr := se.dBuffer.DataBufferDeleteDataPage(evictPage.DpGetPageId())
+		if deleteErr != nil {
+			return deleteErr
+		}
+	}
+
+	//insert the page into buffer
+	err4 := se.dBuffer.DataBufferInsertDataPage(page)
+	if err4 != nil {
+		return err4
+	}
+
 	return nil
+
 }
 
 //TODO
 //delete a data page according to its pageId, related page not swapped into disk
 //remember to swap related pages
 func (se *storageEngine) DeleteDataPage(pageId uint32) error {
-	return nil
+	return se.dBuffer.DataBufferDeleteDataPage(pageId)
 }
 
 //TODO
 //swap a data page into disk according to its pageId
 func (se *storageEngine) SwapDataPage(pageId uint32) error {
-	return nil
+	//get this page from buffer
+	page, err := se.dBuffer.DataBufferFetchPage(pageId)
+	if err != nil {
+		return err
+	}
+
+	//convert this page into bytes
+	bytes, err2 := page.DataPageToBytes()
+	if err2 != nil {
+		return err2
+	}
+
+	//push bytes into disk
+	err3 := se.iom.BytesToDataFile(bytes, page.DpGetPageId())
+
+	if err3 == nil { //delete page from buffer
+		page.UnmodifyDataPage()
+		err4 := se.dBuffer.DataBufferDeleteDataPage(page.DpGetPageId())
+		if err4 != nil {
+			return err4
+		}
+	}
+
+	return err3
 }
 
 //get an index page according to its pageId from index buffer
