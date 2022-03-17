@@ -305,7 +305,7 @@ func (se *storageEngine) SwapIndexPage(pageId uint32) error {
 //fetch a log page according to its pageId from the disk
 //if this page is modified, remember to swap it
 func (se *storageEngine) FetchLogPage(pageId uint32) (*logPage, error) {
-	bytes, bytesErr := se.iom.BytesFromLogFile(pageId, DEFAULT_PAGE_SIZE)
+	bytes, bytesErr := se.iom.BytesFromLogFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 	if bytesErr != nil {
 		return nil, bytesErr
 	}
@@ -324,6 +324,21 @@ func (se *storageEngine) SwapLogPage(page *logPage) error {
 	bytes := page.LogPageToBytes()
 	pos := page.LogPageGetLogPageId()
 
-	se.iom.BytesToLogFile(bytes, pos)
+	se.iom.BytesToLogFile(bytes, pos*uint32(DEFAULT_PAGE_SIZE))
 	return nil
+}
+
+//erase data file
+func (se *storageEngine) EraseDataFile() error {
+	return se.iom.EmptyDataFile()
+}
+
+//erase index file
+func (se *storageEngine) EraseIndexFile() error {
+	return se.iom.EmptyIndexFile()
+}
+
+//erase log file
+func (se *storageEngine) EraseLogFile() error {
+	return se.iom.EmptyLogFile()
 }

@@ -92,9 +92,9 @@ func NewLogPageFromBytes(bytes []byte) (*logPage, error) {
 	//get logs
 	var i int32
 	for i = 0; i < logNum; i++ {
-		log, _ := NewLogFromBytes(bytes[:12])
+		log, _ := NewLogFromBytes(bytes[:9])
 		lp.logs = append(lp.logs, log)
-		bytes = bytes[12:]
+		bytes = bytes[9:]
 	}
 
 	return lp, nil
@@ -111,7 +111,7 @@ func (lp *logPage) LogPageToBytes() []byte {
 	bytes = append(bytes, Uint32ToBytes(lp.logPrePageId)...)
 
 	//logNextPageId
-	bytes = append(bytes, byte(lp.logNextPageId))
+	bytes = append(bytes, Uint32ToBytes(lp.logNextPageId)...)
 
 	//logNum
 	bytes = append(bytes, INTToBytes(lp.logNum)...)
@@ -187,8 +187,8 @@ func (lp *logPage) LogPageVacantByteNum() int32 {
 	//head takes 16 bytes
 	size -= 16
 
-	//each log takes 12 bytes
-	size -= 12 * lp.logNum
+	//each log takes 9 bytes
+	size -= 9 * lp.logNum
 
 	return size
 }
