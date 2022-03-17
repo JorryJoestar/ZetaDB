@@ -1,11 +1,13 @@
 package storage
 
 import (
+	. "ZetaDB/container"
+	. "ZetaDB/utility"
 	"sync"
 )
 
 type storageEngine struct {
-	//head pages of 16 key tables
+	//head pages of 17 key tables
 
 	//k_userId_userName(userId INT PRIMARY KEY, userName VARCHAR(20))
 	//head page number 0, tableId 0
@@ -43,7 +45,7 @@ type storageEngine struct {
 	//head page number 8, tableId 8
 	headPage_k_tableId_schema *dataPage
 
-	//k_table(tableId INT PRIMARY KEY, headPageId INT, tupleIndexId INT, tupleNum INT)
+	//k_table(tableId INT PRIMARY KEY, headPageId INT, lastTupleIndexId INT, tupleNum INT)
 	//head page number 9, tableId 9
 	headPage_k_table *dataPage
 
@@ -80,15 +82,23 @@ type storageEngine struct {
 
 	//buffer for index page
 	iBuffer *indexBuffer
+
+	//IOManipulator
+	iom *IOManipulator
 }
 
 //use GetBufferPool to get the unique bufferPool
 var seInstance *storageEngine
 var seOnce sync.Once
 
-func GetStorageEngine() *storageEngine {
+func GetStorageEngine(dfl string, ifl string, lfl string) *storageEngine {
+	iom, _ := GetIOManipulator(dfl, ifl, lfl)
+
 	seOnce.Do(func() {
-		seInstance = &storageEngine{}
+		seInstance = &storageEngine{
+			dBuffer: NewDataBuffer(),
+			iBuffer: NewIndexBuffer(),
+			iom:     iom}
 	})
 	return seInstance
 }
@@ -96,7 +106,13 @@ func GetStorageEngine() *storageEngine {
 //TODO
 //get a data page according to its pageId
 //if this page is modified, remember to swap it
-func (se *storageEngine) GetDataPage(pageId uint32) (*dataPage, error) {
+func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, error) {
+	bytes, err := se.iom.BytesFromDataFile(pageId, DEFAULT_PAGE_SIZE)
+	if err != nil {
+		return nil, err
+	}
+
+	page, pageErr := NewDataPageFromBytes(bytes)
 	return nil, nil
 }
 
@@ -120,56 +136,125 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 	return nil
 }
 
-//TODO
-//get an index page according to its pageId
+//get an index page according to its pageId from index buffer
+//if this page is not buffered, fetch it from disk and push it into buffer
+//if buffer is full, evict a page
 //if this page is modified, remember to swap it
 func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
-	return nil, nil
+	page, err1 := se.iBuffer.IndexBufferFetchPage(pageId)
+
+	if err1.Error() == "pageId invalid, this page is not buffered" { //not in buffer
+
+		//fetch bytes from disk
+		bytes, err2 := se.iom.BytesFromIndexFile(pageId, DEFAULT_PAGE_SIZE)
+		if err2 != nil {
+			return nil, err2
+		}
+
+		//convert bytes into an index page
+		page, err2 = NewIndexPageFromBytes(bytes)
+		if err2 != nil {
+			return nil, err2
+		}
+
+	} else if err1 != nil {
+		return nil, err1
+	}
+
+	return page, nil
 }
 
-//TODO
 //insert a newly created index page into buffer, but not swapped into disk
 //remember to swap it
-func (se *storageEngine) InsertIndexPage(*indexPage) error {
+func (se *storageEngine) InsertIndexPage(page *indexPage) error {
+
+	//check if indexBuffer is full
+	if se.iBuffer.IndexBufferIsFull() { //indexBuffer is full, evict and delete one page
+		evictPage, evictErr := se.iBuffer.IndexBufferEvictIndexPage()
+		if evictErr != nil {
+			return evictErr
+		}
+
+		//if the evict page is modified, swap it into disk
+		if evictPage.IndexPageIsModified() {
+			err3 := se.SwapIndexPage(evictPage.IndexPageGetPageId())
+			if err3 != nil {
+				return err3
+			}
+
+		}
+
+		//delete the evict page from buffer
+		evictPage.IndexPageUnModify()
+		deleteErr := se.iBuffer.IndexBufferDeleteIndexPage(evictPage.IndexPageGetPageId())
+		if deleteErr != nil {
+			return deleteErr
+		}
+
+	}
+
+	//insert the page into buffer
+	err4 := se.iBuffer.IndexBufferInsertIndexPage(page)
+	if err4 != nil {
+		return err4
+	}
+
 	return nil
 }
 
-//TODO
 //delete an index page according to its pageId, related page not swapped into disk
 //remember to swap related pages
 func (se *storageEngine) DeleteIndexPage(pageId uint32) error {
-	return nil
+	return se.iBuffer.IndexBufferDeleteIndexPage(pageId)
 }
 
-//TODO
 //swap an index page into disk according to its pageId
 func (se *storageEngine) SwapIndexPage(pageId uint32) error {
-	return nil
+	//get this page from buffer
+	page, err := se.iBuffer.IndexBufferFetchPage(pageId)
+	if err != nil {
+		return err
+	}
+
+	//convert this page into bytes
+	bytes := page.IndexPageToBytes()
+
+	//push bytes into disk
+	err2 := se.iom.BytesToIndexFile(bytes, page.IndexPageGetPageId())
+
+	if err2 == nil { //delete page from buffer
+		page.IndexPageUnModify()
+		err3 := se.iBuffer.IndexBufferDeleteIndexPage(page.IndexPageGetPageId())
+		if err3 != nil {
+			return err3
+		}
+	}
+
+	return err2
 }
 
-//TODO
-//get a log page according to its pageId
+//fetch a log page according to its pageId from the disk
 //if this page is modified, remember to swap it
-func (se *storageEngine) GetLogPage(pageId uint32) (*logPage, error) {
-	return nil, nil
+func (se *storageEngine) FetchLogPage(pageId uint32) (*logPage, error) {
+	bytes, bytesErr := se.iom.BytesFromLogFile(pageId, DEFAULT_PAGE_SIZE)
+	if bytesErr != nil {
+		return nil, bytesErr
+	}
+
+	page, pageErr := NewLogPageFromBytes(bytes)
+	if pageErr != nil {
+		return nil, pageErr
+	}
+
+	return page, nil
 }
 
-//TODO
-//insert a newly created log page into buffer, but not swapped into disk
-//remember to swap it
-func (se *storageEngine) InsertLogPage(*logPage) error {
-	return nil
-}
-
-//TODO
-//delete a log page according to its pageId, related page not swapped into disk
-//remember to swap related pages
-func (se *storageEngine) DeleteLogPage(pageId uint32) error {
-	return nil
-}
-
-//TODO
 //swap a log page into disk according to its pageId
-func (se *storageEngine) SwapLogPage(pageId uint32) error {
+func (se *storageEngine) SwapLogPage(page *logPage) error {
+
+	bytes := page.LogPageToBytes()
+	pos := page.LogPageGetLogPageId()
+
+	se.iom.BytesToLogFile(bytes, pos)
 	return nil
 }
