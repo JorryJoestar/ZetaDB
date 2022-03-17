@@ -3,79 +3,54 @@ package storage
 import (
 	. "ZetaDB/container"
 	. "ZetaDB/utility"
+	"errors"
 	"sync"
 )
 
+/*
+							storage engine structure
+	-an ioManipulator
+	-a data page buffer
+	-an index page buffer
+	-key table head page slice
+	-key tables (16)
+		- k_userId_userName(userId INT PRIMARY KEY, userName VARCHAR(20))
+			head page number 0, tableId 0
+		- k_userId_password(userId INT PRIMARY KEY, password VARCHAR(20))
+			head page number 1, tableId 1
+		- k_tableId_userId(tableId INT PRIMARY KEY, userId INT)
+			head page number 2, tableId 2
+		- k_assertId_userId(assertId INT PRIMARY KEY, userId INT)
+			head page number 3, tableId 3
+		- k_viewId_userId(viewId INT PRIMARY KEY, userId INT)
+			head page number 4, tableId 4
+		- k_indexId_tableId(indexId INT PRIMARY KEY, tableId INT)
+			head page number 5, tableId 5
+		- k_triggerId_userId(triggerId INT PRIMARY KEY, userId INT)
+			head page number 6, tableId 6
+		- k_psmId_userId(psmId INT PRIMARY KEY, userId INT)
+			head page number 7, tableId 7
+		- k_tableId_schema(tableId INT PRIMARY KEY, schema VARCHAR(255))
+			head page number 8, tableId 8
+		- k_table(tableId INT PRIMARY KEY, headPageId INT, lastTupleIndexId INT, tupleNum INT)
+			head page number 9, tableId 9
+		- k_assert(assertId INT PRIMARY KEY, assertStmt VARCHAR(255))
+			head page number 10, tableId 10
+		- k_view(viewId INT PRIMARY KEY, viewStmt VARCHAR(255))
+			head page number 11, tableId 11
+		- k_index(indexId INT PRIMARY KEY, logHeadPageId INT)
+			head page number 12, tableId 12
+		- k_trigger(triggerId INT PRIMARY KEY, triggerStmt VARCHAR(255))
+			head page number 13, tableId 13
+		- k_psm(psmId INT PRIMARY KEY, psmStmt VARCHAR(255))
+			head page number 14, tableId 14
+		- k_emptyPageSlot(pageId INT)
+			head page number 15, tableId 15
+*/
+
 type storageEngine struct {
-	//head pages of 17 key tables
-
-	//k_userId_userName(userId INT PRIMARY KEY, userName VARCHAR(20))
-	//head page number 0, tableId 0
-	headPage_k_userId_userName *dataPage
-
-	//k_userId_password(userId INT PRIMARY KEY, password VARCHAR(20))
-	//head page number 1, tableId 1
-	headPage_k_userId_password *dataPage
-
-	//k_tableId_userId(tableId INT PRIMARY KEY, userId INT)
-	//head page number 2, tableId 2
-	headPage_k_tableId_userId *dataPage
-
-	//k_assertId_userId(assertId INT PRIMARY KEY, userId INT)
-	//head page number 3, tableId 3
-	headPage_k_assertId_userId *dataPage
-
-	//k_viewId_userId(viewId INT PRIMARY KEY, userId INT)
-	//head page number 4, tableId 4
-	headPage_k_viewId_userId *dataPage
-
-	//k_indexId_tableId(indexId INT PRIMARY KEY, tableId INT)
-	//head page number 5, tableId 5
-	headPage_k_indexId_tableId *dataPage
-
-	//k_triggerId_userId(triggerId INT PRIMARY KEY, userId INT)
-	//head page number 6, tableId 6
-	headPage_k_triggerId_userId *dataPage
-
-	//k_psmId_userId(psmId INT PRIMARY KEY, userId INT)
-	//head page number 7, tableId 7
-	headPage_k_psmId_userId *dataPage
-
-	//k_tableId_schema(tableId INT PRIMARY KEY, schema VARCHAR(255))
-	//head page number 8, tableId 8
-	headPage_k_tableId_schema *dataPage
-
-	//k_table(tableId INT PRIMARY KEY, headPageId INT, lastTupleIndexId INT, tupleNum INT)
-	//head page number 9, tableId 9
-	headPage_k_table *dataPage
-
-	//k_assert(assertId INT PRIMARY KEY, assertStmt VARCHAR(255))
-	//head page number 10, tableId 10
-	headPage_k_assert *dataPage
-
-	//k_view(viewId INT PRIMARY KEY, viewStmt VARCHAR(255))
-	//head page number 11, tableId 11
-	headPage_k_view *dataPage
-
-	//k_index(indexId INT PRIMARY KEY, logHeadPageId INT)
-	//head page number 12, tableId 12
-	headPage_k_index *dataPage
-
-	//k_trigger(triggerId INT PRIMARY KEY, triggerStmt VARCHAR(255))
-	//head page number 13, tableId 13
-	headPage_k_trigger *dataPage
-
-	//k_psm(psmId INT PRIMARY KEY, psmStmt VARCHAR(255))
-	//head page number 14, tableId 14
-	headPage_k_psm *dataPage
-
-	//k_emptyPageSlot(pageId INT)
-	//head page number 15, tableId 15
-	headPage_k_emptyPageSlot *dataPage
-
-	//k_log page(log INT PRIMARY KEY, logStmt VARCHAR(20))
-	//head page number 16, tableId 16
-	headPage_k_log *dataPage
+	//stores 16 head pages
+	keyTableHeadPageBuffer [16]*dataPage
 
 	//buffer for data page
 	dBuffer *dataBuffer
@@ -103,71 +78,111 @@ func GetStorageEngine(dfl string, ifl string, lfl string) *storageEngine {
 	return seInstance
 }
 
-//TODO
 //get a data page according to its pageId
 //if this page is modified, remember to swap it
 func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, error) {
-	bytes, err := se.iom.BytesFromDataFile(pageId, DEFAULT_PAGE_SIZE)
-	if err != nil {
-		return nil, err
-	}
+	if pageId <= 15 { // fetch page from keyTableHeadPageBuffer
+		if se.keyTableHeadPageBuffer[pageId] == nil { //fetch it from disk
+			bytes, err := se.iom.BytesFromDataFile(pageId, DEFAULT_PAGE_SIZE)
+			if err != nil {
+				return nil, err
+			}
 
-	page, pageErr := NewDataPageFromBytes(bytes)
-	return nil, nil
+			se.keyTableHeadPageBuffer[pageId], err = NewDataPageFromBytes(bytes, schema)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return se.keyTableHeadPageBuffer[pageId], nil
+	} else { // fetch page from dataBuffer
+		page, err := se.dBuffer.DataBufferFetchPage(pageId)
+		if err.Error() == "pageId invalid, this page is not buffered" { // fetch page from disk
+			bytes, err := se.iom.BytesFromDataFile(pageId, DEFAULT_PAGE_SIZE)
+			if err != nil {
+				return nil, err
+			}
+
+			page, err = NewDataPageFromBytes(bytes, schema)
+			if err != nil {
+				return nil, err
+			}
+
+			err = se.InsertDataPage(page)
+			if err != nil {
+				return nil, err
+			} else {
+				return page, nil
+			}
+		} else if err != nil {
+			return nil, err
+		} else {
+			return page, nil
+		}
+	}
 }
 
-//TODO
-//insert a newly created data page into buffer, but not swapped into disk
+//insert a newly created data page into dataBuffer/keyTableHeadPageBuffer, but not swapped into disk
 //remember to swap it
 func (se *storageEngine) InsertDataPage(page *dataPage) error {
+	if page.DpGetPageId() <= 15 { // insert into keyTableHeadPageBuffer
+		se.keyTableHeadPageBuffer[page.DpGetPageId()] = page
+	} else { // insert into dataBuffer
+		//check if dataBuffer is full
+		if se.dBuffer.DataBufferIsFull() { //dataBuffer is full, evict and delete one page
+			evictPage, evictErr := se.dBuffer.DataBufferEvictDataPage()
+			if evictErr != nil {
+				return evictErr
+			}
 
-	//check if dataBuffer is full
-	if se.dBuffer.DataBufferIsFull() { //dataBuffer is full, evict and delete one page
-		evictPage, evictErr := se.dBuffer.DataBufferEvictDataPage()
-		if evictErr != nil {
-			return evictErr
-		}
+			//if the evict page is modified, swap it into disk
+			if evictPage.DataPageIsModified() {
+				err3 := se.SwapDataPage(evictPage.DpGetPageId())
+				if err3 != nil {
+					return err3
+				}
+			}
 
-		//if the evict page is modified, swap it into disk
-		if evictPage.DataPageIsModified() {
-			err3 := se.SwapDataPage(evictPage.DpGetPageId())
-			if err3 != nil {
-				return err3
+			//delete the evict page from buffer
+			evictPage.UnmodifyDataPage()
+			deleteErr := se.dBuffer.DataBufferDeleteDataPage(evictPage.DpGetPageId())
+			if deleteErr != nil {
+				return deleteErr
 			}
 		}
 
-		//delete the evict page from buffer
-		evictPage.UnmodifyDataPage()
-		deleteErr := se.dBuffer.DataBufferDeleteDataPage(evictPage.DpGetPageId())
-		if deleteErr != nil {
-			return deleteErr
+		//insert the page into buffer
+		err4 := se.dBuffer.DataBufferInsertDataPage(page)
+		if err4 != nil {
+			return err4
 		}
 	}
 
-	//insert the page into buffer
-	err4 := se.dBuffer.DataBufferInsertDataPage(page)
-	if err4 != nil {
-		return err4
-	}
-
 	return nil
-
 }
 
-//TODO
 //delete a data page according to its pageId, related page not swapped into disk
+//throw error if corresponding page is a key table head page
 //remember to swap related pages
 func (se *storageEngine) DeleteDataPage(pageId uint32) error {
+	if pageId <= 15 { //throw error
+		return errors.New("pageId invalid")
+	}
 	return se.dBuffer.DataBufferDeleteDataPage(pageId)
 }
 
-//TODO
 //swap a data page into disk according to its pageId
 func (se *storageEngine) SwapDataPage(pageId uint32) error {
-	//get this page from buffer
-	page, err := se.dBuffer.DataBufferFetchPage(pageId)
-	if err != nil {
-		return err
+
+	//get this page
+	var page *dataPage
+	var err error
+	if pageId <= 15 { //pageId <= 15, fetch page from keyTableHeadPageBuffer
+		page = se.keyTableHeadPageBuffer[pageId]
+	} else { //get this page from buffer
+		page, err = se.dBuffer.DataBufferFetchPage(pageId)
+		if err != nil {
+			return err
+		}
 	}
 
 	//convert this page into bytes
