@@ -4,6 +4,7 @@ import (
 	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -244,6 +245,8 @@ func (se *storageEngine) InsertIndexPage(page *indexPage) error {
 			return evictErr
 		}
 
+		fmt.Printf("evict page: %v\n", evictPage.IndexPageGetPageId())
+
 		//if the evict page is modified, swap it into disk
 		if evictPage.IndexPageIsModified() {
 			err3 := se.SwapIndexPage(evictPage.IndexPageGetPageId())
@@ -289,15 +292,7 @@ func (se *storageEngine) SwapIndexPage(pageId uint32) error {
 	bytes := page.IndexPageToBytes()
 
 	//push bytes into disk
-	err2 := se.iom.BytesToIndexFile(bytes, page.IndexPageGetPageId())
-
-	if err2 == nil { //delete page from buffer
-		page.IndexPageUnModify()
-		err3 := se.iBuffer.IndexBufferDeleteIndexPage(page.IndexPageGetPageId())
-		if err3 != nil {
-			return err3
-		}
-	}
+	err2 := se.iom.BytesToIndexFile(bytes, page.IndexPageGetPageId()*uint32(DEFAULT_PAGE_SIZE))
 
 	return err2
 }

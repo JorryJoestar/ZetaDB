@@ -3,6 +3,7 @@ package storage
 import (
 	. "ZetaDB/utility"
 	"errors"
+	"fmt"
 )
 
 type indexBuffer struct {
@@ -81,6 +82,7 @@ func (ib *indexBuffer) IndexBufferInsertIndexPage(page *indexPage) error {
 	//update mapper
 	ib.mapper[currentPageId] = bufferId
 
+	fmt.Printf("insert page: %v at %v\n", page.IndexPageGetPageId(), bufferId)
 	return nil
 }
 
@@ -88,6 +90,8 @@ func (ib *indexBuffer) IndexBufferInsertIndexPage(page *indexPage) error {
 //throw error if this page is not in this buffer
 //throw error if this page is modified
 func (ib *indexBuffer) IndexBufferDeleteIndexPage(pageId uint32) error {
+	fmt.Printf("delete page: %v\n", pageId)
+
 	//throw error if this page is not in this buffer
 	if ib.mapper[pageId] == 0 {
 		return errors.New("page not buffered")
@@ -114,10 +118,10 @@ func (ib *indexBuffer) IndexBufferDeleteIndexPage(pageId uint32) error {
 			//update evictPointer
 			if len(ib.bufferIds) == 1 { //after deleting, this buffer is empty
 				ib.evictPointer = -1
-			} else if i == ib.evictPointer && i == len(ib.bufferIds)-1 {
+			} else if i+1 == ib.evictPointer && i == len(ib.bufferIds)-1 {
 				//pointer points to the id that ready to delete, and the id is the last one
-				ib.evictPointer = 0
-			} else if ib.evictPointer > i { //ecivtPointer is affected
+				ib.evictPointer = 1
+			} else if ib.evictPointer > i+1 { //ecivtPointer is affected
 				ib.evictPointer = ib.evictPointer - 1
 			}
 
@@ -147,21 +151,21 @@ func (ib *indexBuffer) IndexBufferEvictIndexPage() (*indexPage, error) {
 		return nil, errors.New("this buffer is not full")
 	}
 
-	//if this is the first evict since last time the buffer is empty, initialize evictPointer to 0
+	//if this is the first evict since last time the buffer is empty, initialize evictPointer to 1
 	if ib.evictPointer == -1 {
-		ib.evictPointer = 0
+		ib.evictPointer = 1
 	}
 
 	//remember turn ending position
-	endPointer := 0
-	if ib.evictPointer == 0 {
-		endPointer = len(ib.bufferIds) - 1
+	endPointer := 1
+	if ib.evictPointer == 1 {
+		endPointer = len(ib.bufferIds)
 	} else {
 		endPointer = ib.evictPointer - 1
 	}
 
 	//first turn, find out the first (unmarked,unmodified), unmark all witnessed (marked,unmodified)
-	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds) {
+	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1 {
 		page := ib.buffer[ib.evictPointer]
 		if page.IndexPageIsMarked() && !page.IndexPageIsModified() {
 			//if current page is (marked,unmodified), unmark it
@@ -173,8 +177,8 @@ func (ib *indexBuffer) IndexBufferEvictIndexPage() (*indexPage, error) {
 	}
 
 	//second turn, find out the first (marked,unmodified)
-	ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds)
-	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds) {
+	ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1
+	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1 {
 		page := ib.buffer[ib.evictPointer]
 		//(marked,unmodified) are all set to (unmarked,unmodified) in the previous turn
 		if !page.IndexPageIsMarked() && !page.IndexPageIsModified() {
@@ -183,8 +187,8 @@ func (ib *indexBuffer) IndexBufferEvictIndexPage() (*indexPage, error) {
 	}
 
 	//third turn, find out the first (unmarked, modified), unmark all witnessed (marked, modified)
-	ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds)
-	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds) {
+	ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1
+	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1 {
 		page := ib.buffer[ib.evictPointer]
 		if page.IndexPageIsMarked() {
 			//if current page is (marked,modified), unmark it
@@ -196,8 +200,8 @@ func (ib *indexBuffer) IndexBufferEvictIndexPage() (*indexPage, error) {
 	}
 
 	//forth turn, find out the first (marked, modified)
-	ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds)
-	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer + 1) % len(ib.bufferIds) {
+	ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1
+	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1 {
 		page := ib.buffer[ib.evictPointer]
 		//(marked,modified) are all set to (unmarked,modified) in the previous turn
 		if !page.IndexPageIsMarked() {
