@@ -34,11 +34,8 @@ func main() {
 	fmt.Println(ASTToString(ast))
 
 	se := GetStorageEngine(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION, DEFAULT_LOGFILE_LOCATION)
-	se.EraseIndexFile()
-
-	for i := 0; i < 600; i++ {
-		iPage, _ := NewIndexPage(uint32(i), 1, 3)
-		se.InsertIndexPage(iPage)
-	}
+	p, err := se.GetIndexPage(3)
+	fmt.Println(err)
+	fmt.Println(p)
 
 }

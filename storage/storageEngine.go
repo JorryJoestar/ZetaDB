@@ -216,7 +216,7 @@ func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
 	if err1.Error() == "pageId invalid, this page is not buffered" { //not in buffer
 
 		//fetch bytes from disk
-		bytes, err2 := se.iom.BytesFromIndexFile(pageId, DEFAULT_PAGE_SIZE)
+		bytes, err2 := se.iom.BytesFromIndexFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 		if err2 != nil {
 			return nil, err2
 		}
