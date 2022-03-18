@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ZetaDB/container"
 	"ZetaDB/parser"
 	. "ZetaDB/storage"
 	. "ZetaDB/utility"
@@ -35,16 +34,29 @@ func main() {
 	fmt.Println(ASTToString(ast))
 
 	se := GetStorageEngine(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION, DEFAULT_LOGFILE_LOCATION)
-	se.GetIndexPage(5)
-	p, _ := se.GetIndexPage(1)
-	ir := container.NewIndexRecord(Uint32ToBytes(1020), 18, 1)
-	ir2 := container.NewIndexRecord(Uint32ToBytes(111), 32, 3)
+	/*	for i := 0; i < 5; i++ {
+			np, _ := NewIndexPage(uint32(i), 1, 2)
+			se.InsertIndexPage(np)
+		}
+		for i := 0; i < 5; i++ {
+			se.SwapIndexPage(uint32(i))
+		}
+		p1, _ := NewIndexPage(5, 2, 4)
+		p2, _ := NewIndexPage(6, 3, 7)
+		se.InsertIndexPage(p1)
+		se.InsertIndexPage(p2)
+		se.SwapIndexPage(5)
+		se.SwapIndexPage(6)
+	*/
 
-	fmt.Println(p.IndexPageInsertNewIndexRecord(ir))
-	fmt.Println(p.IndexPageInsertNewIndexRecord(ir2))
-	fmt.Println("---------------")
-	fmt.Println(p.IndexPageGetIndexRecordAt(0))
-	fmt.Println(p.IndexPageGetIndexRecordAt(1))
-	se.SwapIndexPage(1)
+	/*	p, _ := se.GetIndexPage(1)
+		fmt.Println(p.IndexPageSetElementAt(2, INTToBytes(19)))
+		fmt.Println(p.IndexPageSetPointerPageIdAt(1, 99))
+		fmt.Println(p.IndexPageToBytes())
+		se.SwapIndexPage(1)
+	*/
+
+	p, _ := se.GetIndexPage(1)
+	fmt.Println(p.IndexPageGetPointerPageIdAt(1))
 
 }

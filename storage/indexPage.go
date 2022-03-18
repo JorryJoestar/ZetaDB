@@ -178,6 +178,9 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 
 	if ip.IndexPageGetMode() == 1 { //set pointerNum to 0
 		ip.IndexPageSetPointerNum(0)
+		maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
+		ip.elements = make([][]byte, maxPointerNum)
+		ip.pointerPageId = make([]uint32, maxPointerNum)
 	} else if ip.IndexPageGetMode() == 2 { //set recordNum to 0, set prePageId and nextPageId to indexPageId itself
 		ip.recordNum = 0
 		ip.IndexPageSetPrePageId(ip.IndexPageGetPageId())
@@ -228,11 +231,23 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		pointerNum, _ := BytesToINT(bytes[:4])
 		bytes = bytes[4:]
 
+		ip := &indexPage{
+			marked:      true,
+			modified:    false,
+			indexPageId: indexPageId,
+			mode:        mode,
+			elementType: elementType,
+			pointerNum:  pointerNum}
+
+		maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
+
 		//elements
 		elementLen, _ := IndexPageGetElementLength(elementType)
 		var elements [][]byte
+		firstElement := make([]byte, elementLen)
+		elements = append(elements, firstElement)
 		var i int32
-		for i = 1; i < pointerNum; i++ {
+		for i = 1; i < maxPointerNum; i++ {
 			elements = append(elements, bytes[:elementLen])
 			bytes = bytes[elementLen:]
 		}
@@ -240,21 +255,13 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		//pointerPageId
 		var pointerPageId []uint32
 		var j int32
-		for j = 0; j < pointerNum; j++ {
+		for j = 0; j < maxPointerNum; j++ {
 			pointer, _ := BytesToUint32(bytes[:4])
 			pointerPageId = append(pointerPageId, pointer)
 			bytes = bytes[4:]
 		}
-
-		ip := &indexPage{
-			marked:        true,
-			modified:      false,
-			indexPageId:   indexPageId,
-			mode:          mode,
-			elementType:   elementType,
-			pointerNum:    pointerNum,
-			elements:      elements,
-			pointerPageId: pointerPageId}
+		ip.elements = elements
+		ip.pointerPageId = pointerPageId
 
 		return ip, nil
 	} else if mode == 2 { //leaf node
@@ -345,15 +352,14 @@ func (ip *indexPage) IndexPageToBytes() []byte {
 		bytes = append(bytes, INTToBytes(ip.pointerNum)...)
 
 		//elements
-		pointerNum, _ := ip.IndexPageGetPointerNum()
+		maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
 		var i int32
-		for i = 1; i < pointerNum; i++ {
-			elementBytes, _ := ip.IndexPageGetElementAt(i)
-			bytes = append(bytes, elementBytes...)
+		for i = 1; i < maxPointerNum; i++ {
+			bytes = append(bytes, ip.elements[i]...)
 		}
 
 		//pointerPageId
-		for i = 0; i < pointerNum; i++ {
+		for i = 0; i < maxPointerNum; i++ {
 			bytes = append(bytes, Uint32ToBytes(ip.pointerPageId[i])...)
 		}
 
@@ -506,7 +512,7 @@ func (ip *indexPage) IndexPageGetMaxPointerNum() (int32, error) {
 }
 
 //element getter
-//throw error if i is not in [1, pointerNum-1]
+//throw error if i is not in [1, IndexPageGetMaxPointerNum()-1]
 //throw error if mode is not 1
 func (ip *indexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
 	//throw error if mode is not 1
@@ -514,9 +520,9 @@ func (ip *indexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
 		return nil, errors.New("mode invalid")
 	}
 
-	//throw error if i is not in [1, pointerNum-1]
-	pointerNum, _ := ip.IndexPageGetPointerNum()
-	if i < 1 || i > pointerNum-1 {
+	//throw error if i is not in [1, maxPointerNum-1]
+	maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
+	if i < 1 || i > maxPointerNum-1 {
 		return nil, errors.New("i value invalid")
 	}
 
@@ -535,9 +541,9 @@ func (ip *indexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
 		return errors.New("mode invalid")
 	}
 
-	//throw error if i is not in [1, pointerNum-1]
-	pointerNum, _ := ip.IndexPageGetPointerNum()
-	if i < 1 || i > pointerNum-1 {
+	//throw error if i is not in [1, maxPointerNum-1]
+	maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
+	if i < 1 || i > maxPointerNum-1 {
 		return errors.New("i value invalid")
 	}
 
@@ -550,15 +556,16 @@ func (ip *indexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
 
 //pointerPageId getter
 //throw error if mode is not 1
-//throw error if i is not in [0, pointerNum-1]
+//throw error if i is not in [0, IndexPageGetMaxPointerNum()-1]
 func (ip *indexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return 0, errors.New("mode invalid")
 	}
 
-	//throw error if i is not in [0, pointerNum-1]
-	if i < 0 || i > ip.pointerNum-1 {
+	//throw error if i is not in [0, maxPointerNum-1]
+	maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
+	if i < 0 || i > maxPointerNum-1 {
 		return 0, errors.New("i value invalid")
 	}
 
@@ -569,15 +576,16 @@ func (ip *indexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
 
 //pointerPageId setter
 //throw error if mode is not 1
-//throw error if i is not in [0, pointerNum-1]
+//throw error if i is not in [0, IndexPageGetMaxPointerNum()-1]
 func (ip *indexPage) IndexPageSetPointerPageIdAt(i int32, pageId uint32) error {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return errors.New("mode invalid")
 	}
 
-	//throw error if i is not in [0, pointerNum-1]
-	if i < 0 || i > ip.pointerNum-1 {
+	//throw error if i is not in [0, maxPointerNum-1]
+	maxPointerNum, _ := ip.IndexPageGetMaxPointerNum()
+	if i < 0 || i > maxPointerNum-1 {
 		return errors.New("i value invalid")
 	}
 
