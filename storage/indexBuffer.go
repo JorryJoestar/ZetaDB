@@ -82,7 +82,7 @@ func (ib *indexBuffer) IndexBufferInsertIndexPage(page *indexPage) error {
 	//update mapper
 	ib.mapper[currentPageId] = bufferId
 
-	fmt.Printf("insert page: %v at %v\n", page.IndexPageGetPageId(), bufferId)
+	fmt.Printf("insert into buffer: %v at %v\n", page.IndexPageGetPageId(), bufferId)
 	return nil
 }
 
@@ -90,7 +90,6 @@ func (ib *indexBuffer) IndexBufferInsertIndexPage(page *indexPage) error {
 //throw error if this page is not in this buffer
 //throw error if this page is modified
 func (ib *indexBuffer) IndexBufferDeleteIndexPage(pageId uint32) error {
-	fmt.Printf("delete page: %v\n", pageId)
 
 	//throw error if this page is not in this buffer
 	if ib.mapper[pageId] == 0 {
@@ -99,6 +98,8 @@ func (ib *indexBuffer) IndexBufferDeleteIndexPage(pageId uint32) error {
 
 	//get bufferId
 	bufferId := ib.mapper[pageId]
+
+	fmt.Printf("delete from buffer: %v at %v\n", pageId, bufferId)
 
 	//throw error if this page is modified
 	if ib.buffer[bufferId].IndexPageIsModified() {
@@ -153,18 +154,14 @@ func (ib *indexBuffer) IndexBufferEvictIndexPage() (*indexPage, error) {
 
 	//if this is the first evict since last time the buffer is empty, initialize evictPointer to 1
 	if ib.evictPointer == -1 {
-		ib.evictPointer = 1
+		ib.evictPointer = len(ib.bufferIds)
 	}
 
 	//remember turn ending position
-	endPointer := 1
-	if ib.evictPointer == 1 {
-		endPointer = len(ib.bufferIds)
-	} else {
-		endPointer = ib.evictPointer - 1
-	}
+	endPointer := ib.evictPointer
 
 	//first turn, find out the first (unmarked,unmodified), unmark all witnessed (marked,unmodified)
+	ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1
 	for ; endPointer != ib.evictPointer; ib.evictPointer = (ib.evictPointer % len(ib.bufferIds)) + 1 {
 		page := ib.buffer[ib.evictPointer]
 		if page.IndexPageIsMarked() && !page.IndexPageIsModified() {
@@ -220,4 +217,9 @@ func (ib *indexBuffer) IndexBufferIsFull() bool {
 //test if buffer is empty
 func (ib *indexBuffer) IndexBufferIsEmpty() bool {
 	return len(ib.bufferSlots) == DEFAULT_INDEX_BUFFER_SIZE
+}
+
+//TEMP remember to delete
+func (ib *indexBuffer) IndexBufferPages() map[int]*indexPage {
+	return ib.buffer
 }

@@ -216,7 +216,6 @@ func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
 		return page, nil
 	} else if err1.Error() == "pageId invalid, this page is not buffered" { //not in buffer
 
-		fmt.Println("true")
 		//fetch bytes from disk
 		bytes, err2 := se.iom.BytesFromIndexFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 		if err2 != nil {
@@ -299,6 +298,8 @@ func (se *storageEngine) SwapIndexPage(pageId uint32) error {
 
 	//push bytes into disk
 	err2 := se.iom.BytesToIndexFile(bytes, page.IndexPageGetPageId()*uint32(DEFAULT_PAGE_SIZE))
+
+	fmt.Printf("swap: %v\n", pageId)
 
 	return err2
 }

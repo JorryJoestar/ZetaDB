@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ZetaDB/container"
 	"ZetaDB/parser"
 	. "ZetaDB/storage"
 	. "ZetaDB/utility"
@@ -34,11 +35,16 @@ func main() {
 	fmt.Println(ASTToString(ast))
 
 	se := GetStorageEngine(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION, DEFAULT_LOGFILE_LOCATION)
-	p, err := se.FetchLogPage(1)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(p)
-	}
+	se.GetIndexPage(5)
+	p, _ := se.GetIndexPage(1)
+	ir := container.NewIndexRecord(Uint32ToBytes(1020), 18, 1)
+	ir2 := container.NewIndexRecord(Uint32ToBytes(111), 32, 3)
+
+	fmt.Println(p.IndexPageInsertNewIndexRecord(ir))
+	fmt.Println(p.IndexPageInsertNewIndexRecord(ir2))
+	fmt.Println("---------------")
+	fmt.Println(p.IndexPageGetIndexRecordAt(0))
+	fmt.Println(p.IndexPageGetIndexRecordAt(1))
+	se.SwapIndexPage(1)
 
 }

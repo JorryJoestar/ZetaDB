@@ -179,7 +179,7 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 	if ip.IndexPageGetMode() == 1 { //set pointerNum to 0
 		ip.IndexPageSetPointerNum(0)
 	} else if ip.IndexPageGetMode() == 2 { //set recordNum to 0, set prePageId and nextPageId to indexPageId itself
-		ip.IndexPageSetRecordNum(0)
+		ip.recordNum = 0
 		ip.IndexPageSetPrePageId(ip.IndexPageGetPageId())
 		ip.IndexPageSetNextPageId(ip.IndexPageGetPageId())
 	} else if ip.IndexPageGetMode() == 3 { //set dataPageIdNum to 0, set prePageId and nextPageId to indexPageId itself
@@ -601,21 +601,6 @@ func (ip *indexPage) IndexPageGetRecordNum() (int32, error) {
 	return ip.recordNum, nil
 }
 
-//recordNum setter
-//throw error if mode is not 2
-func (ip *indexPage) IndexPageSetRecordNum(n int32) error {
-	//throw error if mode is not 2
-	if ip.IndexPageGetMode() != 2 {
-		return errors.New("mode invalid")
-	}
-
-	ip.IndexPageMark()
-	ip.IndexPageModify()
-
-	ip.recordNum = n
-	return nil
-}
-
 //return max record number this page can contain
 //throw error if mode is not 2
 func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
@@ -706,6 +691,19 @@ func (ip *indexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
 	ip.IndexPageMark()
 
 	return ip.records[i], nil
+}
+
+//insert a new index record into the end of records, length of records increase by 1
+//throw error if mode is not 2
+func (ip *indexPage) IndexPageInsertNewIndexRecord(ir *IndexRecord) error {
+	//throw error if mode is not 2
+	if ip.IndexPageGetMode() != 2 {
+		return errors.New("mode invalid")
+	}
+
+	ip.records = append(ip.records, ir)
+	ip.recordNum++
+	return nil
 }
 
 //IndexRecord setter
