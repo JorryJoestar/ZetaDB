@@ -212,9 +212,11 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 //if this page is modified, remember to swap it
 func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
 	page, err1 := se.iBuffer.IndexBufferFetchPage(pageId)
+	if err1 == nil {
+		return page, nil
+	} else if err1.Error() == "pageId invalid, this page is not buffered" { //not in buffer
 
-	if err1.Error() == "pageId invalid, this page is not buffered" { //not in buffer
-
+		fmt.Println("true")
 		//fetch bytes from disk
 		bytes, err2 := se.iom.BytesFromIndexFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 		if err2 != nil {
@@ -223,6 +225,12 @@ func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
 
 		//convert bytes into an index page
 		page, err2 = NewIndexPageFromBytes(bytes)
+		if err2 != nil {
+			return nil, err2
+		}
+
+		//push this page into buffer
+		err2 = se.InsertIndexPage(page)
 		if err2 != nil {
 			return nil, err2
 		}
@@ -244,8 +252,6 @@ func (se *storageEngine) InsertIndexPage(page *indexPage) error {
 		if evictErr != nil {
 			return evictErr
 		}
-
-		fmt.Printf("evict page: %v\n", evictPage.IndexPageGetPageId())
 
 		//if the evict page is modified, swap it into disk
 		if evictPage.IndexPageIsModified() {

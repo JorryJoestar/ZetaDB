@@ -34,8 +34,11 @@ func main() {
 	fmt.Println(ASTToString(ast))
 
 	se := GetStorageEngine(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION, DEFAULT_LOGFILE_LOCATION)
-	p, err := se.GetIndexPage(3)
-	fmt.Println(err)
-	fmt.Println(p)
+	p, err := se.FetchLogPage(1)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(p)
+	}
 
 }
