@@ -81,6 +81,8 @@ func GetStorageEngine(dfl string, ifl string, lfl string) *storageEngine {
 }
 
 //get a data page according to its pageId
+//if this page is not buffered, fetch it from disk and push it into buffer
+//if buffer is full, evict a page
 //if this page is modified, remember to swap it
 func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, error) {
 	if pageId <= 16 { // fetch page from keyTableHeadPageBuffer
@@ -180,6 +182,9 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 	var err error
 	if pageId <= 16 { //pageId <= 16, fetch page from keyTableHeadPageBuffer
 		page = se.keyTableHeadPageBuffer[pageId]
+		if page == nil { //throw error if this page is not buffered
+			return errors.New("key page not buffered")
+		}
 	} else { //get this page from buffer
 		page, err = se.dBuffer.DataBufferFetchPage(pageId)
 		if err != nil {
@@ -194,7 +199,7 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 	}
 
 	//push bytes into disk
-	err3 := se.iom.BytesToDataFile(bytes, page.DpGetPageId())
+	err3 := se.iom.BytesToDataFile(bytes, page.DpGetPageId()*uint32(DEFAULT_DATA_BUFFER_SIZE))
 
 	if err3 == nil { //delete page from buffer
 		page.UnmodifyDataPage()
