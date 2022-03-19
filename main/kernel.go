@@ -35,6 +35,11 @@ func main() {
 
 	se := GetStorageEngine(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION, DEFAULT_LOGFILE_LOCATION)
 
-	p,_:= NewDataPageMode0()
-	se.InsertDataPage()
+	for i := 20; i < 25; i++ {
+		np := NewDataPageMode0(uint32(i), 12, 3, 6)
+		se.InsertDataPage(np)
+	}
+	for i := 20; i < 25; i++ {
+		se.SwapDataPage(uint32(i))
+	}
 }

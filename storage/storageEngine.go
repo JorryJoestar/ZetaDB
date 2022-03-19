@@ -13,7 +13,7 @@ import (
 	-a data page buffer
 	-an index page buffer
 	-key table head page slice
-	-key tables (16)
+	-key tables (17)
 		- k_userId_userName(userId INT PRIMARY KEY, userName VARCHAR(20))
 			head page number 0, tableId 0
 		- k_userId_password(userId INT PRIMARY KEY, password VARCHAR(20))
@@ -44,13 +44,15 @@ import (
 			head page number 13, tableId 13
 		- k_psm(psmId INT PRIMARY KEY, psmStmt VARCHAR(255))
 			head page number 14, tableId 14
-		- k_emptyPageSlot(pageId INT)
+		- k_emptyDataPageSlot(pageId INT)
 			head page number 15, tableId 15
+		- k_emptyIndexPageSlot(pageId INT)
+			head page number 16, tableId 16
 */
 
 type storageEngine struct {
-	//stores 16 head pages
-	keyTableHeadPageBuffer [16]*dataPage
+	//stores 17 head pages
+	keyTableHeadPageBuffer [17]*dataPage
 
 	//buffer for data page
 	dBuffer *dataBuffer
@@ -81,9 +83,9 @@ func GetStorageEngine(dfl string, ifl string, lfl string) *storageEngine {
 //get a data page according to its pageId
 //if this page is modified, remember to swap it
 func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, error) {
-	if pageId <= 15 { // fetch page from keyTableHeadPageBuffer
+	if pageId <= 16 { // fetch page from keyTableHeadPageBuffer
 		if se.keyTableHeadPageBuffer[pageId] == nil { //fetch it from disk
-			bytes, err := se.iom.BytesFromDataFile(pageId, DEFAULT_PAGE_SIZE)
+			bytes, err := se.iom.BytesFromDataFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 			if err != nil {
 				return nil, err
 			}
@@ -97,7 +99,7 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 	} else { // fetch page from dataBuffer
 		page, err := se.dBuffer.DataBufferFetchPage(pageId)
 		if err.Error() == "pageId invalid, this page is not buffered" { // fetch page from disk
-			bytes, err := se.iom.BytesFromDataFile(pageId, DEFAULT_PAGE_SIZE)
+			bytes, err := se.iom.BytesFromDataFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 			if err != nil {
 				return nil, err
 			}
@@ -124,7 +126,7 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 //insert a newly created data page into dataBuffer/keyTableHeadPageBuffer, but not swapped into disk
 //remember to swap it
 func (se *storageEngine) InsertDataPage(page *dataPage) error {
-	if page.DpGetPageId() <= 15 { // insert into keyTableHeadPageBuffer
+	if page.DpGetPageId() <= 16 { // insert into keyTableHeadPageBuffer
 		se.keyTableHeadPageBuffer[page.DpGetPageId()] = page
 	} else { // insert into dataBuffer
 		//check if dataBuffer is full
@@ -164,7 +166,7 @@ func (se *storageEngine) InsertDataPage(page *dataPage) error {
 //throw error if corresponding page is a key table head page
 //remember to swap related pages
 func (se *storageEngine) DeleteDataPage(pageId uint32) error {
-	if pageId <= 15 { //throw error
+	if pageId <= 16 { //throw error
 		return errors.New("pageId invalid")
 	}
 	return se.dBuffer.DataBufferDeleteDataPage(pageId)
@@ -176,7 +178,7 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 	//get this page
 	var page *dataPage
 	var err error
-	if pageId <= 15 { //pageId <= 15, fetch page from keyTableHeadPageBuffer
+	if pageId <= 16 { //pageId <= 16, fetch page from keyTableHeadPageBuffer
 		page = se.keyTableHeadPageBuffer[pageId]
 	} else { //get this page from buffer
 		page, err = se.dBuffer.DataBufferFetchPage(pageId)
