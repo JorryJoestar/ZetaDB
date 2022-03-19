@@ -274,6 +274,8 @@ func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 			}
 
 			tupleDataBytes := bytes[:tupleLen]
+			bytes = bytes[tupleLen:]
+
 			newTuple, ntErr := NewTupleFromBytes(tupleDataBytes, schema, dp.DpGetTableId())
 			if ntErr != nil {
 				return nil, ntErr
@@ -507,6 +509,19 @@ func (dataPage *dataPage) DpVacantByteNum() int {
 	return DEFAULT_PAGE_SIZE - dataPage.DpSizeInByte()
 }
 
+//get a tuple in this page according to its tupleId
+//throw error if no such tuple in this page
+func (dataPage *dataPage) GetTuple(tupleId uint32) (*Tuple, error) {
+	for _, t := range dataPage.tuples {
+		if t.TupleGetTupleId() == tupleId {
+			return t, nil
+		}
+	}
+
+	//throw error if no such tuple in this page
+	return nil, errors.New("no such tuple in this page")
+}
+
 //insert a tuple into this page
 //throw error if mode is not 0
 //throw error if no enough space to store this tuple
@@ -714,10 +729,10 @@ func (dataPage *dataPage) DpGetLinkPrePageId() (uint32, error) {
 }
 
 //linkPrePageId setter
-//throw error if mode is 0
+//throw error if mode is 0 or 1
 func (dataPage *dataPage) DpSetLinkPrePageId(linkPrePageId uint32) error {
 	//throw error if mode is 0
-	if dataPage.pageMode == 0 {
+	if dataPage.pageMode == 0 || dataPage.pageMode == 1 {
 		return errors.New("invalid page mode")
 	}
 

@@ -101,6 +101,7 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 		return se.keyTableHeadPageBuffer[pageId], nil
 	} else { // fetch page from dataBuffer
 		page, err := se.dBuffer.DataBufferFetchPage(pageId)
+
 		if err == nil {
 			return page, nil
 		} else if err.Error() == "pageId invalid, this page is not buffered" { // fetch page from disk

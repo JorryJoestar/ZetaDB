@@ -301,13 +301,7 @@ func (t *Tuple) TupleGetFields() []*Field {
 }
 
 //return true if this field is null
-//throw error if index invalid
 func (t *Tuple) TupleFieldIsNull(index int) (bool, error) {
-
-	//throw error if index invalid
-	if index >= len(t.TupleGetFields()) {
-		return false, errors.New("index invalid")
-	}
 
 	byteIndex := index / 8
 	inByteIndex := index % 8
@@ -321,14 +315,8 @@ func (t *Tuple) TupleFieldIsNull(index int) (bool, error) {
 }
 
 //set a field to null
-//throw error if index invalid
 //throw error if field is already null
 func (t *Tuple) TupleSetFieldNull(index int) error {
-
-	//throw error if index invalid
-	if index >= len(t.TupleGetFields()) {
-		return errors.New("index invalid")
-	}
 
 	//throw error if field is already null
 	isNull, _ := t.TupleFieldIsNull(index)
