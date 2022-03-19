@@ -34,5 +34,7 @@ func main() {
 	fmt.Println(ASTToString(ast))
 
 	se := GetStorageEngine(DEFAULT_DATAFILE_LOCATION, DEFAULT_INDEXFILE_LOCATION, DEFAULT_LOGFILE_LOCATION)
-	se.EraseIndexFile()
+
+	p,_:= NewDataPageMode0()
+	se.InsertDataPage()
 }

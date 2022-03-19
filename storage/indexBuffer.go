@@ -214,8 +214,3 @@ func (ib *indexBuffer) IndexBufferIsFull() bool {
 func (ib *indexBuffer) IndexBufferIsEmpty() bool {
 	return len(ib.bufferSlots) == DEFAULT_INDEX_BUFFER_SIZE
 }
-
-//TEMP remember to delete
-func (ib *indexBuffer) IndexBufferPages() map[int]*indexPage {
-	return ib.buffer
-}
