@@ -4,6 +4,7 @@ import (
 	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -100,7 +101,9 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 		return se.keyTableHeadPageBuffer[pageId], nil
 	} else { // fetch page from dataBuffer
 		page, err := se.dBuffer.DataBufferFetchPage(pageId)
-		if err.Error() == "pageId invalid, this page is not buffered" { // fetch page from disk
+		if err == nil {
+			return page, nil
+		} else if err.Error() == "pageId invalid, this page is not buffered" { // fetch page from disk
 			bytes, err := se.iom.BytesFromDataFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 			if err != nil {
 				return nil, err
@@ -117,10 +120,8 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 			} else {
 				return page, nil
 			}
-		} else if err != nil {
-			return nil, err
 		} else {
-			return page, nil
+			return nil, err
 		}
 	}
 }
@@ -177,6 +178,8 @@ func (se *storageEngine) DeleteDataPage(pageId uint32) error {
 //swap a data page into disk according to its pageId
 func (se *storageEngine) SwapDataPage(pageId uint32) error {
 
+	fmt.Printf("swap page %v\n", pageId)
+
 	//get this page
 	var page *dataPage
 	var err error
@@ -199,15 +202,10 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 	}
 
 	//push bytes into disk
-	err3 := se.iom.BytesToDataFile(bytes, page.DpGetPageId()*uint32(DEFAULT_DATA_BUFFER_SIZE))
+	err3 := se.iom.BytesToDataFile(bytes, page.DpGetPageId()*uint32(DEFAULT_PAGE_SIZE))
 
-	if err3 == nil { //delete page from buffer
-		page.UnmodifyDataPage()
-		err4 := se.dBuffer.DataBufferDeleteDataPage(page.DpGetPageId())
-		if err4 != nil {
-			return err4
-		}
-	}
+	//set page to unmodified
+	page.UnmodifyDataPage()
 
 	return err3
 }

@@ -207,7 +207,7 @@ func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 			return nil, tnErr
 		}
 		dp.tupleNum = tupleNum
-	} else if dp.pageMode == 2 { //else if mode = 2, set dataSize
+	} else if dp.pageMode == 1 || dp.pageMode == 2 { //else if mode = 2, set dataSize
 		dataSizeBytes := bytes[:4]
 		dataSize, dsErr := BytesToINT(dataSizeBytes)
 		if dsErr != nil {
@@ -381,10 +381,7 @@ func (dataPage *dataPage) DataPageToBytes() ([]byte, error) {
 	//tupleNum/dataSize
 	if dataPage.pageMode == 0 { //tupleNum valid
 		bytes = append(bytes, INTToBytes(dataPage.tupleNum)...)
-	} else if dataPage.pageMode == 1 { //padding empty bytes
-		paddingBytes := make([]byte, 4)
-		bytes = append(bytes, paddingBytes...)
-	} else if dataPage.pageMode == 2 { //dataSize valid
+	} else if dataPage.pageMode == 1 || dataPage.pageMode == 2 { //dataSize valid
 		bytes = append(bytes, INTToBytes(dataPage.dataSize)...)
 	}
 

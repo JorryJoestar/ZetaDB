@@ -3,6 +3,7 @@ package storage
 import (
 	. "ZetaDB/utility"
 	"errors"
+	"fmt"
 )
 
 type dataBuffer struct {
@@ -81,6 +82,8 @@ func (db *dataBuffer) DataBufferInsertDataPage(page *dataPage) error {
 	//update mapper
 	db.mapper[currentPageId] = bufferId
 
+	fmt.Printf("insert page %v at %v\n", currentPageId, bufferId)
+
 	return nil
 }
 
@@ -100,6 +103,8 @@ func (db *dataBuffer) DataBufferDeleteDataPage(pageId uint32) error {
 	if db.buffer[bufferId].DataPageIsModified() {
 		return errors.New("page modified")
 	}
+
+	fmt.Printf("delete page %v from %v\n", pageId, bufferId)
 
 	//delete this page from buffer
 	delete(db.buffer, bufferId)
