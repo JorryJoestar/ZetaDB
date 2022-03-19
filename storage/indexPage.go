@@ -186,7 +186,7 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 		ip.IndexPageSetPrePageId(ip.IndexPageGetPageId())
 		ip.IndexPageSetNextPageId(ip.IndexPageGetPageId())
 	} else if ip.IndexPageGetMode() == 3 { //set dataPageIdNum to 0, set prePageId and nextPageId to indexPageId itself
-		ip.IndexPageSetDataPageIdNum(0)
+		ip.dataPageIdNum = 0
 		ip.IndexPageSetPrePageId(ip.IndexPageGetPageId())
 		ip.IndexPageSetNextPageId(ip.IndexPageGetPageId())
 	}
@@ -620,7 +620,7 @@ func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
 	ip.IndexPageMark()
 
 	elementLen, _ := IndexPageGetElementLength(ip.elementType)
-	recordLen := elementLen + 32 + 8
+	recordLen := elementLen + 4 + 1
 	maxRecordNum := (int32(DEFAULT_PAGE_SIZE) - 24) / recordLen
 	return maxRecordNum, nil
 }
@@ -703,10 +703,18 @@ func (ip *indexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
 
 //insert a new index record into the end of records, length of records increase by 1
 //throw error if mode is not 2
+//throw error if this page is full
 func (ip *indexPage) IndexPageInsertNewIndexRecord(ir *IndexRecord) error {
 	//throw error if mode is not 2
 	if ip.IndexPageGetMode() != 2 {
 		return errors.New("mode invalid")
+	}
+
+	//throw error if this page is full
+	recordNum, _ := ip.IndexPageGetRecordNum()
+	maxRecordNum, _ := ip.IndexPageGetMaxRecordNum()
+	if recordNum == maxRecordNum {
+		return errors.New("this page is full")
 	}
 
 	ip.records = append(ip.records, ir)
@@ -749,21 +757,6 @@ func (ip *indexPage) IndexPageGetDataPageIdNum() (int32, error) {
 	return ip.dataPageIdNum, nil
 }
 
-//dataPageIdNum setter
-//throw error if mode is not 3
-func (ip *indexPage) IndexPageSetDataPageIdNum(num int32) error {
-	//throw error if mode is not 3
-	if ip.IndexPageGetMode() != 3 {
-		return errors.New("mode invalid")
-	}
-
-	ip.IndexPageMark()
-	ip.IndexPageModify()
-
-	ip.dataPageIdNum = num
-	return nil
-}
-
 //return max dataPageId number this page can contain
 //throw error if mode is not 3
 func (ip *indexPage) IndexPageGetMaxDataPageIdNum() (int32, error) {
@@ -799,7 +792,7 @@ func (ip *indexPage) IndexPageGetDataPageIdAt(i int32) (uint32, error) {
 }
 
 //dataPageId setter
-//throw error if modd is not 3
+//throw error if mode is not 3
 //throw error if i is not in [0, IndexPageGetMaxDataPageIdNum()-1]
 func (ip *indexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
 	//throw error if mode is not 3
@@ -817,6 +810,28 @@ func (ip *indexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
 	ip.IndexPageModify()
 
 	ip.dataPageIds[i] = pageId
+	return nil
+}
+
+//insert a dataPageId into this page
+//throw error if mode is not 3
+//throw error if this page is full
+func (ip *indexPage) IndexPageInsertNewDataPageId(pageId uint32) error {
+	//throw error if mode is not 3
+	if ip.IndexPageGetMode() != 3 {
+		return errors.New("mode invalid")
+	}
+
+	//throw error if this page is full
+	dataPageIdNum, _ := ip.IndexPageGetDataPageIdNum()
+	maxDataPageIdNum, _ := ip.IndexPageGetMaxDataPageIdNum()
+	if dataPageIdNum == maxDataPageIdNum {
+		return errors.New("this page is full")
+	}
+
+	ip.dataPageIds = append(ip.dataPageIds, pageId)
+	ip.dataPageIdNum++
+
 	return nil
 }
 

@@ -3,7 +3,6 @@ package storage
 import (
 	. "ZetaDB/utility"
 	"errors"
-	"fmt"
 )
 
 type indexBuffer struct {
@@ -82,7 +81,6 @@ func (ib *indexBuffer) IndexBufferInsertIndexPage(page *indexPage) error {
 	//update mapper
 	ib.mapper[currentPageId] = bufferId
 
-	fmt.Printf("insert into buffer: %v at %v\n", page.IndexPageGetPageId(), bufferId)
 	return nil
 }
 
@@ -98,8 +96,6 @@ func (ib *indexBuffer) IndexBufferDeleteIndexPage(pageId uint32) error {
 
 	//get bufferId
 	bufferId := ib.mapper[pageId]
-
-	fmt.Printf("delete from buffer: %v at %v\n", pageId, bufferId)
 
 	//throw error if this page is modified
 	if ib.buffer[bufferId].IndexPageIsModified() {

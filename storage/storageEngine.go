@@ -4,7 +4,6 @@ import (
 	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -298,8 +297,6 @@ func (se *storageEngine) SwapIndexPage(pageId uint32) error {
 
 	//push bytes into disk
 	err2 := se.iom.BytesToIndexFile(bytes, page.IndexPageGetPageId()*uint32(DEFAULT_PAGE_SIZE))
-
-	fmt.Printf("swap: %v\n", pageId)
 
 	return err2
 }
