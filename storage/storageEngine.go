@@ -33,7 +33,7 @@ import (
 			head page number 7, tableId 7
 		- k_tableId_schema(tableId INT PRIMARY KEY, schema VARCHAR(255))
 			head page number 8, tableId 8
-		- k_table(tableId INT PRIMARY KEY, headPageId INT, lastTupleIndexId INT, tupleNum INT)
+		- k_table(tableId INT PRIMARY KEY, headPageId INT, lastTupleId INT, tupleNum INT)
 			head page number 9, tableId 9
 		- k_assert(assertId INT PRIMARY KEY, assertStmt VARCHAR(255))
 			head page number 10, tableId 10
