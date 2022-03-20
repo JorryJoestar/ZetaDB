@@ -522,6 +522,17 @@ func (dataPage *dataPage) GetTuple(tupleId uint32) (*Tuple, error) {
 	return nil, errors.New("no such tuple in this page")
 }
 
+//get a tuple in this page according to its slice index of tuples
+//throw error if index is invalid
+func (dataPage *dataPage) GetTupleAt(i int) (*Tuple, error) {
+	//throw error if index is invalid
+	if i < 0 || i >= len(dataPage.tuples) {
+		return nil, errors.New("dataPage.go    GetTupleAt() index invalid")
+	}
+
+	return dataPage.tuples[i], nil
+}
+
 //insert a tuple into this page
 //throw error if mode is not 0
 //throw error if no enough space to store this tuple
@@ -778,4 +789,15 @@ func (dataPage *dataPage) DpGetTupleNum() int32 {
 	dataPage.MarkDataPage()
 
 	return dataPage.tupleNum
+}
+
+//data getter
+//throw error if page mode is 0
+func (dataPage *dataPage) DpGetData() ([]byte, error) {
+	//throw error if page mode is 0
+	if dataPage.pageMode == 0 {
+		return nil, errors.New("dataPage.go    DpGetData() mode invalid")
+	}
+
+	return dataPage.data, nil
 }

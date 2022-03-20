@@ -51,7 +51,7 @@ import (
 			head page number 16, tableId 16
 */
 
-type storageEngine struct {
+type StorageEngine struct {
 	//stores 17 head pages
 	keyTableHeadPageBuffer [17]*dataPage
 
@@ -66,14 +66,14 @@ type storageEngine struct {
 }
 
 //use GetBufferPool to get the unique bufferPool
-var seInstance *storageEngine
+var seInstance *StorageEngine
 var seOnce sync.Once
 
-func GetStorageEngine(dfl string, ifl string, lfl string) *storageEngine {
+func GetStorageEngine(dfl string, ifl string, lfl string) *StorageEngine {
 	iom, _ := GetIOManipulator(dfl, ifl, lfl)
 
 	seOnce.Do(func() {
-		seInstance = &storageEngine{
+		seInstance = &StorageEngine{
 			dBuffer: NewDataBuffer(),
 			iBuffer: NewIndexBuffer(),
 			iom:     iom}
@@ -85,7 +85,7 @@ func GetStorageEngine(dfl string, ifl string, lfl string) *storageEngine {
 //if this page is not buffered, fetch it from disk and push it into buffer
 //if buffer is full, evict a page
 //if this page is modified, remember to swap it
-func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, error) {
+func (se *StorageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, error) {
 	if pageId <= 16 { // fetch page from keyTableHeadPageBuffer
 		if se.keyTableHeadPageBuffer[pageId] == nil { //fetch it from disk
 			bytes, err := se.iom.BytesFromDataFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
@@ -129,7 +129,7 @@ func (se *storageEngine) GetDataPage(pageId uint32, schema *Schema) (*dataPage, 
 
 //insert a newly created data page into dataBuffer/keyTableHeadPageBuffer, but not swapped into disk
 //remember to swap it
-func (se *storageEngine) InsertDataPage(page *dataPage) error {
+func (se *StorageEngine) InsertDataPage(page *dataPage) error {
 	if page.DpGetPageId() <= 16 { // insert into keyTableHeadPageBuffer
 		se.keyTableHeadPageBuffer[page.DpGetPageId()] = page
 	} else { // insert into dataBuffer
@@ -169,7 +169,7 @@ func (se *storageEngine) InsertDataPage(page *dataPage) error {
 //delete a data page according to its pageId, related page not swapped into disk
 //throw error if corresponding page is a key table head page
 //remember to swap related pages
-func (se *storageEngine) DeleteDataPage(pageId uint32) error {
+func (se *StorageEngine) DeleteDataPage(pageId uint32) error {
 	if pageId <= 16 { //throw error
 		return errors.New("pageId invalid")
 	}
@@ -177,7 +177,7 @@ func (se *storageEngine) DeleteDataPage(pageId uint32) error {
 }
 
 //swap a data page into disk according to its pageId
-func (se *storageEngine) SwapDataPage(pageId uint32) error {
+func (se *StorageEngine) SwapDataPage(pageId uint32) error {
 
 	fmt.Printf("swap page %v\n", pageId)
 
@@ -215,7 +215,7 @@ func (se *storageEngine) SwapDataPage(pageId uint32) error {
 //if this page is not buffered, fetch it from disk and push it into buffer
 //if buffer is full, evict a page
 //if this page is modified, remember to swap it
-func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
+func (se *StorageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
 	page, err1 := se.iBuffer.IndexBufferFetchPage(pageId)
 	if err1 == nil {
 		return page, nil
@@ -248,7 +248,7 @@ func (se *storageEngine) GetIndexPage(pageId uint32) (*indexPage, error) {
 
 //insert a newly created index page into buffer, but not swapped into disk
 //remember to swap it
-func (se *storageEngine) InsertIndexPage(page *indexPage) error {
+func (se *StorageEngine) InsertIndexPage(page *indexPage) error {
 
 	//check if indexBuffer is full
 	if se.iBuffer.IndexBufferIsFull() { //indexBuffer is full, evict and delete one page
@@ -286,12 +286,12 @@ func (se *storageEngine) InsertIndexPage(page *indexPage) error {
 
 //delete an index page according to its pageId, related page not swapped into disk
 //remember to swap related pages
-func (se *storageEngine) DeleteIndexPage(pageId uint32) error {
+func (se *StorageEngine) DeleteIndexPage(pageId uint32) error {
 	return se.iBuffer.IndexBufferDeleteIndexPage(pageId)
 }
 
 //swap an index page into disk according to its pageId
-func (se *storageEngine) SwapIndexPage(pageId uint32) error {
+func (se *StorageEngine) SwapIndexPage(pageId uint32) error {
 	//get this page from buffer
 	page, err := se.iBuffer.IndexBufferFetchPage(pageId)
 	if err != nil {
@@ -309,7 +309,7 @@ func (se *storageEngine) SwapIndexPage(pageId uint32) error {
 
 //fetch a log page according to its pageId from the disk
 //if this page is modified, remember to swap it
-func (se *storageEngine) FetchLogPage(pageId uint32) (*logPage, error) {
+func (se *StorageEngine) FetchLogPage(pageId uint32) (*logPage, error) {
 	bytes, bytesErr := se.iom.BytesFromLogFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
 	if bytesErr != nil {
 		return nil, bytesErr
@@ -324,7 +324,7 @@ func (se *storageEngine) FetchLogPage(pageId uint32) (*logPage, error) {
 }
 
 //swap a log page into disk according to its pageId
-func (se *storageEngine) SwapLogPage(page *logPage) error {
+func (se *StorageEngine) SwapLogPage(page *logPage) error {
 
 	bytes := page.LogPageToBytes()
 	pos := page.LogPageGetLogPageId()
@@ -334,16 +334,16 @@ func (se *storageEngine) SwapLogPage(page *logPage) error {
 }
 
 //erase data file
-func (se *storageEngine) EraseDataFile() error {
+func (se *StorageEngine) EraseDataFile() error {
 	return se.iom.EmptyDataFile()
 }
 
 //erase index file
-func (se *storageEngine) EraseIndexFile() error {
+func (se *StorageEngine) EraseIndexFile() error {
 	return se.iom.EmptyIndexFile()
 }
 
 //erase log file
-func (se *storageEngine) EraseLogFile() error {
+func (se *StorageEngine) EraseLogFile() error {
 	return se.iom.EmptyLogFile()
 }
