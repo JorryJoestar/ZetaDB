@@ -8,6 +8,7 @@ import (
 
 //this iterator is used to fetch tuples from the disk
 type ReadFileIterator struct {
+	headPageId      uint32
 	currentPageId   uint32
 	currentTuple    *container.Tuple
 	currentTuplesId int //slice id of currentTupe in current data page tuples[], valid for mode 0
@@ -20,6 +21,7 @@ type ReadFileIterator struct {
 func NewReadFileIterator(se *storage.StorageEngine, tableHeadPageId uint32, schema *container.Schema) *ReadFileIterator {
 
 	rfi := &ReadFileIterator{
+		headPageId:      tableHeadPageId,
 		currentPageId:   tableHeadPageId,
 		currentTuplesId: 0,
 		se:              se,
@@ -43,7 +45,7 @@ func (rfi *ReadFileIterator) Open(iterator1 *Iterator, iterator2 *Iterator) erro
 		return err
 	}
 
-	if firstPage.DataPageMode() == 0 { //mode 0 page
+	if firstPage.DataPageMode() == 0 { // mode 0 page
 		if firstPage.DpGetTupleNum() != 0 { // not an empty table
 			rfi.currentTuple, err = firstPage.GetTupleAt(rfi.currentTuplesId)
 			if err != nil {
@@ -81,8 +83,6 @@ func (rfi *ReadFileIterator) Open(iterator1 *Iterator, iterator2 *Iterator) erro
 			return err
 		}
 
-		rfi.currentTuplesId = 0
-
 	} else { //mode2 is invalid for being a head page
 		return errors.New("ReadFileIterator.go    Open() page mode invalid")
 	}
@@ -110,6 +110,9 @@ func (rfi *ReadFileIterator) GetNext() (*container.Tuple, error) {
 			isTail, _ := currentPage.DpIsTailPage()
 			if isTail { //already iterate all tuples within this table
 				rfi.hasNext = false
+			} else { //update currentPageId & currentTuplesId, ready for next iterate turn
+				rfi.currentPageId, _ = currentPage.DpGetNextPageId()
+				rfi.currentTuplesId = 0
 			}
 
 		} else { // update currentTuplesId for next iterate turn
@@ -130,13 +133,55 @@ func (rfi *ReadFileIterator) GetNext() (*container.Tuple, error) {
 		return nil, errors.New("ReadFileIterator.go    GetNext() page mode invalid")
 	}
 
+	//update currentTuple
+	currentPage, err = rfi.se.GetDataPage(rfi.currentPageId, rfi.schema)
+	if err != nil {
+		return nil, err
+	}
+	if currentPage.DataPageMode() == 0 {
+		rfi.currentTuple, err = currentPage.GetTupleAt(rfi.currentTuplesId)
+		if err != nil {
+			return nil, err
+		}
+	} else if currentPage.DataPageMode() == 1 {
+		var data []byte
+		firstPageData, _ := currentPage.DpGetData()
+		data = append(data, firstPageData...)
+
+		firstMode2PageId, _ := currentPage.DpGetLinkNextPageId()
+		mode2Page, err := rfi.se.GetDataPage(firstMode2PageId, rfi.schema)
+		if err != nil {
+			return nil, err
+		}
+
+		for {
+			mode2PageData, _ := mode2Page.DpGetData()
+			data = append(data, mode2PageData...)
+
+			isListTail, _ := mode2Page.DpIsListTailPage()
+			if isListTail { //reach the list tail
+				break
+			}
+		}
+
+		rfi.currentTuple, err = container.NewTupleFromBytes(data, rfi.schema, currentPage.DpGetTableId())
+		if err != nil {
+			return nil, err
+		}
+	} else { //mode 2, throw error
+		return nil, errors.New("ReadFileIterator.go    GetNext() page mode invalid")
+	}
+
 	return tupleToReturn, nil
 }
 
+//if HasNext returns false, it is invalid to call GetNext()
 func (rfi *ReadFileIterator) HasNext() bool {
 	return rfi.hasNext
 }
 
+//initialize this ReadFileIterator
 func (rfi *ReadFileIterator) Close() error {
+	rfi = NewReadFileIterator(rfi.se, rfi.headPageId, rfi.schema)
 	return nil
 }
