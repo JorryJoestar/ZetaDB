@@ -7,7 +7,7 @@ import (
 )
 
 //this iterator is used to fetch tuples from the disk
-type ReadFileIterator struct {
+type SequentialFileReaderIterator struct {
 	headPageId      uint32
 	currentPageId   uint32
 	currentTuple    *container.Tuple
@@ -17,10 +17,10 @@ type ReadFileIterator struct {
 	hasNext         bool
 }
 
-//ReadFileIterator constructor
-func NewReadFileIterator(se *storage.StorageEngine, tableHeadPageId uint32, schema *container.Schema) *ReadFileIterator {
+//SequentialFileReaderIterator constructor
+func NewSequentialFileReaderIterator(se *storage.StorageEngine, tableHeadPageId uint32, schema *container.Schema) *SequentialFileReaderIterator {
 
-	rfi := &ReadFileIterator{
+	rfi := &SequentialFileReaderIterator{
 		headPageId:      tableHeadPageId,
 		currentPageId:   tableHeadPageId,
 		currentTuplesId: 0,
@@ -34,7 +34,7 @@ func NewReadFileIterator(se *storage.StorageEngine, tableHeadPageId uint32, sche
 //iterator1 & iterator2 should always be null
 //throw error if iterator1 or iterator2 is not null
 //throw error if the first page is mode 2
-func (rfi *ReadFileIterator) Open(iterator1 *Iterator, iterator2 *Iterator) error {
+func (rfi *SequentialFileReaderIterator) Open(iterator1 *Iterator, iterator2 *Iterator) error {
 	//throw error if iterator1 or iterator2 is not null
 	if iterator1 != nil || iterator2 != nil {
 		return errors.New("ReadFileIterator.go    Open() parameter invalid")
@@ -91,7 +91,7 @@ func (rfi *ReadFileIterator) Open(iterator1 *Iterator, iterator2 *Iterator) erro
 }
 
 //throw error if HasNext() is false
-func (rfi *ReadFileIterator) GetNext() (*container.Tuple, error) {
+func (rfi *SequentialFileReaderIterator) GetNext() (*container.Tuple, error) {
 	if !rfi.HasNext() {
 		return nil, errors.New("ReadFileIterator.go    GetNext() hasNext false")
 	}
@@ -176,12 +176,12 @@ func (rfi *ReadFileIterator) GetNext() (*container.Tuple, error) {
 }
 
 //if HasNext returns false, it is invalid to call GetNext()
-func (rfi *ReadFileIterator) HasNext() bool {
+func (rfi *SequentialFileReaderIterator) HasNext() bool {
 	return rfi.hasNext
 }
 
-//initialize this ReadFileIterator
-func (rfi *ReadFileIterator) Close() error {
-	rfi = NewReadFileIterator(rfi.se, rfi.headPageId, rfi.schema)
+//initialize this SequentialFileReaderIterator
+func (rfi *SequentialFileReaderIterator) Close() error {
+	rfi = NewSequentialFileReaderIterator(rfi.se, rfi.headPageId, rfi.schema)
 	return nil
 }
