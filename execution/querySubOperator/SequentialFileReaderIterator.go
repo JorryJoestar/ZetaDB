@@ -104,6 +104,8 @@ func (rfi *SequentialFileReaderIterator) GetNext() (*container.Tuple, error) {
 		return nil, err
 	}
 
+	//update currentPageId, currentTuplesId
+	//if no more tuples, set hasNext to false
 	if currentPage.DataPageMode() == 0 { //mode 0 page
 
 		if rfi.currentTuplesId+1 == int(currentPage.DpGetTupleNum()) { //already iterate all tuples within this page
@@ -139,10 +141,17 @@ func (rfi *SequentialFileReaderIterator) GetNext() (*container.Tuple, error) {
 		return nil, err
 	}
 	if currentPage.DataPageMode() == 0 {
-		rfi.currentTuple, err = currentPage.GetTupleAt(rfi.currentTuplesId)
-		if err != nil {
-			return nil, err
+
+		if currentPage.DpGetTupleNum() != 0 { // not an empty table
+			rfi.currentTuple, err = currentPage.GetTupleAt(rfi.currentTuplesId)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			rfi.hasNext = false
+			rfi.currentTuple = nil
 		}
+
 	} else if currentPage.DataPageMode() == 1 {
 		var data []byte
 		firstPageData, _ := currentPage.DpGetData()
