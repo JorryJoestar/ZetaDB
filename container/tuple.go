@@ -397,12 +397,13 @@ func (t *Tuple) TupleGetMapKey() (string, error) {
 	keyString := ""
 
 	for _, field := range t.TupleGetFields() {
+
 		fieldData, nullErr := field.FieldToBytes()
 
 		if nullErr != nil { //this is a null field
 
 			currentFieldLen = 0
-			keyString += string(Uint16ToBytes(currentFieldLen))
+			keyString += BytesToHexString(Uint16ToBytes(currentFieldLen))
 
 		} else { //this is  not a null field
 
@@ -413,19 +414,17 @@ func (t *Tuple) TupleGetMapKey() (string, error) {
 
 			if uint16(len(fieldData)) > DEFAULT_TUPLE_SINGAL_FIELD_OVER_LONG_LENGTH { //this field is too large, throw error
 				return "", errors.New("tuple.go    TupleGetMapKey() field over long")
-			} else {
-
-				currentFieldLen = uint16(len(fieldData))
-				totalLen += currentFieldLen
-
-				if totalLen > DEFAULT_TUPLE_TOTAL_OVER_LONG_LENGTH { //this tuple is too large, thorw error
-					return "", errors.New("tuple.go    TupleGetMapKey() tuple over long")
-				}
-
-				keyString += string(Uint16ToBytes(currentFieldLen))
-				keyString += BytesToHexString(fieldData)
-
 			}
+
+			currentFieldLen = uint16(len(fieldData))
+			totalLen += currentFieldLen
+
+			if totalLen > DEFAULT_TUPLE_TOTAL_OVER_LONG_LENGTH { //this tuple is too large, thorw error
+				return "", errors.New("tuple.go    TupleGetMapKey() tuple over long")
+			}
+
+			keyString += BytesToHexString(Uint16ToBytes(currentFieldLen))
+			keyString += BytesToHexString(fieldData)
 
 		}
 	}

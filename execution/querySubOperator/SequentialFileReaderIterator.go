@@ -34,7 +34,7 @@ func NewSequentialFileReaderIterator(se *storage.StorageEngine, tableHeadPageId 
 //iterator1 & iterator2 should always be null
 //throw error if iterator1 or iterator2 is not null
 //throw error if the first page is mode 2
-func (rfi *SequentialFileReaderIterator) Open(iterator1 *Iterator, iterator2 *Iterator) error {
+func (rfi *SequentialFileReaderIterator) Open(iterator1 Iterator, iterator2 Iterator) error {
 	//throw error if iterator1 or iterator2 is not null
 	if iterator1 != nil || iterator2 != nil {
 		return errors.New("ReadFileIterator.go    Open() parameter invalid")
@@ -190,7 +190,9 @@ func (rfi *SequentialFileReaderIterator) HasNext() bool {
 }
 
 //initialize this SequentialFileReaderIterator
-func (rfi *SequentialFileReaderIterator) Close() error {
-	rfi = NewSequentialFileReaderIterator(rfi.se, rfi.headPageId, rfi.schema)
-	return nil
+func (rfi *SequentialFileReaderIterator) Close() {
+	rfi.currentPageId = rfi.headPageId
+	rfi.currentTuple = nil
+	rfi.currentTuplesId = 0
+	rfi.hasNext = true
 }

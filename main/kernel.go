@@ -2,7 +2,7 @@ package main
 
 import (
 	"ZetaDB/container"
-	//. "ZetaDB/execution/querySubOperator"
+	. "ZetaDB/execution/querySubOperator"
 	"ZetaDB/parser"
 	. "ZetaDB/storage"
 	. "ZetaDB/utility"
@@ -157,7 +157,122 @@ func main() {
 
 	   	} */
 
-	fmt.Println(se)
-	fmt.Println(schema)
+	/* 	t0f0, _ := container.NewFieldFromBytes(INTToBytes(1))
+	   	t0Name, _ := VARCHARToBytes("Simeon")
+	   	t0f1, _ := container.NewFieldFromBytes(t0Name)
+	   	t0Address, _ := VARCHARToBytes("Birmingham")
+	   	t0f2, _ := container.NewFieldFromBytes(t0Address)
+	   	t0Date, _ := DATEToBytes("1997-11-12")
+	   	t0f3, _ := container.NewFieldFromBytes(t0Date)
+	   	var f0 []*container.Field
+	   	f0 = append(f0, t0f0)
+	   	f0 = append(f0, t0f1)
+	   	f0 = append(f0, t0f2)
+	   	f0 = append(f0, t0f3)
+	   	t0, _ := container.NewTuple(30, 0, schema, f0)
 
+	   	t1f0, _ := container.NewFieldFromBytes(INTToBytes(2))
+	   	t1Name, _ := VARCHARToBytes("Alex")
+	   	t1f1, _ := container.NewFieldFromBytes(t1Name)
+	   	t1Address, _ := VARCHARToBytes("Beijing")
+	   	t1f2, _ := container.NewFieldFromBytes(t1Address)
+	   	t1Date, _ := DATEToBytes("1998-03-02")
+	   	t1f3, _ := container.NewFieldFromBytes(t1Date)
+	   	var f1 []*container.Field
+	   	f1 = append(f1, t1f0)
+	   	f1 = append(f1, t1f1)
+	   	f1 = append(f1, t1f2)
+	   	f1 = append(f1, t1f3)
+	   	t1, _ := container.NewTuple(30, 1, schema, f1)
+
+	   	t2f0, _ := container.NewFieldFromBytes(INTToBytes(168))
+	   	t2Name, _ := VARCHARToBytes("Claire")
+	   	t2f1, _ := container.NewFieldFromBytes(t2Name)
+	   	t2Address, _ := VARCHARToBytes("London")
+	   	t2f2, _ := container.NewFieldFromBytes(t2Address)
+	   	t2Date, _ := DATEToBytes("1997-10-20")
+	   	t2f3, _ := container.NewFieldFromBytes(t2Date)
+	   	var f2 []*container.Field
+	   	f2 = append(f2, t2f0)
+	   	f2 = append(f2, t2f1)
+	   	f2 = append(f2, t2f2)
+	   	f2 = append(f2, t2f3)
+	   	t2, _ := container.NewTuple(30, 2, schema, f2)
+
+	   	t3f0, _ := container.NewFieldFromBytes(INTToBytes(1))
+	   	t3Name, _ := VARCHARToBytes("Simeon")
+	   	t3f1, _ := container.NewFieldFromBytes(t3Name)
+	   	t3Address, _ := VARCHARToBytes("Birmingham")
+	   	t3f2, _ := container.NewFieldFromBytes(t3Address)
+	   	t3Date, _ := DATEToBytes("1997-11-12")
+	   	t3f3, _ := container.NewFieldFromBytes(t3Date)
+	   	var f3 []*container.Field
+	   	f3 = append(f3, t3f0)
+	   	f3 = append(f3, t3f1)
+	   	f3 = append(f3, t3f2)
+	   	f3 = append(f3, t3f3)
+	   	t3, _ := container.NewTuple(30, 3, schema, f3)
+
+	   	t4f0, _ := container.NewFieldFromBytes(INTToBytes(72))
+	   	t4Name, _ := VARCHARToBytes("Jack")
+	   	t4f1, _ := container.NewFieldFromBytes(t4Name)
+	   	t4Address, _ := VARCHARToBytes("Java")
+	   	t4f2, _ := container.NewFieldFromBytes(t4Address)
+	   	t4Date, _ := DATEToBytes("1894-11-16")
+	   	t4f3, _ := container.NewFieldFromBytes(t4Date)
+	   	var f4 []*container.Field
+	   	f4 = append(f4, t4f0)
+	   	f4 = append(f4, t4f1)
+	   	f4 = append(f4, t4f2)
+	   	f4 = append(f4, t4f3)
+	   	t4, _ := container.NewTuple(30, 4, schema, f4)
+
+	   	t5f0, _ := container.NewFieldFromBytes(INTToBytes(1))
+	   	t5Name, _ := VARCHARToBytes("Simeon")
+	   	t5f1, _ := container.NewFieldFromBytes(t5Name)
+	   	t5Address, _ := VARCHARToBytes("Birmingham")
+	   	t5f2, _ := container.NewFieldFromBytes(t5Address)
+	   	t5Date, _ := DATEToBytes("1997-11-12")
+	   	t5f3, _ := container.NewFieldFromBytes(t5Date)
+	   	var f5 []*container.Field
+	   	f5 = append(f5, t5f0)
+	   	f5 = append(f5, t5f1)
+	   	f5 = append(f5, t5f2)
+	   	f5 = append(f5, t5f3)
+	   	t5, _ := container.NewTuple(30, 5, schema, f5)
+
+	   	page := NewDataPageMode0(30, 30, 30, 30)
+	   	page.InsertTuple(t0)
+	   	page.InsertTuple(t1)
+	   	page.InsertTuple(t2)
+	   	page.InsertTuple(t3)
+	   	page.InsertTuple(t4)
+	   	page.InsertTuple(t5)
+
+	   	se.InsertDataPage(page)
+	   	se.SwapDataPage(page.DpGetPageId()) */
+	page, _ := se.GetDataPage(30, schema)
+	fmt.Println(page)
+	seqIt := NewSequentialFileReaderIterator(se, 30, schema)
+	seqIt.Open(nil, nil)
+	for seqIt.HasNext() {
+		fmt.Println(seqIt.GetNext())
+	}
+	fmt.Println("---------------------")
+
+	seqIt.Close()
+	seqIt.Open(nil, nil)
+	dupEliminateIt := NewDuplicateEliminationIterator()
+	dupEliminateIt.Open(seqIt, nil)
+	for dupEliminateIt.HasNext() {
+		fmt.Println(dupEliminateIt.GetNext())
+	}
+	fmt.Println("---------------------")
+	seqIt.Close()
+	seqIt.Open(nil, nil)
+	dupEliminateIt.Close()
+	dupEliminateIt.Open(seqIt, nil)
+	for dupEliminateIt.HasNext() {
+		fmt.Println(dupEliminateIt.GetNext())
+	}
 }
