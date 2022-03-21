@@ -392,30 +392,43 @@ func (t *Tuple) TupleSizeFixed() bool {
 */
 func (t *Tuple) TupleGetMapKey() (string, error) {
 
-	var currentFieldLen uint16
-	currentFieldLen = 0
-	var totalLen uint16
-	totalLen = 0
+	var currentFieldLen uint16 = 0
+	var totalLen uint16 = 0
 	keyString := ""
 
 	for _, field := range t.TupleGetFields() {
 		fieldData, nullErr := field.FieldToBytes()
+
 		if nullErr != nil { //this is a null field
+
 			currentFieldLen = 0
 			keyString += string(Uint16ToBytes(currentFieldLen))
-		} else {
-			currentFieldLen = uint16(len(fieldData))
+
+		} else { //this is  not a null field
+
+			if len(fieldData) > int(UINT16_MAX) { //field length is greater than max range of uint16
+				return "", errors.New("tuple.go    TupleGetMapKey() field over long")
+
+			}
+
 			if uint16(len(fieldData)) > DEFAULT_TUPLE_SINGAL_FIELD_OVER_LONG_LENGTH { //this field is too large, throw error
 				return "", errors.New("tuple.go    TupleGetMapKey() field over long")
 			} else {
+
+				currentFieldLen = uint16(len(fieldData))
 				totalLen += currentFieldLen
+
 				if totalLen > DEFAULT_TUPLE_TOTAL_OVER_LONG_LENGTH { //this tuple is too large, thorw error
 					return "", errors.New("tuple.go    TupleGetMapKey() tuple over long")
 				}
+
 				keyString += string(Uint16ToBytes(currentFieldLen))
 				keyString += BytesToHexString(fieldData)
+
 			}
+
 		}
 	}
+
 	return keyString, nil
 }
