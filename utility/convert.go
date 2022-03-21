@@ -425,3 +425,52 @@ func Uint32ToBytes(i uint32) []byte {
 	bytes[3] = byte(i >> 24)
 	return bytes
 }
+
+//convert 2 bytes to uint16, little-endian
+func BytesToUint16(bytes []byte) (uint16, error) {
+	if len(bytes) != 2 {
+		return 0, errors.New("length of byte slice invalid")
+	}
+
+	var result uint16 = uint16(bytes[0]) + uint16(bytes[1])<<8
+
+	return result, nil
+}
+
+//convert uint16 to 2 bytes, little-endian
+func Uint16ToBytes(i uint16) []byte {
+	bytes := make([]byte, 2)
+	bytes[0] = byte(i)
+	bytes[1] = byte(i >> 8)
+	return bytes
+}
+
+//convert byte slice into hex string format
+//65 is 'A' in ascii
+//48 is '0' in ascii
+func BytesToHexString(bytes []byte) string {
+	hexString := ""
+	for _, b := range bytes {
+		highNum := b >> 4
+		lowNum := b & 0b00001111
+		highLetter := ""
+		lowLetter := ""
+
+		if highNum < 10 {
+			highLetter = string(48 + highNum)
+		} else {
+			highLetter = string(65 + highNum - 10)
+		}
+
+		if lowNum < 10 {
+			lowLetter = string(48 + lowNum)
+		} else {
+			lowLetter = string(65 + lowNum - 10)
+		}
+
+		hexString += highLetter
+		hexString += lowLetter
+	}
+
+	return hexString
+}

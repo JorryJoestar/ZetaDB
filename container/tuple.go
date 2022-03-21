@@ -377,3 +377,45 @@ func (t *Tuple) TupleSizeInBytes() int {
 func (t *Tuple) TupleSizeFixed() bool {
 	return t.schema.UnfixedDomainNum() == 0
 }
+
+//generate a key for map, it is determined by all fields content
+//if fields of two tuples are identical, they must have the same map key
+//throw error if any single field length in bytes is over DEFAULT_TUPLE_SINGAL_FIELD_OVER_LONG_LENGTH
+//throw error if total length of this tuple is over DEFAULT_TUPLE_TOTAL_OVER_LONG_LENGTH
+/*
+
+	map key structure:
+		field0Length + field0InHex + field1Length + field1InHex + ... + field(n-1)Length + field(n-1)InHex
+	-if a field is null, the corresponding length is 0 and no fieldInHex included
+	-field0Length is uint16 in hex form
+
+*/
+func (t *Tuple) TupleGetMapKey() (string, error) {
+
+	var currentFieldLen uint16
+	currentFieldLen = 0
+	var totalLen uint16
+	totalLen = 0
+	keyString := ""
+
+	for _, field := range t.TupleGetFields() {
+		fieldData, nullErr := field.FieldToBytes()
+		if nullErr != nil { //this is a null field
+			currentFieldLen = 0
+			keyString += string(Uint16ToBytes(currentFieldLen))
+		} else {
+			currentFieldLen = uint16(len(fieldData))
+			if uint16(len(fieldData)) > DEFAULT_TUPLE_SINGAL_FIELD_OVER_LONG_LENGTH { //this field is too large, throw error
+				return "", errors.New("tuple.go    TupleGetMapKey() field over long")
+			} else {
+				totalLen += currentFieldLen
+				if totalLen > DEFAULT_TUPLE_TOTAL_OVER_LONG_LENGTH { //this tuple is too large, thorw error
+					return "", errors.New("tuple.go    TupleGetMapKey() tuple over long")
+				}
+				keyString += string(Uint16ToBytes(currentFieldLen))
+				keyString += BytesToHexString(fieldData)
+			}
+		}
+	}
+	return keyString, nil
+}

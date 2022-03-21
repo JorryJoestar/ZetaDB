@@ -6,7 +6,7 @@ import (
 	"errors"
 )
 
-//this iterator is used to fetch tuples from the disk
+//this iterator is used to fetch tuples from the disk sequentially
 type SequentialFileReaderIterator struct {
 	headPageId      uint32
 	currentPageId   uint32
