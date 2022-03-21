@@ -262,17 +262,15 @@ func main() {
 
 	seqIt.Close()
 	seqIt.Open(nil, nil)
+
+	seqIt2 := NewSequentialFileReaderIterator(se, 30, schema)
+	seqIt2.Open(nil, nil)
 	dupEliminateIt := NewDuplicateEliminationIterator()
-	dupEliminateIt.Open(seqIt, nil)
-	for dupEliminateIt.HasNext() {
-		fmt.Println(dupEliminateIt.GetNext())
-	}
-	fmt.Println("---------------------")
-	seqIt.Close()
-	seqIt.Open(nil, nil)
-	dupEliminateIt.Close()
-	dupEliminateIt.Open(seqIt, nil)
-	for dupEliminateIt.HasNext() {
-		fmt.Println(dupEliminateIt.GetNext())
+	dupEliminateIt.Open(seqIt2, nil)
+
+	bagUnionIt := NewBagUnionIterator()
+	bagUnionIt.Open(seqIt, dupEliminateIt)
+	for bagUnionIt.HasNext() {
+		fmt.Println(bagUnionIt.GetNext())
 	}
 }
