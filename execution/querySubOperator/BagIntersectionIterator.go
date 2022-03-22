@@ -45,7 +45,6 @@ func (bii *BagIntersectionIterator) Open(iterator1 Iterator, iterator2 Iterator)
 				//begin to use iterator2, until discover a over large tuple or iterator2 is exhausted
 
 				for {
-
 					if !bii.iterator2.HasNext() { //iterator2 is exhausted
 						bii.hasNext = false
 						return nil
@@ -62,6 +61,7 @@ func (bii *BagIntersectionIterator) Open(iterator1 Iterator, iterator2 Iterator)
 						return nil
 					} else { //check if it is in tuplesIn1, if it is in set it as nextTuple and update tuplesIn1
 						if bii.tuplesIn1[mapKey2] != nil {
+
 							//update tuplesIn1
 							if bii.tuplesIn1[mapKey2].count == 1 { //delete this bagUnionStruct from iterator1Tuples
 								delete(bii.tuplesIn1, mapKey2)
@@ -112,71 +112,70 @@ func (bii *BagIntersectionIterator) GetNext() (*container.Tuple, error) {
 		return nil, errors.New("bagIntersectionIterator.go    GetNext() hasNext false")
 	}
 
+	if !bii.iterator2.HasNext() { //iterator2 is exhausted
+		bii.hasNext = false
+	}
+
 	returnTuple := bii.nextTuple
 
-	if bii.iterator1.HasNext() { //still some over large tuples in iterator1
+	for { //loop until iterator1 is exhausted or an over large tuple is discovered
 
-		for { //loop until iterator1 is exhausted or an over large tuple is discovered
+		if !bii.iterator1.HasNext() { //iterator1 exhausted
+			break
+		}
 
-			if !bii.iterator1.HasNext() { //iterator1 exhausted
-				break
-			}
+		//get a tuple from iterator1
+		tuple1, error1 := bii.iterator1.GetNext()
+		if error1 != nil {
+			return nil, error1
+		}
 
-			//get a tuple from iterator1
-			tuple1, error1 := bii.iterator1.GetNext()
-			if error1 != nil {
-				return nil, error1
-			}
-
-			mapKey1, key1Err := tuple1.TupleGetMapKey()
-			if key1Err != nil { //tuple1 is over large
-				bii.nextTuple = tuple1
-				return returnTuple, nil
-			} else { //tuple1 should be insert into tuplesIn1
-				if bii.tuplesIn1[mapKey1] != nil { //duplicated tuple(s) have appeared
-					bii.tuplesIn1[mapKey1].count++
-				} else {
-					bii.tuplesIn1[mapKey1] = &bagIntersectionStruct{ //discover a new tuple
-						tuple: tuple1,
-						count: 1}
-				}
+		mapKey1, key1Err := tuple1.TupleGetMapKey()
+		if key1Err != nil { //tuple1 is over large
+			bii.nextTuple = tuple1
+			return returnTuple, nil
+		} else { //tuple1 should be insert into tuplesIn1
+			if bii.tuplesIn1[mapKey1] != nil { //duplicated tuple(s) have appeared
+				bii.tuplesIn1[mapKey1].count++
+			} else {
+				bii.tuplesIn1[mapKey1] = &bagIntersectionStruct{ //discover a new tuple
+					tuple: tuple1,
+					count: 1}
 			}
 		}
 	}
 
-	if bii.iterator2.HasNext() { //iterator2 is not exhausted
-		for {
+	for { //loop until an over large tuple is discovered, or iterator2 is exhausted
 
-			if !bii.iterator2.HasNext() { //iterator2 is exhausted
-				bii.hasNext = false
-				return returnTuple, nil
-			}
-
-			tuple2, error2 := bii.iterator2.GetNext()
-			if error2 != nil {
-				return nil, error2
-			}
-
-			mapKey2, key2Err := tuple2.TupleGetMapKey()
-			if key2Err != nil { // this is an over large tuple,set it as nextTuple
-				bii.nextTuple = tuple2
-				return returnTuple, nil
-			} else { //check if it is in tuplesIn1, if it is in set it as nextTuple and update tuplesIn1
-				if bii.tuplesIn1[mapKey2] != nil {
-					//update tuplesIn1
-					if bii.tuplesIn1[mapKey2].count == 1 { //delete this bagUnionStruct from iterator1Tuples
-						delete(bii.tuplesIn1, mapKey2)
-					} else { //decrease bagUnionStruct count value
-						bii.tuplesIn1[mapKey2].count--
-					}
-
-					//set nextTuple
-					bii.nextTuple = tuple2
-					return returnTuple, nil
-				}
-			}
+		if !bii.iterator2.HasNext() { //iterator2 is exhausted
+			break
 		}
 
+		tuple2, error2 := bii.iterator2.GetNext()
+
+		if error2 != nil {
+			return nil, error2
+		}
+
+		mapKey2, key2Err := tuple2.TupleGetMapKey()
+		if key2Err != nil { // this is an over large tuple,set it as nextTuple
+			bii.nextTuple = tuple2
+			break
+		} else { //check if it is in tuplesIn1, if it is in set it as nextTuple and update tuplesIn1
+			if bii.tuplesIn1[mapKey2] != nil {
+
+				//update tuplesIn1
+				if bii.tuplesIn1[mapKey2].count == 1 { //delete this bagUnionStruct from iterator1Tuples
+					delete(bii.tuplesIn1, mapKey2)
+				} else { //decrease bagUnionStruct count value
+					bii.tuplesIn1[mapKey2].count--
+				}
+
+				//set nextTuple
+				bii.nextTuple = tuple2
+				break
+			}
+		}
 	}
 
 	return returnTuple, nil
