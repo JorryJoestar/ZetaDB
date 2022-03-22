@@ -105,7 +105,7 @@ func (bdi *BagDifferenceIterator) Open(iterator1 Iterator, iterator2 Iterator) e
 			if key1Err != nil { //tuple1 is over large
 				bdi.nextTuple = tuple1
 				return nil
-			} else { //tuple1 should be insert into iterator1Tuples
+			} else { //tuple1 should be insert into tuplesIn1NotIn2
 				if bdi.tuplesIn1NotIn2[mapKey1] != nil { //duplicated tuple(s) have appeared
 					bdi.tuplesIn1NotIn2[mapKey1].count++
 				} else {
