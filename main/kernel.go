@@ -62,8 +62,8 @@ func main() {
 	p66.InsertTuple(CreateNewTuple("Claire", 66, 0, schema))
 	p66.InsertTuple(CreateNewTuple("Claire", 66, 1, schema))
 	p66.InsertTuple(CreateNewTuple("alse", 66, 2, schema))
-	p66.InsertTuple(CreateNewTuple("simeon", 66, 3, schema))
-	p66.InsertTuple(CreateNewTuple(longString, 66, 4, schema))
+	p66.InsertTuple(CreateNewTuple("alex", 66, 3, schema))
+	p66.InsertTuple(CreateNewTuple(longString+"X", 66, 4, schema))
 
 	se.InsertDataPage(p72)
 	se.InsertDataPage(p66)
@@ -77,11 +77,11 @@ func main() {
 	seqIt72.Open(nil, nil)
 	seqIt66.Open(nil, nil)
 
-	bagIntersectionIt := execution.NewBagIntersectionIterator()
-	bagIntersectionIt.Open(seqIt72, seqIt66)
+	setUnionIt := execution.NewSetUnionIterator()
+	setUnionIt.Open(seqIt72, seqIt66)
 
-	for bagIntersectionIt.HasNext() {
-		tup, _ := bagIntersectionIt.GetNext()
+	for setUnionIt.HasNext() {
+		tup, _ := setUnionIt.GetNext()
 		tupBytes, _ := tup.TupleGetFieldValue(0)
 		fmt.Println(BytesToVARCHAR(tupBytes))
 	}
