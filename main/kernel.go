@@ -50,20 +50,20 @@ func main() {
 	for i := 0; i < 100; i++ {
 		longString += "A"
 	}
-	p72.InsertTuple(CreateNewTuple(longString, 72, 0, schema))
+	p72.InsertTuple(CreateNewTuple("longString", 72, 0, schema))
 	p72.InsertTuple(CreateNewTuple("Claire", 72, 1, schema))
 	p72.InsertTuple(CreateNewTuple("simeon", 72, 2, schema))
 	p72.InsertTuple(CreateNewTuple("simeon", 72, 3, schema))
 	p72.InsertTuple(CreateNewTuple("simeon", 72, 4, schema))
 	p72.InsertTuple(CreateNewTuple("Claire", 72, 5, schema))
 	p72.InsertTuple(CreateNewTuple("simeon", 72, 6, schema))
-	p72.InsertTuple(CreateNewTuple("simeon", 72, 7, schema))
+	p72.InsertTuple(CreateNewTuple("alse", 72, 7, schema))
 
 	p66.InsertTuple(CreateNewTuple("Claire", 66, 0, schema))
-	p66.InsertTuple(CreateNewTuple("Claire", 66, 1, schema))
+	p66.InsertTuple(CreateNewTuple("simeon", 66, 1, schema))
 	p66.InsertTuple(CreateNewTuple("alse", 66, 2, schema))
 	p66.InsertTuple(CreateNewTuple("alex", 66, 3, schema))
-	p66.InsertTuple(CreateNewTuple(longString+"X", 66, 4, schema))
+	p66.InsertTuple(CreateNewTuple(longString, 66, 4, schema))
 
 	se.InsertDataPage(p72)
 	se.InsertDataPage(p66)
@@ -77,11 +77,11 @@ func main() {
 	seqIt72.Open(nil, nil)
 	seqIt66.Open(nil, nil)
 
-	setUnionIt := execution.NewSetUnionIterator()
-	setUnionIt.Open(seqIt72, seqIt66)
+	setIntersectionIt := execution.NewSetIntersectionIterator()
+	setIntersectionIt.Open(seqIt72, seqIt66)
 
-	for setUnionIt.HasNext() {
-		tup, _ := setUnionIt.GetNext()
+	for setIntersectionIt.HasNext() {
+		tup, _ := setIntersectionIt.GetNext()
 		tupBytes, _ := tup.TupleGetFieldValue(0)
 		fmt.Println(BytesToVARCHAR(tupBytes))
 	}
