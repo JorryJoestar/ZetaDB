@@ -90,3 +90,7 @@ func (bui *BagUnionIterator) Close() {
 	bui.iterator2 = nil
 	bui.hasNext = true
 }
+
+func (bui *BagUnionIterator) GetSchema() *container.Schema {
+	return bui.iterator1.GetSchema()
+}

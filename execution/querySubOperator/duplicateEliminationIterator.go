@@ -90,3 +90,7 @@ func (dei *DuplicateEliminationIterator) Close() {
 	dei.appearedTuples = make(map[string]*container.Tuple)
 	dei.currentTuple = nil
 }
+
+func (dei *DuplicateEliminationIterator) GetSchema() *container.Schema {
+	return dei.inputIterator.GetSchema()
+}

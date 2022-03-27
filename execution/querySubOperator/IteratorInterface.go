@@ -9,4 +9,5 @@ type Iterator interface {
 	GetNext() (*container.Tuple, error)
 	HasNext() bool
 	Close()
+	GetSchema() *container.Schema
 }

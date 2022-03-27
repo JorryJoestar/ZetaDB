@@ -150,3 +150,7 @@ func (sii *SetIntersectionIterator) Close() {
 	sii.iterator2 = nil
 	sii.hasNext = true
 }
+
+func (sii *SetIntersectionIterator) GetSchema() *container.Schema {
+	return sii.iterator1.GetSchema()
+}

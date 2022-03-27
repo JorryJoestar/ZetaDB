@@ -136,3 +136,7 @@ func (sui *SetUnionIterator) Close() {
 	sui.iterator2 = nil
 	sui.hasNext = true
 }
+
+func (sui *SetUnionIterator) GetSchema() *container.Schema {
+	return sui.iterator1.GetSchema()
+}

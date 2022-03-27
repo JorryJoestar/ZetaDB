@@ -196,3 +196,7 @@ func (rfi *SequentialFileReaderIterator) Close() {
 	rfi.currentTuplesId = 0
 	rfi.hasNext = true
 }
+
+func (rfi *SequentialFileReaderIterator) GetSchema() *container.Schema {
+	return rfi.schema
+}

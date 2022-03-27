@@ -193,6 +193,10 @@ func (bii *BagIntersectionIterator) Close() {
 	bii.hasNext = true
 }
 
+func (bii *BagIntersectionIterator) GetSchema() *container.Schema {
+	return bii.iterator1.GetSchema()
+}
+
 type bagIntersectionStruct struct {
 	tuple *container.Tuple
 	count int

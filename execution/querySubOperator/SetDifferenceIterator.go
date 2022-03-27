@@ -196,3 +196,7 @@ func (sdi *SetDifferenceIterator) Close() {
 	sdi.nextIndex = 0
 	sdi.maxIndex = 0
 }
+
+func (sdi *SetDifferenceIterator) GetSchema() *container.Schema {
+	return sdi.iterator1.GetSchema()
+}

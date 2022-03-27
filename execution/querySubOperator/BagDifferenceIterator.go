@@ -231,6 +231,10 @@ func (bdi *BagDifferenceIterator) Close() {
 	bdi.maxIndex = 0
 }
 
+func (bdi *BagDifferenceIterator) GetSchema() *container.Schema {
+	return bdi.iterator1.GetSchema()
+}
+
 //this structure is used to save info about a tuple and its appearing counts in iterator1
 type bagUnionStruct struct {
 	tuple *container.Tuple
