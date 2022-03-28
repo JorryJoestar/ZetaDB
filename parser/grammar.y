@@ -2310,7 +2310,6 @@ elementaryValueList
 			updateList COMMA updateListEntry
 
         updateListEntry
-        	ID EQUAL expression
 			ID EQUAL elementaryValue
 
     -------------------------------------------------------------------------------- */
@@ -2344,16 +2343,7 @@ updateList
 
 /*  ------------------------------- updateListEntry -------------------------------- */
 updateListEntry
-    :ID EQUAL expression {
-        $$ = &Node{}
-        $$.Type = UPDATE_LIST_ENTRY
-
-        $$.UpdateListEntry = &UpdateListEntryNode{}
-        $$.UpdateListEntry.Type = UPDATE_LIST_ENTRY_EXPRESSION
-        $$.UpdateListEntry.AttributeName = $1
-        $$.UpdateListEntry.Expression = $3.Expression
-    }
-    |ID EQUAL elementaryValue {
+    :ID EQUAL elementaryValue {
         $$ = &Node{}
         $$.Type = UPDATE_LIST_ENTRY
 

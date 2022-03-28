@@ -29,7 +29,7 @@ const (
 	DEFAULT_KEY_TABLE_4_SCHEMA  string = "CREATE TABLE k_viewId_userId (viewId INT PRIMARY KEY, userId INT);"
 	DEFAULT_KEY_TABLE_5_SCHEMA  string = "CREATE TABLE k_indexId_tableId (indexId INT PRIMARY KEY, tableId INT);"
 	DEFAULT_KEY_TABLE_6_SCHEMA  string = "CREATE TABLE k_triggerId_userId (triggerId INT PRIMARY KEY, userId INT);"
-	DEFAULT_KEY_TABLE_7_SCHEMA  string = "CREATE TABLE k_psmId_userId(psmId INT PRIMARY KEY, userId INT);"
+	DEFAULT_KEY_TABLE_7_SCHEMA  string = "CREATE TABLE k_psmId_userId (psmId INT PRIMARY KEY, userId INT);"
 	DEFAULT_KEY_TABLE_8_SCHEMA  string = "CREATE TABLE k_tableId_schema (tableId INT PRIMARY KEY, schema VARCHAR(255));"
 	DEFAULT_KEY_TABLE_9_SCHEMA  string = "CREATE TABLE k_table (tableId INT PRIMARY KEY, headPageId INT, lastTupleId INT, tupleNum INT);"
 	DEFAULT_KEY_TABLE_10_SCHEMA string = "CREATE TABLE k_assert (assertId INT PRIMARY KEY, assertStmt VARCHAR(255));"

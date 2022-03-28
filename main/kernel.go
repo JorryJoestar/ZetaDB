@@ -38,7 +38,7 @@ func GetInstance() *Kernel {
 func main() {
 	kernel := GetInstance()
 
-	s := "select a from t where a > 10;"
+	s := "CREATE TABLE m (x int default 1);"
 
 	ast := kernel.parser.ParseSql(s)
 	fmt.Println(ASTToString(ast))
