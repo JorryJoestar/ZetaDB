@@ -2,6 +2,7 @@ package container
 
 //default as bag operation
 type LogicalPlan struct {
+	TopNode LogicalPlanNode
 }
 
 type LogicalPlanNode interface {
@@ -51,6 +52,23 @@ type ThetaNode struct {
 type RenameNode struct {
 	NewTableName         string
 	NewAttributeNameList []string
+}
+
+type GroupingNode struct {
+	Node                    LogicalPlanNode
+	GroupAttributeIndexList []int
+}
+
+type OrderNode struct {
+	Node                    LogicalPlanNode
+	OrderAttributeIndexList []int
+	OrderByAscending        []bool
+}
+
+type LimitNode struct {
+	Node      LogicalPlanNode
+	LimitNum  int
+	OffsetNum int
 }
 
 type DuplicateNode struct {
