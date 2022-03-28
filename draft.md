@@ -6,4 +6,13 @@ storage/indexPage.go
     mode3 page is similar to mode2
 
 storage/storageEngine.go
-    data buffer: for page whose pageId is under 16, they are stored in keyTableHeadPageBuffer and it is invalid to delete them.
+    data buffer: for page whose pageId is under 17, they are stored in keyTableHeadPageBuffer and it is invalid to delete them.
+
+execution/querySubOperator
+    after tuples going through these operators, their tableId & tupleId is invalid
+
+execution/initializationManager.go
+    always remember before initialization, old files should be removed
+
+container/logicalPlan.go
+    all nodes are bag operation defaultly

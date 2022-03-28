@@ -15,4 +15,28 @@ const (
 	//if a tuple total length in bytes is over this value, it is invalid to generate map key for this value
 	//total length is the sum of all singal field
 	DEFAULT_TUPLE_TOTAL_OVER_LONG_LENGTH uint16 = 100
+
+	//default administrator info
+	DEFAULT_ADMINISTRATOR_NAME     string = "Zhenyu Jiang"
+	DEFAULT_ADMINISTRATOR_ID       int    = 0
+	DEFAULT_ADMINISTRATOR_PASSWORD string = "4319633"
+
+	//key table schemas
+	DEFAULT_KEY_TABLE_0_SCHEMA  string = "CREATE TABLE k_userId_userName (userId INT PRIMARY KEY, userName VARCHAR(20));"
+	DEFAULT_KEY_TABLE_1_SCHEMA  string = "CREATE TABLE k_userId_password (userId INT PRIMARY KEY, password VARCHAR(20));"
+	DEFAULT_KEY_TABLE_2_SCHEMA  string = "CREATE TABLE k_tableId_userId (tableId INT PRIMARY KEY, userId INT);"
+	DEFAULT_KEY_TABLE_3_SCHEMA  string = "CREATE TABLE k_assertId_userId (assertId INT PRIMARY KEY, userId INT);"
+	DEFAULT_KEY_TABLE_4_SCHEMA  string = "CREATE TABLE k_viewId_userId (viewId INT PRIMARY KEY, userId INT);"
+	DEFAULT_KEY_TABLE_5_SCHEMA  string = "CREATE TABLE k_indexId_tableId (indexId INT PRIMARY KEY, tableId INT);"
+	DEFAULT_KEY_TABLE_6_SCHEMA  string = "CREATE TABLE k_triggerId_userId (triggerId INT PRIMARY KEY, userId INT);"
+	DEFAULT_KEY_TABLE_7_SCHEMA  string = "CREATE TABLE k_psmId_userId(psmId INT PRIMARY KEY, userId INT);"
+	DEFAULT_KEY_TABLE_8_SCHEMA  string = "CREATE TABLE k_tableId_schema (tableId INT PRIMARY KEY, schema VARCHAR(255));"
+	DEFAULT_KEY_TABLE_9_SCHEMA  string = "CREATE TABLE k_table (tableId INT PRIMARY KEY, headPageId INT, lastTupleId INT, tupleNum INT);"
+	DEFAULT_KEY_TABLE_10_SCHEMA string = "CREATE TABLE k_assert (assertId INT PRIMARY KEY, assertStmt VARCHAR(255));"
+	DEFAULT_KEY_TABLE_11_SCHEMA string = "CREATE TABLE k_view (viewId INT PRIMARY KEY, viewStmt VARCHAR(255));"
+	DEFAULT_KEY_TABLE_12_SCHEMA string = "CREATE TABLE k_index (indexId INT PRIMARY KEY, indexStmt VARCHAR(255), indexHeadPageId INT);"
+	DEFAULT_KEY_TABLE_13_SCHEMA string = "CREATE TABLE k_trigger (triggerId INT PRIMARY KEY, triggerStmt VARCHAR(255));"
+	DEFAULT_KEY_TABLE_14_SCHEMA string = "CREATE TABLE k_psm (psmId INT PRIMARY KEY, psmStmt VARCHAR(255));"
+	DEFAULT_KEY_TABLE_15_SCHEMA string = "CREATE TABLE k_emptyDataPageSlot (pageId INT);"
+	DEFAULT_KEY_TABLE_16_SCHEMA string = "CREATE TABLE k_emptyIndexPageSlot (pageId INT);"
 )

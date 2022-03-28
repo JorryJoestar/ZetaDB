@@ -113,7 +113,7 @@ import (
                                                       \-------/                                             \/
 */
 
-type dataPage struct {
+type DataPage struct {
 	//mark used for evict policy
 	//this value would not be saved into disk
 	mark bool
@@ -164,13 +164,13 @@ type dataPage struct {
 
 //generate a new page from a byte slice
 //throw error if byte slice length invalid
-func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
+func NewDataPageFromBytes(bytes []byte, schema *Schema) (*DataPage, error) {
 	//throw error if byte slice length invalid
 	if len(bytes) != DEFAULT_PAGE_SIZE {
 		return nil, errors.New("bytes length invalid")
 	}
 
-	dp := &dataPage{}
+	dp := &DataPage{}
 
 	//set pageId
 	pageIdBytes := bytes[:4]
@@ -299,8 +299,8 @@ func NewDataPageFromBytes(bytes []byte, schema *Schema) (*dataPage, error) {
 }
 
 //create a new data page in mode 0, empty
-func NewDataPageMode0(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32) *dataPage {
-	dp := &dataPage{
+func NewDataPageMode0(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32) *DataPage {
+	dp := &DataPage{
 		pageId:         pageId,
 		tableId:        tableId,
 		pageMode:       0,
@@ -322,8 +322,8 @@ func NewDataPageMode0(pageId uint32, tableId uint32, priorPageId uint32, nextPag
 }
 
 //create a new data page in mode 1
-func NewDataPageMode1(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32, linkNextPageId uint32, data []byte) *dataPage {
-	dp := &dataPage{
+func NewDataPageMode1(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32, linkNextPageId uint32, data []byte) *DataPage {
+	dp := &DataPage{
 		pageId:         pageId,
 		tableId:        tableId,
 		pageMode:       1,
@@ -345,8 +345,8 @@ func NewDataPageMode1(pageId uint32, tableId uint32, priorPageId uint32, nextPag
 }
 
 //create a new data page in mode 2
-func NewDataPageMode2(pageId uint32, tableId uint32, dataSize int32, linkPrePageId uint32, linkNextPageId uint32, data []byte) *dataPage {
-	dp := &dataPage{
+func NewDataPageMode2(pageId uint32, tableId uint32, dataSize int32, linkPrePageId uint32, linkNextPageId uint32, data []byte) *DataPage {
+	dp := &DataPage{
 		pageId:         pageId,
 		tableId:        tableId,
 		pageMode:       2,
@@ -368,7 +368,7 @@ func NewDataPageMode2(pageId uint32, tableId uint32, dataSize int32, linkPrePage
 }
 
 //convert this dataPage into byte slice, ready to insert into file
-func (dataPage *dataPage) DataPageToBytes() ([]byte, error) {
+func (dataPage *DataPage) DataPageToBytes() ([]byte, error) {
 	var bytes []byte
 
 	//pageId
@@ -434,7 +434,7 @@ func (dataPage *dataPage) DataPageToBytes() ([]byte, error) {
 }
 
 //return mode
-func (dataPage *dataPage) DataPageMode() uint32 {
+func (dataPage *DataPage) DataPageMode() uint32 {
 
 	//mark this page
 	dataPage.MarkDataPage()
@@ -443,38 +443,38 @@ func (dataPage *dataPage) DataPageMode() uint32 {
 }
 
 //set mark to true
-func (dataPage *dataPage) MarkDataPage() {
+func (dataPage *DataPage) MarkDataPage() {
 
 	dataPage.mark = true
 }
 
 //set mark to false
-func (dataPage *dataPage) UnmarkDataPage() {
+func (dataPage *DataPage) UnmarkDataPage() {
 	dataPage.mark = false
 }
 
 //mark getter
-func (dataPage *dataPage) DataPageIsMarked() bool {
+func (dataPage *DataPage) DataPageIsMarked() bool {
 	return dataPage.mark
 }
 
 //set modified to true
-func (dataPage *dataPage) ModifyDataPage() {
+func (dataPage *DataPage) ModifyDataPage() {
 	dataPage.modified = true
 }
 
 //set modified to false
-func (dataPage *dataPage) UnmodifyDataPage() {
+func (dataPage *DataPage) UnmodifyDataPage() {
 	dataPage.modified = false
 }
 
 //modified getter
-func (dataPage *dataPage) DataPageIsModified() bool {
+func (dataPage *DataPage) DataPageIsModified() bool {
 	return dataPage.modified
 }
 
 //return data page in bytes
-func (dataPage *dataPage) DpSizeInByte() int {
+func (dataPage *DataPage) DpSizeInByte() int {
 	size := 0
 
 	//8 header fields, each 4 bytes
@@ -503,7 +503,7 @@ func (dataPage *dataPage) DpSizeInByte() int {
 }
 
 //return vacant byte number within this page
-func (dataPage *dataPage) DpVacantByteNum() int {
+func (dataPage *DataPage) DpVacantByteNum() int {
 	dataPage.MarkDataPage()
 
 	return DEFAULT_PAGE_SIZE - dataPage.DpSizeInByte()
@@ -511,7 +511,7 @@ func (dataPage *dataPage) DpVacantByteNum() int {
 
 //get a tuple in this page according to its tupleId
 //throw error if no such tuple in this page
-func (dataPage *dataPage) GetTuple(tupleId uint32) (*Tuple, error) {
+func (dataPage *DataPage) GetTuple(tupleId uint32) (*Tuple, error) {
 	for _, t := range dataPage.tuples {
 		if t.TupleGetTupleId() == tupleId {
 			return t, nil
@@ -524,7 +524,7 @@ func (dataPage *dataPage) GetTuple(tupleId uint32) (*Tuple, error) {
 
 //get a tuple in this page according to its slice index of tuples
 //throw error if index is invalid
-func (dataPage *dataPage) GetTupleAt(i int) (*Tuple, error) {
+func (dataPage *DataPage) GetTupleAt(i int) (*Tuple, error) {
 	//throw error if index is invalid
 	if i < 0 || i >= len(dataPage.tuples) {
 		return nil, errors.New("dataPage.go    GetTupleAt() index invalid")
@@ -536,7 +536,7 @@ func (dataPage *dataPage) GetTupleAt(i int) (*Tuple, error) {
 //insert a tuple into this page
 //throw error if mode is not 0
 //throw error if no enough space to store this tuple
-func (dataPage *dataPage) InsertTuple(tup *Tuple) error {
+func (dataPage *DataPage) InsertTuple(tup *Tuple) error {
 
 	//throw error if mode is not 0
 	if dataPage.pageMode != 0 {
@@ -566,7 +566,7 @@ func (dataPage *dataPage) InsertTuple(tup *Tuple) error {
 //delete a tuple from this page according to its tupleId
 //throw error if mode is not 0
 //throw error if no corresponding tupleId within this page
-func (dataPage *dataPage) DpDeleteTuple(tupleId uint32) error {
+func (dataPage *DataPage) DpDeleteTuple(tupleId uint32) error {
 
 	//throw error if mode is not 0
 	if dataPage.pageMode != 0 {
@@ -603,7 +603,7 @@ func (dataPage *dataPage) DpDeleteTuple(tupleId uint32) error {
 
 //check if this page is a head page
 //throw error if mode is 2
-func (dataPage *dataPage) DpIsHeadPage() (bool, error) {
+func (dataPage *DataPage) DpIsHeadPage() (bool, error) {
 
 	//if mode is 2, this method is invalid
 	if dataPage.pageMode == 2 {
@@ -617,7 +617,7 @@ func (dataPage *dataPage) DpIsHeadPage() (bool, error) {
 
 //check if this page is a tail page
 //throw error if mode is 2
-func (dataPage *dataPage) DpIsTailPage() (bool, error) {
+func (dataPage *DataPage) DpIsTailPage() (bool, error) {
 	//if mode is 2, this method is invalid
 	if dataPage.pageMode == 2 {
 		return false, errors.New("invalid page mode")
@@ -630,7 +630,7 @@ func (dataPage *dataPage) DpIsTailPage() (bool, error) {
 
 //check if this page is a list head page
 //throw error if mode is 0
-func (dataPage *dataPage) DpIsListHeadPage() (bool, error) {
+func (dataPage *DataPage) DpIsListHeadPage() (bool, error) {
 	//throw error if mode is 0
 	if dataPage.pageMode == 0 {
 		return false, errors.New("invalid page mode")
@@ -643,7 +643,7 @@ func (dataPage *dataPage) DpIsListHeadPage() (bool, error) {
 
 //check if this page is a list tail page
 //throw error if mode is 0
-func (dataPage *dataPage) DpIsListTailPage() (bool, error) {
+func (dataPage *DataPage) DpIsListTailPage() (bool, error) {
 	//throw error if mode is 0
 	if dataPage.pageMode == 0 {
 		return false, errors.New("invalid page mode")
@@ -655,14 +655,14 @@ func (dataPage *dataPage) DpIsListTailPage() (bool, error) {
 }
 
 //pageId getter
-func (dataPage *dataPage) DpGetPageId() uint32 {
+func (dataPage *DataPage) DpGetPageId() uint32 {
 	dataPage.MarkDataPage()
 
 	return dataPage.pageId
 }
 
 //tableId getter
-func (dataPage *dataPage) DpGetTableId() uint32 {
+func (dataPage *DataPage) DpGetTableId() uint32 {
 	dataPage.MarkDataPage()
 
 	return dataPage.tableId
@@ -670,7 +670,7 @@ func (dataPage *dataPage) DpGetTableId() uint32 {
 
 //priorPageId getter
 //throw error if mode is 2
-func (dataPage *dataPage) DpGetPriorPageId() (uint32, error) {
+func (dataPage *DataPage) DpGetPriorPageId() (uint32, error) {
 	//throw error if mode is 2
 	if dataPage.pageMode == 2 {
 		return dataPage.pageId, errors.New("invalid page mode")
@@ -683,7 +683,7 @@ func (dataPage *dataPage) DpGetPriorPageId() (uint32, error) {
 
 //priorPageId setter
 //throw error if mode is 2
-func (dataPage *dataPage) DpSetPriorPageId(priorPageId uint32) error {
+func (dataPage *DataPage) DpSetPriorPageId(priorPageId uint32) error {
 	//throw error if mode is 2
 	if dataPage.pageMode == 2 {
 		return errors.New("invalid page mode")
@@ -699,7 +699,7 @@ func (dataPage *dataPage) DpSetPriorPageId(priorPageId uint32) error {
 
 //nextPageId getter
 //throw error if mode is 2
-func (dataPage *dataPage) DpGetNextPageId() (uint32, error) {
+func (dataPage *DataPage) DpGetNextPageId() (uint32, error) {
 	//throw error if mode is 2
 	if dataPage.pageMode == 2 {
 		return dataPage.pageId, errors.New("invalid page mode")
@@ -712,7 +712,7 @@ func (dataPage *dataPage) DpGetNextPageId() (uint32, error) {
 
 //nextPageId setter
 //throw error if mode is 2
-func (dataPage *dataPage) DpSetNextPageId(nextPageId uint32) error {
+func (dataPage *DataPage) DpSetNextPageId(nextPageId uint32) error {
 	//throw error if mode is 2
 	if dataPage.pageMode == 2 {
 		return errors.New("invalid page mode")
@@ -728,7 +728,7 @@ func (dataPage *dataPage) DpSetNextPageId(nextPageId uint32) error {
 
 //linkPrePageId getter
 //throw error if mode is 0
-func (dataPage *dataPage) DpGetLinkPrePageId() (uint32, error) {
+func (dataPage *DataPage) DpGetLinkPrePageId() (uint32, error) {
 	//throw error if mode is 0
 	if dataPage.pageMode == 0 {
 		return dataPage.pageId, errors.New("invalid page mode")
@@ -741,7 +741,7 @@ func (dataPage *dataPage) DpGetLinkPrePageId() (uint32, error) {
 
 //linkPrePageId setter
 //throw error if mode is 0 or 1
-func (dataPage *dataPage) DpSetLinkPrePageId(linkPrePageId uint32) error {
+func (dataPage *DataPage) DpSetLinkPrePageId(linkPrePageId uint32) error {
 	//throw error if mode is 0
 	if dataPage.pageMode == 0 || dataPage.pageMode == 1 {
 		return errors.New("invalid page mode")
@@ -757,7 +757,7 @@ func (dataPage *dataPage) DpSetLinkPrePageId(linkPrePageId uint32) error {
 
 //linkNextPageId getter
 //throw error if mode is 0
-func (dataPage *dataPage) DpGetLinkNextPageId() (uint32, error) {
+func (dataPage *DataPage) DpGetLinkNextPageId() (uint32, error) {
 	//throw error if mode is 0
 	if dataPage.pageMode == 0 {
 		return dataPage.pageId, errors.New("invalid page mode")
@@ -770,7 +770,7 @@ func (dataPage *dataPage) DpGetLinkNextPageId() (uint32, error) {
 
 //linkNextPageId setter
 //throw error if mode is 0
-func (dataPage *dataPage) DpSetLinkNextPageId(linkNextPageId uint32) error {
+func (dataPage *DataPage) DpSetLinkNextPageId(linkNextPageId uint32) error {
 	//throw error if mode is 0
 	if dataPage.pageMode == 0 {
 		return errors.New("invalid page mode")
@@ -784,7 +784,7 @@ func (dataPage *dataPage) DpSetLinkNextPageId(linkNextPageId uint32) error {
 }
 
 //tupleNum getter
-func (dataPage *dataPage) DpGetTupleNum() int32 {
+func (dataPage *DataPage) DpGetTupleNum() int32 {
 
 	dataPage.MarkDataPage()
 
@@ -793,7 +793,7 @@ func (dataPage *dataPage) DpGetTupleNum() int32 {
 
 //data getter
 //throw error if page mode is 0
-func (dataPage *dataPage) DpGetData() ([]byte, error) {
+func (dataPage *DataPage) DpGetData() ([]byte, error) {
 	//throw error if page mode is 0
 	if dataPage.pageMode == 0 {
 		return nil, errors.New("dataPage.go    DpGetData() mode invalid")

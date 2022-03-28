@@ -1,15 +1,24 @@
 package container
 
-type ConstraintEnum uint8
+type Constraint interface {
+}
 
-const (
-	CONSTRAINT_UNIQUE      ConstraintEnum = 1
-	CONSTRAINT_PRIMARY_KEY ConstraintEnum = 2
-	CONSTRAINT_FOREIGN_KEY ConstraintEnum = 3
-	CONSTRAINT_NOT_NULL    ConstraintEnum = 4
-	CONSTRAINT_DEFAULT     ConstraintEnum = 5
-	CONSTRAINT_CHECK       ConstraintEnum = 6
-)
+//if value is not assigned for an attribute, the default value would be assigned to
+type DefaultConstraint struct {
+	
+}
 
-type Constraint struct {
+type UniqueConstraint struct {
+}
+
+type PrimarykeyConstraint struct {
+}
+
+type NotNullConstraint struct {
+}
+
+type ForeignkeyConstraint struct {
+}
+
+type CheckConstraint struct {
 }

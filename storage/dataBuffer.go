@@ -8,7 +8,7 @@ import (
 
 type dataBuffer struct {
 	//page container, key is called bufferId
-	buffer map[int]*dataPage
+	buffer map[int]*DataPage
 
 	//mapping from pageId to bufferId
 	mapper map[uint32]int
@@ -27,7 +27,7 @@ type dataBuffer struct {
 //in order to create a new dataBuffer, call this function
 func NewDataBuffer() *dataBuffer {
 	db := &dataBuffer{}
-	db.buffer = make(map[int]*dataPage)
+	db.buffer = make(map[int]*DataPage)
 	db.mapper = make(map[uint32]int)
 	db.evictPointer = -1
 
@@ -41,7 +41,7 @@ func NewDataBuffer() *dataBuffer {
 
 //fetch a data page from data buffer by its pageId
 //throw error if data page with id pageId is not in this buffer
-func (db *dataBuffer) DataBufferFetchPage(pageId uint32) (*dataPage, error) {
+func (db *dataBuffer) DataBufferFetchPage(pageId uint32) (*DataPage, error) {
 	//throw error if data page with id pageId is not in this buffer
 	if db.mapper[pageId] == 0 {
 		return nil, errors.New("pageId invalid, this page is not buffered")
@@ -56,7 +56,7 @@ func (db *dataBuffer) DataBufferFetchPage(pageId uint32) (*dataPage, error) {
 //insert a data page into the buffer
 //throw error if data page with the same pageId is already in this buffer
 //throw error if this buffer is full at present
-func (db *dataBuffer) DataBufferInsertDataPage(page *dataPage) error {
+func (db *dataBuffer) DataBufferInsertDataPage(page *DataPage) error {
 	currentPageId := page.DpGetPageId()
 
 	//throw error if data page with the same pageId is already in this buffer
@@ -146,7 +146,7 @@ func (db *dataBuffer) DataBufferDeleteDataPage(pageId uint32) error {
 //pick a page that is not used recently, return it, but it is not deleted from this buffer
 //evict order: (unmarked,unmodified) (marked,unmodified) (unmarked, modified) (marked, modified)
 //throw error if this buffer is not full
-func (db *dataBuffer) DataBufferEvictDataPage() (*dataPage, error) {
+func (db *dataBuffer) DataBufferEvictDataPage() (*DataPage, error) {
 	//throw error if this buffer is not full
 	if !db.DataBufferIsFull() {
 		return nil, errors.New("this buffer is not full")

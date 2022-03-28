@@ -7,7 +7,7 @@ import (
 
 type indexBuffer struct {
 	//page container, key is called bufferId
-	buffer map[int]*indexPage
+	buffer map[int]*IndexPage
 
 	//mapping from pageId to bufferId
 	mapper map[uint32]int
@@ -26,7 +26,7 @@ type indexBuffer struct {
 //in order to create a new indexBuffer, call this function
 func NewIndexBuffer() *indexBuffer {
 	ib := &indexBuffer{}
-	ib.buffer = make(map[int]*indexPage)
+	ib.buffer = make(map[int]*IndexPage)
 	ib.mapper = make(map[uint32]int)
 	ib.evictPointer = -1
 
@@ -40,7 +40,7 @@ func NewIndexBuffer() *indexBuffer {
 
 //fetch an index page from index buffer by its pageId
 //throw error if index page with id pageId is not in this buffer
-func (ib *indexBuffer) IndexBufferFetchPage(pageId uint32) (*indexPage, error) {
+func (ib *indexBuffer) IndexBufferFetchPage(pageId uint32) (*IndexPage, error) {
 	//throw error if index page with id pageId is not in this buffer
 	if ib.mapper[pageId] == 0 {
 		return nil, errors.New("pageId invalid, this page is not buffered")
@@ -55,7 +55,7 @@ func (ib *indexBuffer) IndexBufferFetchPage(pageId uint32) (*indexPage, error) {
 //insert an index page into the buffer
 //throw error if index page with the same pageId is already in this buffer
 //throw error if this buffer is full at present
-func (ib *indexBuffer) IndexBufferInsertIndexPage(page *indexPage) error {
+func (ib *indexBuffer) IndexBufferInsertIndexPage(page *IndexPage) error {
 	currentPageId := page.IndexPageGetPageId()
 
 	//throw error if index page with the same pageId is already in this buffer
@@ -142,7 +142,7 @@ func (ib *indexBuffer) IndexBufferDeleteIndexPage(pageId uint32) error {
 //pick a page that is not used recently, return it, but it is not deleted from this buffer
 //evict order: (unmarked,unmodified) (marked,unmodified) (unmarked, modified) (marked, modified)
 //throw error if this buffer is not full
-func (ib *indexBuffer) IndexBufferEvictIndexPage() (*indexPage, error) {
+func (ib *indexBuffer) IndexBufferEvictIndexPage() (*IndexPage, error) {
 	//throw error if this buffer is not full
 	if !ib.IndexBufferIsFull() {
 		return nil, errors.New("this buffer is not full")

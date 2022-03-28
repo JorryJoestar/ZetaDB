@@ -133,7 +133,7 @@ import (
 
 */
 
-type indexPage struct {
+type IndexPage struct {
 	marked   bool
 	modified bool
 
@@ -158,7 +158,7 @@ type indexPage struct {
 //create empty indexPage
 //throw error if mode is not 1, 2 or 3
 //throw error if elementType is not 1 to 9
-func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPage, error) {
+func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*IndexPage, error) {
 	//throw error if mode is not 1, 2 or 3
 	if mode != 1 && mode != 2 && mode != 3 {
 		return nil, errors.New("mode invalid")
@@ -169,7 +169,7 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 		return nil, errors.New("elementType invalid")
 	}
 
-	ip := &indexPage{
+	ip := &IndexPage{
 		marked:      true,
 		modified:    true,
 		indexPageId: indexPageId,
@@ -198,7 +198,7 @@ func NewIndexPage(indexPageId uint32, mode uint32, elementType uint32) (*indexPa
 //throw error if bytes length invalid
 //throw error if mode is not 1, 2, or 3
 //throw error if elementType is not in [1,9]
-func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
+func NewIndexPageFromBytes(bytes []byte) (*IndexPage, error) {
 	//throw error if bytes length invalid
 	if len(bytes) != DEFAULT_PAGE_SIZE {
 		return nil, errors.New("bytes length invalid")
@@ -231,7 +231,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 		pointerNum, _ := BytesToINT(bytes[:4])
 		bytes = bytes[4:]
 
-		ip := &indexPage{
+		ip := &IndexPage{
 			marked:      true,
 			modified:    false,
 			indexPageId: indexPageId,
@@ -287,7 +287,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 			records = append(records, record)
 		}
 
-		ip := &indexPage{
+		ip := &IndexPage{
 			marked:      true,
 			modified:    false,
 			indexPageId: indexPageId,
@@ -321,7 +321,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 			dataPageIds = append(dataPageIds, dataPageId)
 		}
 
-		ip := &indexPage{
+		ip := &IndexPage{
 			marked:        true,
 			modified:      false,
 			indexPageId:   indexPageId,
@@ -337,7 +337,7 @@ func NewIndexPageFromBytes(bytes []byte) (*indexPage, error) {
 }
 
 //convert this index page to byte slice, ready to push into disk
-func (ip *indexPage) IndexPageToBytes() []byte {
+func (ip *IndexPage) IndexPageToBytes() []byte {
 	if ip.IndexPageGetMode() == 1 { //internal node
 		//indexPageId
 		bytes := Uint32ToBytes(ip.IndexPageGetPageId())
@@ -439,19 +439,19 @@ func (ip *indexPage) IndexPageToBytes() []byte {
 }
 
 //indexPageId getter
-func (ip *indexPage) IndexPageGetPageId() uint32 {
+func (ip *IndexPage) IndexPageGetPageId() uint32 {
 	ip.IndexPageMark()
 	return ip.indexPageId
 }
 
 //mode getter
-func (ip *indexPage) IndexPageGetMode() uint32 {
+func (ip *IndexPage) IndexPageGetMode() uint32 {
 	ip.IndexPageMark()
 	return ip.mode
 }
 
 //elementType getter
-func (ip *indexPage) IndexPageGetElementType() uint32 {
+func (ip *IndexPage) IndexPageGetElementType() uint32 {
 	ip.IndexPageMark()
 	return ip.elementType
 }
@@ -459,7 +459,7 @@ func (ip *indexPage) IndexPageGetElementType() uint32 {
 //pointerNum getter
 //valid for mode 1
 //throw error, if mode is not 1
-func (ip *indexPage) IndexPageGetPointerNum() (int32, error) {
+func (ip *IndexPage) IndexPageGetPointerNum() (int32, error) {
 	//throw error, if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return 0, errors.New("mode invalid")
@@ -474,7 +474,7 @@ func (ip *indexPage) IndexPageGetPointerNum() (int32, error) {
 //valid for mode 1
 //throw error, if mode is not 1
 //throw error, if pointerNum > IndexPageGetMaxPointerNum()
-func (ip *indexPage) IndexPageSetPointerNum(n int32) error {
+func (ip *IndexPage) IndexPageSetPointerNum(n int32) error {
 	//throw error, if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return errors.New("mode invalid")
@@ -495,7 +495,7 @@ func (ip *indexPage) IndexPageSetPointerNum(n int32) error {
 
 //return max pointer number this page can contain
 //throw error if mode is not 1
-func (ip *indexPage) IndexPageGetMaxPointerNum() (int32, error) {
+func (ip *IndexPage) IndexPageGetMaxPointerNum() (int32, error) {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return 0, errors.New("mode invalid")
@@ -514,7 +514,7 @@ func (ip *indexPage) IndexPageGetMaxPointerNum() (int32, error) {
 //element getter
 //throw error if i is not in [1, IndexPageGetMaxPointerNum()-1]
 //throw error if mode is not 1
-func (ip *indexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
+func (ip *IndexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return nil, errors.New("mode invalid")
@@ -535,7 +535,7 @@ func (ip *indexPage) IndexPageGetElementAt(i int32) ([]byte, error) {
 //throw error if i is not in [1, IndexPageGetMaxPointerNum()-1]
 //throw error if mode is not 1
 //throw error if bytes length invalid
-func (ip *indexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
+func (ip *IndexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return errors.New("mode invalid")
@@ -557,7 +557,7 @@ func (ip *indexPage) IndexPageSetElementAt(i int32, bytes []byte) error {
 //pointerPageId getter
 //throw error if mode is not 1
 //throw error if i is not in [0, IndexPageGetMaxPointerNum()-1]
-func (ip *indexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
+func (ip *IndexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return 0, errors.New("mode invalid")
@@ -577,7 +577,7 @@ func (ip *indexPage) IndexPageGetPointerPageIdAt(i int32) (uint32, error) {
 //pointerPageId setter
 //throw error if mode is not 1
 //throw error if i is not in [0, IndexPageGetMaxPointerNum()-1]
-func (ip *indexPage) IndexPageSetPointerPageIdAt(i int32, pageId uint32) error {
+func (ip *IndexPage) IndexPageSetPointerPageIdAt(i int32, pageId uint32) error {
 	//throw error if mode is not 1
 	if ip.IndexPageGetMode() != 1 {
 		return errors.New("mode invalid")
@@ -598,7 +598,7 @@ func (ip *indexPage) IndexPageSetPointerPageIdAt(i int32, pageId uint32) error {
 
 //recordNum getter
 //throw error if mode is not 2
-func (ip *indexPage) IndexPageGetRecordNum() (int32, error) {
+func (ip *IndexPage) IndexPageGetRecordNum() (int32, error) {
 	//throw error if mode is not 2
 	if ip.IndexPageGetMode() != 2 {
 		return 0, errors.New("mode invalid")
@@ -611,7 +611,7 @@ func (ip *indexPage) IndexPageGetRecordNum() (int32, error) {
 
 //return max record number this page can contain
 //throw error if mode is not 2
-func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
+func (ip *IndexPage) IndexPageGetMaxRecordNum() (int32, error) {
 	//throw error if mode is not 2
 	if ip.IndexPageGetMode() != 2 {
 		return 0, errors.New("mode invalid")
@@ -627,7 +627,7 @@ func (ip *indexPage) IndexPageGetMaxRecordNum() (int32, error) {
 
 //prePageId getter
 //throw error if mode is not 2 or 3
-func (ip *indexPage) IndexPageGetPrePageId() (uint32, error) {
+func (ip *IndexPage) IndexPageGetPrePageId() (uint32, error) {
 	//throw error if mode is not 2 or 3
 	if ip.IndexPageGetMode() == 1 {
 		return 0, errors.New("mode invalid")
@@ -640,7 +640,7 @@ func (ip *indexPage) IndexPageGetPrePageId() (uint32, error) {
 
 //prePageId setter
 //throw error if mode is not 2 or 3
-func (ip *indexPage) IndexPageSetPrePageId(pageId uint32) error {
+func (ip *IndexPage) IndexPageSetPrePageId(pageId uint32) error {
 	//throw error if mode is not 2 or 3
 	if ip.IndexPageGetMode() == 1 {
 		return errors.New("mode invalid")
@@ -655,7 +655,7 @@ func (ip *indexPage) IndexPageSetPrePageId(pageId uint32) error {
 
 //nextPageId getter
 //throw error if mode is not 2 or 3
-func (ip *indexPage) IndexPageGetNextPageId() (uint32, error) {
+func (ip *IndexPage) IndexPageGetNextPageId() (uint32, error) {
 	//throw error if mode is not 2 or 3
 	if ip.IndexPageGetMode() == 1 {
 		return 0, errors.New("mode invalid")
@@ -668,7 +668,7 @@ func (ip *indexPage) IndexPageGetNextPageId() (uint32, error) {
 
 //nextPageId setter
 //throw error if mode is not 2 or 3
-func (ip *indexPage) IndexPageSetNextPageId(pageId uint32) error {
+func (ip *IndexPage) IndexPageSetNextPageId(pageId uint32) error {
 	//throw error if mode is not 2 or 3
 	if ip.IndexPageGetMode() == 1 {
 		return errors.New("mode invalid")
@@ -684,7 +684,7 @@ func (ip *indexPage) IndexPageSetNextPageId(pageId uint32) error {
 //IndexRecord getter
 //throw error if mode is not 2
 //throw error if i is not in [0, recordNum-1]
-func (ip *indexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
+func (ip *IndexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
 	//throw error if mode is not 2
 	if ip.IndexPageGetMode() != 2 {
 		return nil, errors.New("mode invalid")
@@ -704,7 +704,7 @@ func (ip *indexPage) IndexPageGetIndexRecordAt(i int32) (*IndexRecord, error) {
 //insert a new index record into the end of records, length of records increase by 1
 //throw error if mode is not 2
 //throw error if this page is full
-func (ip *indexPage) IndexPageInsertNewIndexRecord(ir *IndexRecord) error {
+func (ip *IndexPage) IndexPageInsertNewIndexRecord(ir *IndexRecord) error {
 	//throw error if mode is not 2
 	if ip.IndexPageGetMode() != 2 {
 		return errors.New("mode invalid")
@@ -725,7 +725,7 @@ func (ip *indexPage) IndexPageInsertNewIndexRecord(ir *IndexRecord) error {
 //IndexRecord setter
 //throw error if mode is not 2
 //throw error if i is not in [0, recordNum-1]
-func (ip *indexPage) IndexPageSetIndexRecordAt(i int32, ir *IndexRecord) error {
+func (ip *IndexPage) IndexPageSetIndexRecordAt(i int32, ir *IndexRecord) error {
 	//throw error if mode is not 2
 	if ip.IndexPageGetMode() != 2 {
 		return errors.New("mode invalid")
@@ -746,7 +746,7 @@ func (ip *indexPage) IndexPageSetIndexRecordAt(i int32, ir *IndexRecord) error {
 
 //dataPageIdNum getter
 //throw error if mode is not 3
-func (ip *indexPage) IndexPageGetDataPageIdNum() (int32, error) {
+func (ip *IndexPage) IndexPageGetDataPageIdNum() (int32, error) {
 	//throw error if mode is not 3
 	if ip.IndexPageGetMode() != 3 {
 		return 0, errors.New("mode invalid")
@@ -759,7 +759,7 @@ func (ip *indexPage) IndexPageGetDataPageIdNum() (int32, error) {
 
 //return max dataPageId number this page can contain
 //throw error if mode is not 3
-func (ip *indexPage) IndexPageGetMaxDataPageIdNum() (int32, error) {
+func (ip *IndexPage) IndexPageGetMaxDataPageIdNum() (int32, error) {
 	//throw error if mode is not 3
 	if ip.IndexPageGetMode() != 3 {
 		return 0, errors.New("mode invalid")
@@ -774,7 +774,7 @@ func (ip *indexPage) IndexPageGetMaxDataPageIdNum() (int32, error) {
 //dataPageId getter
 //throw error if mode is not 3
 //throw error if i is not in [0, dataPageIdNum-1]
-func (ip *indexPage) IndexPageGetDataPageIdAt(i int32) (uint32, error) {
+func (ip *IndexPage) IndexPageGetDataPageIdAt(i int32) (uint32, error) {
 	//throw error if mode is not 3
 	if ip.IndexPageGetMode() != 3 {
 		return 0, errors.New("mode invalid")
@@ -794,7 +794,7 @@ func (ip *indexPage) IndexPageGetDataPageIdAt(i int32) (uint32, error) {
 //dataPageId setter
 //throw error if mode is not 3
 //throw error if i is not in [0, IndexPageGetMaxDataPageIdNum()-1]
-func (ip *indexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
+func (ip *IndexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
 	//throw error if mode is not 3
 	if ip.IndexPageGetMode() != 3 {
 		return errors.New("mode invalid")
@@ -816,7 +816,7 @@ func (ip *indexPage) IndexPageSetDataPageIdAt(i int32, pageId uint32) error {
 //insert a dataPageId into this page
 //throw error if mode is not 3
 //throw error if this page is full
-func (ip *indexPage) IndexPageInsertNewDataPageId(pageId uint32) error {
+func (ip *IndexPage) IndexPageInsertNewDataPageId(pageId uint32) error {
 	//throw error if mode is not 3
 	if ip.IndexPageGetMode() != 3 {
 		return errors.New("mode invalid")
@@ -836,34 +836,34 @@ func (ip *indexPage) IndexPageInsertNewDataPageId(pageId uint32) error {
 }
 
 //mark this index page
-func (ip *indexPage) IndexPageMark() {
+func (ip *IndexPage) IndexPageMark() {
 	ip.marked = true
 }
 
 //unmark this index page
-func (ip *indexPage) IndexPageUnMark() {
+func (ip *IndexPage) IndexPageUnMark() {
 	ip.marked = false
 }
 
 //marked getter
 //if this page is marked, return true
-func (ip *indexPage) IndexPageIsMarked() bool {
+func (ip *IndexPage) IndexPageIsMarked() bool {
 	return ip.marked
 }
 
 //set modified to true
-func (ip *indexPage) IndexPageModify() {
+func (ip *IndexPage) IndexPageModify() {
 	ip.modified = true
 }
 
 //set modified to false
-func (ip *indexPage) IndexPageUnModify() {
+func (ip *IndexPage) IndexPageUnModify() {
 	ip.modified = false
 }
 
 //modified getter
 //if this page is modified, return true
-func (ip *indexPage) IndexPageIsModified() bool {
+func (ip *IndexPage) IndexPageIsModified() bool {
 	return ip.modified
 }
 
