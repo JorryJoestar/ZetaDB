@@ -36,9 +36,7 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-
 	kernel.executionEngine.InitializeSystem()
-
 }
 
 /* func CreateNewTuple(id int32, name string, age int32, height float32, birthday string, tableId uint32, tupleId uint32, schema *container.Schema) *container.Tuple {

@@ -2,12 +2,9 @@ package execution
 
 import (
 	"ZetaDB/container"
-	its "ZetaDB/execution/querySubOperator"
 	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
-	. "ZetaDB/utility"
-	"errors"
 	"sync"
 )
 
@@ -16,6 +13,7 @@ type ExecutionEngine struct {
 	parser                *parser.Parser
 	rewriter              *optimizer.Rewriter
 	initializationManager *InitializationManager
+	ktm                   *KeytableManager
 }
 
 //use GetExecutionEngine to get the unique ExecutionEngine
@@ -31,6 +29,7 @@ func GetExecutionEngine(se *storage.StorageEngine, parser *parser.Parser) *Execu
 			rewriter: &optimizer.Rewriter{}}
 	})
 	eeInstance.initializationManager = NewInitializationManager(eeInstance.se, eeInstance.parser, eeInstance.rewriter)
+	eeInstance.ktm = NewKeytableManager(eeInstance.parser, eeInstance.rewriter, eeInstance.se)
 
 	return eeInstance
 }
@@ -38,49 +37,6 @@ func GetExecutionEngine(se *storage.StorageEngine, parser *parser.Parser) *Execu
 //initialze the whole system, create key tables and insert necessary tuples into these tables
 func (ee *ExecutionEngine) InitializeSystem() {
 	ee.initializationManager.InitializeSystem()
-}
-
-//fetch schema of a table from dataFile according to tableName, k_tableId_schema table 8
-//throw error if no such table
-func (ee *ExecutionEngine) GetSchemaFromFileByTableName(tableName string) (*container.Schema, error) {
-	astOfCreateTable8 := ee.parser.ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
-	schemaOfCreateTable8, err := ee.rewriter.ASTNodeToSchema(astOfCreateTable8)
-	if err != nil {
-		return nil, err
-	}
-
-	seqIt := its.NewSequentialFileReaderIterator(ee.se, 8, schemaOfCreateTable8)
-	seqIt.Open(nil, nil)
-	for seqIt.HasNext() {
-		table8Tuple, err := seqIt.GetNext()
-		if err != nil {
-			return nil, err
-		}
-
-		//TODO mantain: if schema of table 8 is changed, this index could be asked to change
-		schemaStringBytes, err := table8Tuple.TupleGetFieldValue(1)
-		if err != nil {
-			return nil, err
-		}
-		schemaString, err := BytesToVARCHAR(schemaStringBytes)
-		if err != nil {
-			return nil, err
-		}
-
-		//parse this string to get schema
-		ast := ee.parser.ParseSql(schemaString)
-		currentSchema, err := ee.rewriter.ASTNodeToSchema(ast)
-		if err != nil {
-			return nil, err
-		}
-
-		//found correct table schema
-		if currentSchema.GetSchemaTableName() == tableName {
-			return currentSchema, nil
-		}
-
-	}
-	return nil, errors.New("execution/executionEngine.go    GetSchemaFromFileByTableName() no such table")
 }
 
 //insert a tuple into a table, if no enough space, then create a new page
@@ -121,8 +77,6 @@ func (ee *ExecutionEngine) PsmCallOperator()        {}
 func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) {
 
 }
-
-func (ee *ExecutionEngine) GetSchemaByTableId() {}
 
 /* func (ee *ExecutionEngine) GetKeyTableSchema(tableId uint32) (*container.Schema, error) {
 	if tableId < 0 || tableId > 16 {
