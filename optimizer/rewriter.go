@@ -4,9 +4,22 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
 	"errors"
+	"sync"
 )
 
 type Rewriter struct {
+}
+
+//for singleton pattern
+var instance *Rewriter
+var once sync.Once
+
+//to get Rewriter, call this function
+func GetRewriter() *Rewriter {
+	once.Do(func() {
+		instance = &Rewriter{}
+	})
+	return instance
 }
 
 //throw error if ASTNode type is not AST_DDL

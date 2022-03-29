@@ -12,7 +12,7 @@ var instance *Parser
 var once sync.Once
 
 //to get parser, call this function
-func GetInstance() *Parser {
+func GetParser() *Parser {
 	once.Do(func() {
 		instance = &Parser{}
 	})

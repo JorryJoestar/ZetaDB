@@ -33,7 +33,7 @@ var (
 		"CREATE TABLE k_triggerId_userId (triggerId INT PRIMARY KEY, userId INT);",
 		"CREATE TABLE k_psmId_userId (psmId INT PRIMARY KEY, userId INT);",
 		"CREATE TABLE k_tableId_schema (tableId INT PRIMARY KEY, schema VARCHAR(255));",
-		"CREATE TABLE k_table (tableId INT PRIMARY KEY, headPageId INT, lastTupleId INT, tupleNum INT);",
+		"CREATE TABLE k_table (tableId INT PRIMARY KEY, headPageId INT, tailPageId INT, lastTupleId INT, tupleNum INT);",
 		"CREATE TABLE k_assert (assertId INT PRIMARY KEY, assertStmt VARCHAR(255));",
 		"CREATE TABLE k_view (viewId INT PRIMARY KEY, viewStmt VARCHAR(255));",
 		"CREATE TABLE k_index (indexId INT PRIMARY KEY, indexStmt VARCHAR(255), indexHeadPageId INT);",

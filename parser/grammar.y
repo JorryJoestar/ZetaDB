@@ -495,7 +495,7 @@ ast
         $$.Ast.Type = AST_DDL
         $$.Ast.Ddl = $1.Ddl
 
-        GetInstance().AST = $$.Ast
+        GetParser().AST = $$.Ast
     }
     |dml {
         $$ = &Node{}
@@ -505,7 +505,7 @@ ast
         $$.Ast.Type = AST_DML
         $$.Ast.Dml = $1.Dml
 
-        GetInstance().AST = $$.Ast
+        GetParser().AST = $$.Ast
     }
     |dcl {
         $$ = &Node{}
@@ -515,7 +515,7 @@ ast
         $$.Ast.Type = AST_DCL
         $$.Ast.Dcl = $1.Dcl
 
-        GetInstance().AST = $$.Ast
+        GetParser().AST = $$.Ast
     }
     |dql {
         $$ = &Node{}
@@ -525,7 +525,7 @@ ast
         $$.Ast.Type = AST_DQL
         $$.Ast.Dql = $1.Dql
 
-        GetInstance().AST = $$.Ast
+        GetParser().AST = $$.Ast
     }
     ;
 

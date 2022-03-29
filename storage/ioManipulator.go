@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"ZetaDB/utility"
 	"errors"
 	"os"
 	"sync"
@@ -19,16 +20,16 @@ type IOManipulator struct {
 var ioMinstance *IOManipulator
 var ioOnce sync.Once
 
-func GetIOManipulator(dfl string, ifl string, lfl string) (*IOManipulator, error) {
+func GetIOManipulator() (*IOManipulator, error) {
 	ioOnce.Do(func() {
 		ioMinstance = &IOManipulator{
-			dataFileLocation:  dfl,
-			indexFileLocation: ifl,
-			logFileLocation:   lfl}
+			dataFileLocation:  utility.DEFAULT_DATAFILE_LOCATION,
+			indexFileLocation: utility.DEFAULT_INDEXFILE_LOCATION,
+			logFileLocation:   utility.DEFAULT_LOGFILE_LOCATION}
 	})
 
 	//try to open data file from location dfl
-	dFile, dfOpenError := os.OpenFile(dfl, os.O_RDWR|os.O_SYNC, 0)
+	dFile, dfOpenError := os.OpenFile(utility.DEFAULT_DATAFILE_LOCATION, os.O_RDWR|os.O_SYNC, 0)
 	if dfOpenError != nil {
 		return nil, dfOpenError
 	} else {
@@ -36,7 +37,7 @@ func GetIOManipulator(dfl string, ifl string, lfl string) (*IOManipulator, error
 	}
 
 	//try to open index file from location ifl
-	iFile, ifOpenError := os.OpenFile(ifl, os.O_RDWR|os.O_SYNC, 0)
+	iFile, ifOpenError := os.OpenFile(utility.DEFAULT_INDEXFILE_LOCATION, os.O_RDWR|os.O_SYNC, 0)
 	if ifOpenError != nil {
 		return nil, ifOpenError
 	} else {
@@ -44,7 +45,7 @@ func GetIOManipulator(dfl string, ifl string, lfl string) (*IOManipulator, error
 	}
 
 	//try to open log file from location lfl
-	lFile, lfOpenError := os.OpenFile(lfl, os.O_RDWR|os.O_SYNC, 0)
+	lFile, lfOpenError := os.OpenFile(utility.DEFAULT_LOGFILE_LOCATION, os.O_RDWR|os.O_SYNC, 0)
 	if lfOpenError != nil {
 		return nil, lfOpenError
 	} else {

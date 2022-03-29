@@ -35,8 +35,8 @@ type StorageEngine struct {
 var seInstance *StorageEngine
 var seOnce sync.Once
 
-func GetStorageEngine(dfl string, ifl string, lfl string) *StorageEngine {
-	iom, _ := GetIOManipulator(dfl, ifl, lfl)
+func GetStorageEngine() *StorageEngine {
+	iom, _ := GetIOManipulator()
 
 	seOnce.Do(func() {
 		seInstance = &StorageEngine{

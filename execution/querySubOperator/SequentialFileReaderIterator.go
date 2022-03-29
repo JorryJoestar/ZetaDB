@@ -18,13 +18,13 @@ type SequentialFileReaderIterator struct {
 }
 
 //SequentialFileReaderIterator constructor
-func NewSequentialFileReaderIterator(se *storage.StorageEngine, tableHeadPageId uint32, schema *container.Schema) *SequentialFileReaderIterator {
+func NewSequentialFileReaderIterator(tableHeadPageId uint32, schema *container.Schema) *SequentialFileReaderIterator {
 
 	rfi := &SequentialFileReaderIterator{
 		headPageId:      tableHeadPageId,
 		currentPageId:   tableHeadPageId,
 		currentTuplesId: 0,
-		se:              se,
+		se:              storage.GetStorageEngine(),
 		schema:          schema,
 		hasNext:         true}
 
