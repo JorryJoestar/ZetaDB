@@ -39,7 +39,7 @@ func GetInstance() *Kernel {
 func main() {
 	kernel := GetInstance()
 
-	table8Ast := kernel.parser.ParseSql(utility.DEFAULT_KEY_TABLE_8_SCHEMA)
+	table8Ast := kernel.parser.ParseSql(utility.DEFAULT_KEYTABLES_SCHEMA[8])
 	fmt.Println(ASTToString(table8Ast))
 
 	rewriter := optimizer.Rewriter{}
@@ -73,12 +73,7 @@ func main() {
 	   	kernel.storageEngine.SwapDataPage(8)
 	*/
 
-	schema, err := kernel.executionEngine.GetSchemaFromFileByTableName("k_userId_userName")
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(schema.GetSchemaDomain(1))
-	}
+	kernel.executionEngine.InitializeSystem()
 
 }
 

@@ -12,9 +12,10 @@ import (
 )
 
 type ExecutionEngine struct {
-	se       *storage.StorageEngine
-	parser   *parser.Parser
-	rewriter *optimizer.Rewriter
+	se                    *storage.StorageEngine
+	parser                *parser.Parser
+	rewriter              *optimizer.Rewriter
+	initializationManager *InitializationManager
 }
 
 //use GetExecutionEngine to get the unique ExecutionEngine
@@ -29,13 +30,20 @@ func GetExecutionEngine(se *storage.StorageEngine, parser *parser.Parser) *Execu
 			parser:   parser,
 			rewriter: &optimizer.Rewriter{}}
 	})
+	eeInstance.initializationManager = NewInitializationManager(eeInstance.se, eeInstance.parser, eeInstance.rewriter)
+
 	return eeInstance
+}
+
+//initialze the whole system, create key tables and insert necessary tuples into these tables
+func (ee *ExecutionEngine) InitializeSystem() {
+	ee.initializationManager.InitializeSystem()
 }
 
 //fetch schema of a table from dataFile according to tableName, k_tableId_schema table 8
 //throw error if no such table
 func (ee *ExecutionEngine) GetSchemaFromFileByTableName(tableName string) (*container.Schema, error) {
-	astOfCreateTable8 := ee.parser.ParseSql(DEFAULT_KEY_TABLE_8_SCHEMA)
+	astOfCreateTable8 := ee.parser.ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
 	schemaOfCreateTable8, err := ee.rewriter.ASTNodeToSchema(astOfCreateTable8)
 	if err != nil {
 		return nil, err
@@ -73,6 +81,12 @@ func (ee *ExecutionEngine) GetSchemaFromFileByTableName(tableName string) (*cont
 
 	}
 	return nil, errors.New("execution/executionEngine.go    GetSchemaFromFileByTableName() no such table")
+}
+
+//insert a tuple into a table, if no enough space, then create a new page
+//throw error if no such table
+func (ee *ExecutionEngine) InsertTupleIntoTable(tuple *container.Tuple, tableId uint8) error {
+	return nil
 }
 
 //TODO
