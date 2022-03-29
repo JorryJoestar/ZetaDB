@@ -9,11 +9,10 @@ import (
 )
 
 type ExecutionEngine struct {
-	se                    *storage.StorageEngine
-	parser                *parser.Parser
-	rewriter              *optimizer.Rewriter
-	initializationManager *InitializationManager
-	ktm                   *KeytableManager
+	se       *storage.StorageEngine
+	parser   *parser.Parser
+	rewriter *optimizer.Rewriter
+	ktm      *KeytableManager
 }
 
 //use GetExecutionEngine to get the unique ExecutionEngine
@@ -28,7 +27,6 @@ func GetExecutionEngine(se *storage.StorageEngine, parser *parser.Parser) *Execu
 			parser:   parser,
 			rewriter: &optimizer.Rewriter{}}
 	})
-	eeInstance.initializationManager = NewInitializationManager(eeInstance.se, eeInstance.parser, eeInstance.rewriter)
 	eeInstance.ktm = NewKeytableManager(eeInstance.parser, eeInstance.rewriter, eeInstance.se)
 
 	return eeInstance
@@ -36,7 +34,7 @@ func GetExecutionEngine(se *storage.StorageEngine, parser *parser.Parser) *Execu
 
 //initialze the whole system, create key tables and insert necessary tuples into these tables
 func (ee *ExecutionEngine) InitializeSystem() {
-	ee.initializationManager.InitializeSystem()
+	ee.ktm.InitializeSystem()
 }
 
 //insert a tuple into a table, if no enough space, then create a new page
