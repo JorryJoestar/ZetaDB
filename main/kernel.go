@@ -4,11 +4,9 @@ import (
 	//. "ZetaDB/execution/querySubOperator"
 
 	"ZetaDB/execution"
-	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
-	"fmt"
 	"sync"
 )
 
@@ -38,40 +36,6 @@ func GetInstance() *Kernel {
 
 func main() {
 	kernel := GetInstance()
-
-	table8Ast := kernel.parser.ParseSql(utility.DEFAULT_KEYTABLES_SCHEMA[8])
-	fmt.Println(ASTToString(table8Ast))
-
-	rewriter := optimizer.Rewriter{}
-	table8Schema, err := rewriter.ASTNodeToSchema(table8Ast)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(table8Schema.GetSchemaTableName())
-
-	/* 	f00, _ := container.NewFieldFromBytes(utility.INTToBytes(0))
-	   	f01Bytes, _ := utility.VARCHARToBytes(utility.DEFAULT_KEY_TABLE_0_SCHEMA)
-	   	f01, _ := container.NewFieldFromBytes(f01Bytes)
-	   	var fs1 []*container.Field
-	   	fs1 = append(fs1, f00)
-	   	fs1 = append(fs1, f01)
-	   	tup0, _ := container.NewTuple(8, 0, table8Schema, fs1)
-
-	   	f10, _ := container.NewFieldFromBytes(utility.INTToBytes(1))
-	   	f11Bytes, _ := utility.VARCHARToBytes(utility.DEFAULT_KEY_TABLE_8_SCHEMA)
-	   	f11, _ := container.NewFieldFromBytes(f11Bytes)
-	   	var fs []*container.Field
-	   	fs = append(fs, f10)
-	   	fs = append(fs, f11)
-	   	tup1, _ := container.NewTuple(8, 1, table8Schema, fs)
-
-	   	p8 := storage.NewDataPageMode0(8, 8, 8, 8)
-	   	p8.InsertTuple(tup0)
-	   	p8.InsertTuple(tup1)
-	   	kernel.storageEngine.InsertDataPage(p8)
-	   	kernel.storageEngine.SwapDataPage(8)
-	*/
 
 	kernel.executionEngine.InitializeSystem()
 

@@ -25,7 +25,7 @@ const (
 var (
 	DEFAULT_KEYTABLES_SCHEMA = [17]string{
 		"CREATE TABLE k_userId_userName (userId INT PRIMARY KEY, userName VARCHAR(20));",
-		"CREATE TABLE k_userId_password (userId INT PRIMARY KEY, password VARCHAR(20));",
+		"CREATE TABLE k_userId_password (userId INT PRIMARY KEY, passwords VARCHAR(20));",
 		"CREATE TABLE k_tableId_userId (tableId INT PRIMARY KEY, userId INT);",
 		"CREATE TABLE k_assertId_userId (assertId INT PRIMARY KEY, userId INT);",
 		"CREATE TABLE k_viewId_userId (viewId INT PRIMARY KEY, userId INT);",
