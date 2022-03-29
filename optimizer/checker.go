@@ -1,13 +1,11 @@
 package optimizer
 
 import (
-	"ZetaDB/execution"
 	"ZetaDB/parser"
 )
 
 type Checker struct {
 	currentUserId int
-	ee            *execution.ExecutionEngine
 }
 
 //throw error if this table name already exists that belongs to current user
@@ -95,7 +93,8 @@ func (checker *Checker) Check_PSMCALL() error {
 	return nil
 }
 
-//throw error if
+//throw error if relations in fromStmt do not exist
+//TODO
 func (checker *Checker) Check_DQL() error {
 	return nil
 }

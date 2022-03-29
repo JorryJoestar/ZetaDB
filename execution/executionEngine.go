@@ -2,14 +2,19 @@ package execution
 
 import (
 	"ZetaDB/container"
+	its "ZetaDB/execution/querySubOperator"
+	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
+	. "ZetaDB/utility"
+	"errors"
 	"sync"
 )
 
 type ExecutionEngine struct {
-	se     *storage.StorageEngine
-	parser *parser.Parser
+	se       *storage.StorageEngine
+	parser   *parser.Parser
+	rewriter *optimizer.Rewriter
 }
 
 //use GetExecutionEngine to get the unique ExecutionEngine
@@ -20,17 +25,57 @@ func GetExecutionEngine(se *storage.StorageEngine, parser *parser.Parser) *Execu
 
 	eeOnce.Do(func() {
 		eeInstance = &ExecutionEngine{
-			se:     se,
-			parser: parser}
+			se:       se,
+			parser:   parser,
+			rewriter: &optimizer.Rewriter{}}
 	})
 	return eeInstance
 }
 
-func (ee *ExecutionEngine) ExecutePhysicalPlan(pp *container.PhysicalPlan) error {
+//fetch schema of a table from dataFile according to tableName, k_tableId_schema table 8
+//throw error if no such table
+func (ee *ExecutionEngine) GetSchemaFromFileByTableName(tableName string) (*container.Schema, error) {
+	astOfCreateTable8 := ee.parser.ParseSql(DEFAULT_KEY_TABLE_8_SCHEMA)
+	schemaOfCreateTable8, err := ee.rewriter.ASTNodeToSchema(astOfCreateTable8)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil
+	seqIt := its.NewSequentialFileReaderIterator(ee.se, 8, schemaOfCreateTable8)
+	seqIt.Open(nil, nil)
+	for seqIt.HasNext() {
+		table8Tuple, err := seqIt.GetNext()
+		if err != nil {
+			return nil, err
+		}
+
+		//TODO mantain: if schema of table 8 is changed, this index could be asked to change
+		schemaStringBytes, err := table8Tuple.TupleGetFieldValue(1)
+		if err != nil {
+			return nil, err
+		}
+		schemaString, err := BytesToVARCHAR(schemaStringBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		//parse this string to get schema
+		ast := ee.parser.ParseSql(schemaString)
+		currentSchema, err := ee.rewriter.ASTNodeToSchema(ast)
+		if err != nil {
+			return nil, err
+		}
+
+		//found correct table schema
+		if currentSchema.GetSchemaTableName() == tableName {
+			return currentSchema, nil
+		}
+
+	}
+	return nil, errors.New("execution/executionEngine.go    GetSchemaFromFileByTableName() no such table")
 }
 
+//TODO
 func (ee *ExecutionEngine) CreateTableOperator()    {}
 func (ee *ExecutionEngine) DropTableOperator()      {}
 func (ee *ExecutionEngine) AlterTableAddOperator()  {}
