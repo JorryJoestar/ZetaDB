@@ -129,12 +129,12 @@ func (ktm *KeytableManager) Query_k_tableId_schema_FromTableId(tableId uint32) (
 	return nil, errors.New("execution/keyTableManager.go    GetTableSchema() no such table")
 }
 
-//get headPageId, lastTupleId, tupleNum by tableId
-func (ktm *KeytableManager) Query_k_table_FromTableId(tableId uint32) (uint32, uint32, int32, error) {
+//get headPageId, tailPageId, lastTupleId, tupleNum by tableId
+func (ktm *KeytableManager) Query_k_table_FromTableId(tableId uint32) (uint32, uint32, uint32, int32, error) {
 	astOfCreateTable9 := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[9])
 	schemaOfCreateTable9, err := optimizer.GetRewriter().ASTNodeToSchema(astOfCreateTable9)
 	if err != nil {
-		return 0, 0, 0, err
+		return 0, 0, 0, 0, err
 	}
 
 	seqIt := its.NewSequentialFileReaderIterator(9, schemaOfCreateTable9)
@@ -142,7 +142,7 @@ func (ktm *KeytableManager) Query_k_table_FromTableId(tableId uint32) (uint32, u
 	for seqIt.HasNext() {
 		table9Tuple, err := seqIt.GetNext()
 		if err != nil {
-			return 0, 0, 0, err
+			return 0, 0, 0, 0, err
 		}
 
 		//TODO mantain: if schema of table 9 is changed, this index could be asked to change
@@ -154,20 +154,24 @@ func (ktm *KeytableManager) Query_k_table_FromTableId(tableId uint32) (uint32, u
 		headPageId32, _ := BytesToINT(headPageIdBytes)
 		headPageId := uint32(headPageId32)
 
-		lastTupleIdBytes, _ := table9Tuple.TupleGetFieldValue(2)
+		tailPageIdBytes, _ := table9Tuple.TupleGetFieldValue(2)
+		tailPageId32, _ := BytesToINT(tailPageIdBytes)
+		tailPageId := uint32(tailPageId32)
+
+		lastTupleIdBytes, _ := table9Tuple.TupleGetFieldValue(3)
 		lastTupleId32, _ := BytesToINT(lastTupleIdBytes)
 		lastTupleId := uint32(lastTupleId32)
 
-		tupleNumBytes, _ := table9Tuple.TupleGetFieldValue(3)
+		tupleNumBytes, _ := table9Tuple.TupleGetFieldValue(4)
 		tupleNum, _ := BytesToINT(tupleNumBytes)
 
 		//found correct tuple
 		if tupleTableId == tableId {
-			return headPageId, lastTupleId, tupleNum, nil
+			return headPageId, tailPageId, lastTupleId, tupleNum, nil
 		}
 
 	}
-	return 0, 0, 0, errors.New("execution/keyTableManager.go    Query_k_table_FromTableId() no such table")
+	return 0, 0, 0, 0, errors.New("execution/keyTableManager.go    Query_k_table_FromTableId() no such table")
 }
 
 //initialize the whole system
@@ -327,14 +331,16 @@ func (ktm *KeytableManager) InitializeSystem() {
 	se.InsertDataPage(p15)
 	se.InsertDataPage(p16)
 
-	//swap these pages into disk
-	se.SwapDataPage(0)
-	se.SwapDataPage(1)
-	se.SwapDataPage(2)
-	se.SwapDataPage(8)
-	se.SwapDataPage(9)
-	se.SwapDataPage(15)
-	se.SwapDataPage(16)
+	//push pages into transaction, conduct transaction
+	transaction := storage.GetTransaction()
+	transaction.InsertDataPage(p0)
+	transaction.InsertDataPage(p1)
+	transaction.InsertDataPage(p2)
+	transaction.InsertDataPage(p8)
+	transaction.InsertDataPage(p9)
+	transaction.InsertDataPage(p15)
+	transaction.InsertDataPage(p16)
+	transaction.PushTransactionIntoDisk()
 }
 
 //get a vacant dataPageId

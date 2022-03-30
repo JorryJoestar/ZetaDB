@@ -107,8 +107,8 @@ func (se *StorageEngine) InsertDataPage(page *DataPage) error {
 			}
 
 			//if the evict page is modified, swap it into disk
-			if evictPage.DataPageIsModified() {
-				err3 := se.SwapDataPage(evictPage.DpGetPageId())
+			if evictPage.DataPageIsModified() { //TODO swapDataPage to SwapDataPage
+				err3 := se.swapDataPage(evictPage.DpGetPageId())
 				if err3 != nil {
 					return err3
 				}
@@ -132,18 +132,8 @@ func (se *StorageEngine) InsertDataPage(page *DataPage) error {
 	return nil
 }
 
-//delete a data page according to its pageId, related page not swapped into disk
-//throw error if corresponding page is a key table head page
-//remember to swap related pages
-func (se *StorageEngine) DeleteDataPage(pageId uint32) error {
-	if pageId <= 16 { //throw error
-		return errors.New("pageId invalid")
-	}
-	return se.dBuffer.DataBufferDeleteDataPage(pageId)
-}
-
 //swap a data page into disk according to its pageId
-func (se *StorageEngine) SwapDataPage(pageId uint32) error {
+func (se *StorageEngine) swapDataPage(pageId uint32) error {
 
 	fmt.Printf("swap page %v\n", pageId)
 
@@ -175,6 +165,22 @@ func (se *StorageEngine) SwapDataPage(pageId uint32) error {
 	page.UnmodifyDataPage()
 
 	return err3
+}
+
+//throw error if dataBytes length invalid
+func (se *StorageEngine) dataPageBytesToDataFile(dataBytes []byte, pageId uint32) error {
+	//throw error if dataBytes length invalid
+	if len(dataBytes) != DEFAULT_PAGE_SIZE {
+		return errors.New("storage/storageEngine.go    dataPageBytesToDataFile() dataBytes length invalid")
+	}
+
+	//push bytes into disk
+	err := se.iom.BytesToDataFile(dataBytes, pageId*uint32(DEFAULT_PAGE_SIZE))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //get an index page according to its pageId from index buffer
@@ -250,10 +256,20 @@ func (se *StorageEngine) InsertIndexPage(page *IndexPage) error {
 	return nil
 }
 
-//delete an index page according to its pageId, related page not swapped into disk
-//remember to swap related pages
-func (se *StorageEngine) DeleteIndexPage(pageId uint32) error {
-	return se.iBuffer.IndexBufferDeleteIndexPage(pageId)
+//throw error if indexBytes length invalid
+func (se *StorageEngine) indexPageBytesToIndexFile(indexBytes []byte, pageId uint32) error {
+	//throw error if dataBytes length invalid
+	if len(indexBytes) != DEFAULT_PAGE_SIZE {
+		return errors.New("storage/storageEngine.go    indexPageBytesToDataFile() indexBytes length invalid")
+	}
+
+	//push bytes into disk
+	err := se.iom.BytesToIndexFile(indexBytes, pageId*uint32(DEFAULT_PAGE_SIZE))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //swap an index page into disk according to its pageId
@@ -297,6 +313,71 @@ func (se *StorageEngine) SwapLogPage(page *logPage) error {
 
 	se.iom.BytesToLogFile(bytes, pos*uint32(DEFAULT_PAGE_SIZE))
 	return nil
+}
+
+//set the first page of logFile
+//log flag true: first byte is 0b11111111
+//log flag false: first byte is 0b00000000
+func (se *StorageEngine) setLogFlag(flag bool) {
+	var bytes []byte
+	var trueByte byte = 0b11111111
+	var falseByte byte = 0b00000000
+
+	if flag {
+		bytes = append(bytes, trueByte)
+	} else {
+		bytes = append(bytes, falseByte)
+	}
+
+	//padding bytes
+	for i := 0; i < DEFAULT_PAGE_SIZE-1; i++ {
+		bytes = append(bytes, 0)
+	}
+
+	se.swapPageIntoLogFile(bytes, 0)
+}
+
+//TODO
+func (se *StorageEngine) SetLogFlag(flag bool) {
+	se.setLogFlag(flag)
+}
+
+//check log flag
+func (se *StorageEngine) getLogFlag() (bool, error) {
+	var trueByte byte = 0b11111111
+	returnBytes, err := se.getPageBytesFromLogFile(0)
+	if err != nil {
+		return false, err
+	}
+
+	if returnBytes[0] == trueByte {
+		return true, nil
+	} else {
+		return false, nil
+	}
+
+}
+
+//push pageBytes into pos position in the log file
+//throw error if input byte slice length invalid
+func (se *StorageEngine) swapPageIntoLogFile(pageBytes []byte, pos uint32) error {
+	//push byte slice into pos position in the log file
+	if len(pageBytes) != DEFAULT_PAGE_SIZE {
+		return errors.New("storage/storageEngine.go    swapPageIntoLogFile() pageBytes length invalid")
+	}
+
+	se.iom.BytesToLogFile(pageBytes, pos*uint32(DEFAULT_PAGE_SIZE))
+
+	return nil
+}
+
+//get DEFAULT_PAGE_SIZE bytes from pos page
+func (se *StorageEngine) getPageBytesFromLogFile(tableId uint32) ([]byte, error) {
+	returnBytes, err := se.iom.BytesFromLogFile(tableId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
+	if err != nil {
+		return nil, err
+	}
+	return returnBytes, nil
 }
 
 //erase data file

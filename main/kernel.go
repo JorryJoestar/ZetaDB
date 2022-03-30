@@ -3,7 +3,6 @@ package main
 import (
 	//. "ZetaDB/execution/querySubOperator"
 
-	"ZetaDB/container"
 	"ZetaDB/execution"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
@@ -14,7 +13,6 @@ type Kernel struct {
 	parser          *parser.Parser
 	storageEngine   *storage.StorageEngine
 	executionEngine *execution.ExecutionEngine
-	transaction     *container.Transaction
 }
 
 //for singleton pattern
@@ -26,13 +24,13 @@ func GetInstance() *Kernel {
 	once.Do(func() {
 		instance = &Kernel{
 			parser:        parser.GetParser(),
-			storageEngine: storage.GetStorageEngine(),
-			transaction:   container.GetTransaction()}
+			storageEngine: storage.GetStorageEngine()}
 	})
 	instance.executionEngine = execution.GetExecutionEngine()
 	return instance
 }
 
 func main() {
-
+	transaction := storage.GetTransaction()
+	transaction.Recovery()
 }

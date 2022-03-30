@@ -169,7 +169,7 @@ func (lp *logPage) LogPageGetLogs() []*Log {
 //throw error if no enough space to complete this insertion
 func (lp *logPage) LogPageInsertLog(l *Log) error {
 	//throw error if no enough space to complete this insertion
-	if lp.LogPageVacantByteNum() < 12 {
+	if lp.LogPageVacantByteNum() < 9 {
 		return errors.New("not enough space")
 	}
 
@@ -191,4 +191,13 @@ func (lp *logPage) LogPageVacantByteNum() int32 {
 	size -= 9 * lp.logNum
 
 	return size
+}
+
+//if this logPage can hold no more log, return true
+func (lp *logPage) LogPageIsFull() bool {
+	if lp.LogPageVacantByteNum() < 9 {
+		return true
+	} else {
+		return false
+	}
 }
