@@ -4,7 +4,6 @@ import (
 	. "ZetaDB/container"
 	. "ZetaDB/utility"
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -93,96 +92,6 @@ func (se *StorageEngine) GetDataPage(pageId uint32, schema *Schema) (*DataPage, 
 	}
 }
 
-//insert a newly created data page into dataBuffer/keyTableHeadPageBuffer, but not swapped into disk
-//remember to swap it
-func (se *StorageEngine) InsertDataPage(page *DataPage) error {
-	if page.DpGetPageId() <= 16 { // insert into keyTableHeadPageBuffer
-		se.keyTableHeadPageBuffer[page.DpGetPageId()] = page
-	} else { // insert into dataBuffer
-		//check if dataBuffer is full
-		if se.dBuffer.DataBufferIsFull() { //dataBuffer is full, evict and delete one page
-			evictPage, evictErr := se.dBuffer.DataBufferEvictDataPage()
-			if evictErr != nil {
-				return evictErr
-			}
-
-			//if the evict page is modified, swap it into disk
-			if evictPage.DataPageIsModified() { //TODO swapDataPage to SwapDataPage
-				err3 := se.swapDataPage(evictPage.DpGetPageId())
-				if err3 != nil {
-					return err3
-				}
-			}
-
-			//delete the evict page from buffer
-			evictPage.UnmodifyDataPage()
-			deleteErr := se.dBuffer.DataBufferDeleteDataPage(evictPage.DpGetPageId())
-			if deleteErr != nil {
-				return deleteErr
-			}
-		}
-
-		//insert the page into buffer
-		err4 := se.dBuffer.DataBufferInsertDataPage(page)
-		if err4 != nil {
-			return err4
-		}
-	}
-
-	return nil
-}
-
-//swap a data page into disk according to its pageId
-func (se *StorageEngine) swapDataPage(pageId uint32) error {
-
-	fmt.Printf("swap page %v\n", pageId)
-
-	//get this page
-	var page *DataPage
-	var err error
-	if pageId <= 16 { //pageId <= 16, fetch page from keyTableHeadPageBuffer
-		page = se.keyTableHeadPageBuffer[pageId]
-		if page == nil { //throw error if this page is not buffered
-			return errors.New("key page not buffered")
-		}
-	} else { //get this page from buffer
-		page, err = se.dBuffer.DataBufferFetchPage(pageId)
-		if err != nil {
-			return err
-		}
-	}
-
-	//convert this page into bytes
-	bytes, err2 := page.DataPageToBytes()
-	if err2 != nil {
-		return err2
-	}
-
-	//push bytes into disk
-	err3 := se.iom.BytesToDataFile(bytes, page.DpGetPageId()*uint32(DEFAULT_PAGE_SIZE))
-
-	//set page to unmodified
-	page.UnmodifyDataPage()
-
-	return err3
-}
-
-//throw error if dataBytes length invalid
-func (se *StorageEngine) dataPageBytesToDataFile(dataBytes []byte, pageId uint32) error {
-	//throw error if dataBytes length invalid
-	if len(dataBytes) != DEFAULT_PAGE_SIZE {
-		return errors.New("storage/storageEngine.go    dataPageBytesToDataFile() dataBytes length invalid")
-	}
-
-	//push bytes into disk
-	err := se.iom.BytesToDataFile(dataBytes, pageId*uint32(DEFAULT_PAGE_SIZE))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 //get an index page according to its pageId from index buffer
 //if this page is not buffered, fetch it from disk and push it into buffer
 //if buffer is full, evict a page
@@ -218,8 +127,45 @@ func (se *StorageEngine) GetIndexPage(pageId uint32) (*IndexPage, error) {
 	return page, nil
 }
 
-//insert a newly created index page into buffer, but not swapped into disk
-//remember to swap it
+//insert a newly created data page into dataBuffer/keyTableHeadPageBuffer
+//if a page is about to evict, insert it into transaction
+func (se *StorageEngine) InsertDataPage(page *DataPage) error {
+	if page.DpGetPageId() <= 16 { // insert into keyTableHeadPageBuffer
+		se.keyTableHeadPageBuffer[page.DpGetPageId()] = page
+	} else { // insert into dataBuffer
+		//check if dataBuffer is full
+		if se.dBuffer.DataBufferIsFull() { //dataBuffer is full, evict and delete one page
+			evictPage, evictErr := se.dBuffer.DataBufferEvictDataPage()
+			if evictErr != nil {
+				return evictErr
+			}
+
+			//if the evict page is modified, swap it into disk
+			if evictPage.DataPageIsModified() { //insert evict page into transaction
+
+				transaction := GetTransaction()
+				transaction.InsertDataPage(evictPage)
+			}
+
+			//delete the evict page from buffer
+			deleteErr := se.dBuffer.DataBufferDeleteDataPage(evictPage.DpGetPageId())
+			if deleteErr != nil {
+				return deleteErr
+			}
+		}
+
+		//insert the page into buffer
+		err4 := se.dBuffer.DataBufferInsertDataPage(page)
+		if err4 != nil {
+			return err4
+		}
+	}
+
+	return nil
+}
+
+//insert a newly created index page into buffer
+//if a page is about to evict, insert it into transaction
 func (se *StorageEngine) InsertIndexPage(page *IndexPage) error {
 
 	//check if indexBuffer is full
@@ -231,15 +177,11 @@ func (se *StorageEngine) InsertIndexPage(page *IndexPage) error {
 
 		//if the evict page is modified, swap it into disk
 		if evictPage.IndexPageIsModified() {
-			err3 := se.SwapIndexPage(evictPage.IndexPageGetPageId())
-			if err3 != nil {
-				return err3
-			}
-
+			transaction := GetTransaction()
+			transaction.InsertIndexPage(evictPage)
 		}
 
 		//delete the evict page from buffer
-		evictPage.IndexPageUnModify()
 		deleteErr := se.iBuffer.IndexBufferDeleteIndexPage(evictPage.IndexPageGetPageId())
 		if deleteErr != nil {
 			return deleteErr
@@ -251,6 +193,22 @@ func (se *StorageEngine) InsertIndexPage(page *IndexPage) error {
 	err4 := se.iBuffer.IndexBufferInsertIndexPage(page)
 	if err4 != nil {
 		return err4
+	}
+
+	return nil
+}
+
+//throw error if dataBytes length invalid
+func (se *StorageEngine) dataPageBytesToDataFile(dataBytes []byte, pageId uint32) error {
+	//throw error if dataBytes length invalid
+	if len(dataBytes) != DEFAULT_PAGE_SIZE {
+		return errors.New("storage/storageEngine.go    dataPageBytesToDataFile() dataBytes length invalid")
+	}
+
+	//push bytes into disk
+	err := se.iom.BytesToDataFile(dataBytes, pageId*uint32(DEFAULT_PAGE_SIZE))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -269,49 +227,6 @@ func (se *StorageEngine) indexPageBytesToIndexFile(indexBytes []byte, pageId uin
 		return err
 	}
 
-	return nil
-}
-
-//swap an index page into disk according to its pageId
-func (se *StorageEngine) SwapIndexPage(pageId uint32) error {
-	//get this page from buffer
-	page, err := se.iBuffer.IndexBufferFetchPage(pageId)
-	if err != nil {
-		return err
-	}
-
-	//convert this page into bytes
-	bytes := page.IndexPageToBytes()
-
-	//push bytes into disk
-	err2 := se.iom.BytesToIndexFile(bytes, page.IndexPageGetPageId()*uint32(DEFAULT_PAGE_SIZE))
-
-	return err2
-}
-
-//fetch a log page according to its pageId from the disk
-//if this page is modified, remember to swap it
-func (se *StorageEngine) FetchLogPage(pageId uint32) (*logPage, error) {
-	bytes, bytesErr := se.iom.BytesFromLogFile(pageId*uint32(DEFAULT_PAGE_SIZE), DEFAULT_PAGE_SIZE)
-	if bytesErr != nil {
-		return nil, bytesErr
-	}
-
-	page, pageErr := NewLogPageFromBytes(bytes)
-	if pageErr != nil {
-		return nil, pageErr
-	}
-
-	return page, nil
-}
-
-//swap a log page into disk according to its pageId
-func (se *StorageEngine) SwapLogPage(page *logPage) error {
-
-	bytes := page.LogPageToBytes()
-	pos := page.LogPageGetLogPageId()
-
-	se.iom.BytesToLogFile(bytes, pos*uint32(DEFAULT_PAGE_SIZE))
 	return nil
 }
 
@@ -334,12 +249,7 @@ func (se *StorageEngine) setLogFlag(flag bool) {
 		bytes = append(bytes, 0)
 	}
 
-	se.swapPageIntoLogFile(bytes, 0)
-}
-
-//TODO
-func (se *StorageEngine) SetLogFlag(flag bool) {
-	se.setLogFlag(flag)
+	se.swapPageBytesIntoLogFile(bytes, 0)
 }
 
 //check log flag
@@ -355,12 +265,11 @@ func (se *StorageEngine) getLogFlag() (bool, error) {
 	} else {
 		return false, nil
 	}
-
 }
 
 //push pageBytes into pos position in the log file
 //throw error if input byte slice length invalid
-func (se *StorageEngine) swapPageIntoLogFile(pageBytes []byte, pos uint32) error {
+func (se *StorageEngine) swapPageBytesIntoLogFile(pageBytes []byte, pos uint32) error {
 	//push byte slice into pos position in the log file
 	if len(pageBytes) != DEFAULT_PAGE_SIZE {
 		return errors.New("storage/storageEngine.go    swapPageIntoLogFile() pageBytes length invalid")

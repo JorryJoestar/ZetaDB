@@ -127,7 +127,7 @@ func (transaction *Transaction) PushTransactionIntoDisk() {
 			currentLogPage.LogPageSetLogNextPageId(currentLogPageId)
 
 			//swap currentLogPage
-			se.swapPageIntoLogFile(currentLogPage.LogPageToBytes(), currentLogPage.LogPageGetLogPageId())
+			se.swapPageBytesIntoLogFile(currentLogPage.LogPageToBytes(), currentLogPage.LogPageGetLogPageId())
 
 			//set nextLogPage as currentLogPage
 			currentLogPage = nextLogPage
@@ -144,7 +144,7 @@ func (transaction *Transaction) PushTransactionIntoDisk() {
 
 		//swap this dataPage into disk
 		dataPageBytes, _ := dataPage.DataPageToBytes()
-		se.swapPageIntoLogFile(dataPageBytes, currentSavePageId)
+		se.swapPageBytesIntoLogFile(dataPageBytes, currentSavePageId)
 
 		//update currentSavePageId
 		currentSavePageId++
@@ -164,7 +164,7 @@ func (transaction *Transaction) PushTransactionIntoDisk() {
 			currentLogPage.LogPageSetLogNextPageId(currentLogPageId)
 
 			//swap currentLogPage
-			se.swapPageIntoLogFile(currentLogPage.LogPageToBytes(), currentLogPage.LogPageGetLogPageId())
+			se.swapPageBytesIntoLogFile(currentLogPage.LogPageToBytes(), currentLogPage.LogPageGetLogPageId())
 
 			//set nextLogPage as currentLogPage
 			currentLogPage = nextLogPage
@@ -180,13 +180,13 @@ func (transaction *Transaction) PushTransactionIntoDisk() {
 		currentLogPage.LogPageInsertLog(newLog)
 
 		//swap this indexPage into disk
-		se.swapPageIntoLogFile(indexPage.IndexPageToBytes(), currentSavePageId)
+		se.swapPageBytesIntoLogFile(indexPage.IndexPageToBytes(), currentSavePageId)
 
 		//update currentSavePageId
 		currentSavePageId++
 	}
 	//swap the last logPage
-	se.swapPageIntoLogFile(currentLogPage.LogPageToBytes(), currentLogPage.LogPageGetLogPageId())
+	se.swapPageBytesIntoLogFile(currentLogPage.LogPageToBytes(), currentLogPage.LogPageGetLogPageId())
 
 	//set flag to true (first byte of first logPage is 0b11111111)
 	se.setLogFlag(true)
@@ -197,5 +197,4 @@ func (transaction *Transaction) PushTransactionIntoDisk() {
 	//initialize transaction
 	transaction.dataPages = make(map[uint32]*DataPage)
 	transaction.indexPages = make(map[uint32]*IndexPage)
-
 }

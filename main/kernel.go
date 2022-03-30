@@ -4,8 +4,10 @@ import (
 	//. "ZetaDB/execution/querySubOperator"
 
 	"ZetaDB/execution"
+	its "ZetaDB/execution/querySubOperator"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
+	"fmt"
 	"sync"
 )
 
@@ -31,6 +33,12 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	transaction := storage.GetTransaction()
-	transaction.Recovery()
+	ktm := execution.GetKeytableManager()
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(9)
+	seqIt := its.NewSequentialFileReaderIterator(9, schema)
+	seqIt.Open(nil, nil)
+	for seqIt.HasNext() {
+		tup, _ := seqIt.GetNext()
+		fmt.Println(tup.TupleGetMapKey())
+	}
 }
