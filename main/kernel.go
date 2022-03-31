@@ -33,12 +33,15 @@ func GetInstance() *Kernel {
 }
 
 func main() {
+	transaction := storage.GetTransaction()
 	ktm := execution.GetKeytableManager()
-	schema, _ := ktm.Query_k_tableId_schema_FromTableId(9)
-	seqIt := its.NewSequentialFileReaderIterator(9, schema)
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(15)
+	seqIt := its.NewSequentialFileReaderIterator(15, schema)
 	seqIt.Open(nil, nil)
 	for seqIt.HasNext() {
 		tup, _ := seqIt.GetNext()
-		fmt.Println(tup.TupleGetMapKey())
+		fmt.Println(tup.TupleGetFieldValue(0))
 	}
+
+	transaction.PushTransactionIntoDisk()
 }

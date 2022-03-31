@@ -6,19 +6,19 @@ import (
 	"errors"
 )
 
-type DataPageManipulator struct {
+type TableManipulator struct {
 	se *storage.StorageEngine
 }
 
 //DataPageManipulator generator
-func NewDataPageManipulator() *DataPageManipulator {
-	dpm := &DataPageManipulator{
+func GetTableManipulator() *TableManipulator {
+	dpm := &TableManipulator{
 		se: storage.GetStorageEngine()}
 	return dpm
 }
 
 //throw error if pageMode is 2
-func (dpm *DataPageManipulator) GetDataHeadPageId(pageId uint32, schema *container.Schema) (uint32, error) {
+func (dpm *TableManipulator) GetDataHeadPageId(pageId uint32, schema *container.Schema) (uint32, error) {
 	currentDataPage, err := dpm.se.GetDataPage(pageId, schema)
 	if err != nil {
 		return 0, err
@@ -44,7 +44,7 @@ func (dpm *DataPageManipulator) GetDataHeadPageId(pageId uint32, schema *contain
 }
 
 //throw error if pageMode is 2
-func (dpm *DataPageManipulator) GetDataTailPageId(pageId uint32, schema *container.Schema) (uint32, error) {
+func (dpm *TableManipulator) GetDataTailPageId(pageId uint32, schema *container.Schema) (uint32, error) {
 	currentDataPage, err := dpm.se.GetDataPage(pageId, schema)
 	if err != nil {
 		return 0, err
@@ -72,7 +72,7 @@ func (dpm *DataPageManipulator) GetDataTailPageId(pageId uint32, schema *contain
 //delete a page
 //if page is mode 0, just delete itself
 //if page is mode 1/2, delete all pages in mode 1/2 related to it
-func (dpm *DataPageManipulator) DeleteDataPage(pageId uint32, schema *container.Schema) error {
+func (dpm *TableManipulator) DeleteDataPage(pageId uint32, schema *container.Schema) error {
 	//get this page
 	currentPage, err := dpm.se.GetDataPage(pageId, schema)
 	if err != nil {
@@ -91,7 +91,7 @@ func (dpm *DataPageManipulator) DeleteDataPage(pageId uint32, schema *container.
 /* //insert a tuple into the end of this table
 //if this tuple is too large to hold within a single page in mode0, break it into several part and insert into mode1/2 page series
 //if no enough to hold this tuple in the last page, create a new page in mode0 to hold it
-func (dpm *DataPageManipulator) InsertTupleIntoTable(tableId uint32, tuple *container.Tuple) error {
+func (dpm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *container.Tuple) error {
 	//get table schema
 	ktm := GetKeytableManager()
 	se := storage.GetStorageEngine()
@@ -126,10 +126,11 @@ func (dpm *DataPageManipulator) InsertTupleIntoTable(tableId uint32, tuple *cont
 	return nil
 } */
 
-func (dpm *DataPageManipulator) DeleteTupleFromTable(tupleId uint32, tableId uint32, pageId uint32) {}
+func (dpm *TableManipulator) DeleteTupleFromTable(tupleId uint32, tableId uint32, pageId uint32) {
+}
 
-func (dpm *DataPageManipulator) UpdateTupleFromTable(tupleId uint32, tableId uint32, pageId uint32, newTuple *container.Tuple) {
+func (dpm *TableManipulator) UpdateTupleFromTable(tupleId uint32, tableId uint32, pageId uint32, newTuple *container.Tuple) {
 }
 
 //TODO use index to accalarate
-func (dpm *DataPageManipulator) QueryTupleFromTableByTupleId() {}
+func (dpm *TableManipulator) QueryTupleFromTable() {}

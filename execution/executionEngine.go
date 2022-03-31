@@ -13,7 +13,7 @@ type ExecutionEngine struct {
 	parser   *parser.Parser
 	rewriter *optimizer.Rewriter
 	ktm      *KeytableManager
-	dpm      *DataPageManipulator
+	dpm      *TableManipulator
 }
 
 //use GetExecutionEngine to get the unique ExecutionEngine
@@ -28,7 +28,7 @@ func GetExecutionEngine() *ExecutionEngine {
 			parser:   parser.GetParser(),
 			rewriter: &optimizer.Rewriter{}}
 	})
-	eeInstance.dpm = NewDataPageManipulator()
+	eeInstance.dpm = GetTableManipulator()
 	eeInstance.ktm = GetKeytableManager()
 
 	return eeInstance
