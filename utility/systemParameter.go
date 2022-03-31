@@ -2,7 +2,7 @@ package utility
 
 const (
 	DEFAULT_PAGE_SIZE         int = 4096
-	DEFAULT_DATA_BUFFER_SIZE  int = 5   //page number in dataBuffer
+	DEFAULT_DATA_BUFFER_SIZE  int = 500 //page number in dataBuffer
 	DEFAULT_INDEX_BUFFER_SIZE int = 500 //page number in indexBuffer
 
 	DEFAULT_DATAFILE_LOCATION  string = "/Users/jorryjoestar/Documents/go/src/ZetaDB/file/data.zdb"

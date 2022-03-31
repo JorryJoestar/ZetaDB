@@ -616,6 +616,9 @@ func (ktm *KeytableManager) InsertVacantDataPageId(pageId uint32) {
 		newTailPageId := ktm.GetVacantDataPageId()
 		newTailPage := storage.NewDataPageMode0(newTailPageId, 15, tailPageId, newTailPageId)
 
+		//insert newTailPage into dataBuffer
+		se.InsertDataPage(newTailPage)
+
 		//set old tailPage nextPageId
 		tailPage15.DpSetNextPageId(newTailPageId)
 		transaction.InsertDataPage(tailPage15)
@@ -663,6 +666,9 @@ func (ktm *KeytableManager) InsertVacantIndexPageId(pageId uint32) {
 	} else { //no enough space, should create a new page
 		newTailPageId := ktm.GetVacantDataPageId()
 		newTailPage := storage.NewDataPageMode0(newTailPageId, 16, tailPageId, newTailPageId)
+
+		//insert newTailPage into dataBuffer
+		se.InsertDataPage(newTailPage)
 
 		//set old tailPage nextPageId
 		tailPage16.DpSetNextPageId(newTailPageId)

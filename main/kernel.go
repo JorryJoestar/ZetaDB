@@ -4,10 +4,8 @@ import (
 	//. "ZetaDB/execution/querySubOperator"
 
 	"ZetaDB/execution"
-	its "ZetaDB/execution/querySubOperator"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
-	"fmt"
 	"sync"
 )
 
@@ -34,14 +32,14 @@ func GetInstance() *Kernel {
 
 func main() {
 	transaction := storage.GetTransaction()
-	ktm := execution.GetKeytableManager()
-	schema, _ := ktm.Query_k_tableId_schema_FromTableId(15)
-	seqIt := its.NewSequentialFileReaderIterator(15, schema)
-	seqIt.Open(nil, nil)
-	for seqIt.HasNext() {
-		tup, _ := seqIt.GetNext()
-		fmt.Println(tup.TupleGetFieldValue(0))
-	}
+
+	ee := execution.GetExecutionEngine()
+	ee.InitializeSystem()
+
+	/* 	ktm := execution.GetKeytableManager()
+	   	for i := 0; i < 1000; i++ {
+	   		ktm.InsertVacantIndexPageId(uint32(i))
+	   	} */
 
 	transaction.PushTransactionIntoDisk()
 }
