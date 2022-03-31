@@ -1,13 +1,9 @@
 package main
 
 import (
-	"ZetaDB/container"
-	its "ZetaDB/execution/querySubOperator"
-
 	"ZetaDB/execution"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
-	"fmt"
 	"sync"
 )
 
@@ -33,26 +29,5 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	transaction := storage.GetTransaction()
-
-	/* 	ee := execution.GetExecutionEngine()
-	   	ee.InitializeSystem() */
-
-	ktm := execution.GetKeytableManager()
-	schema, _ := ktm.GetKeyTableSchema(15)
-
-	seqIt := its.NewSequentialFileReaderIterator(15, schema)
-	seqIt.Open(nil, nil)
-
-	var tuples []*container.Tuple
-
-	for seqIt.HasNext() {
-		tuple, _ := seqIt.GetNext()
-		tuples = append(tuples, tuple)
-	}
-
-	result := TableToString(schema, tuples)
-	fmt.Println(result)
-
-	transaction.PushTransactionIntoDisk()
+	PrintKeyTable(8)
 }

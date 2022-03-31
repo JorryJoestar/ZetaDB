@@ -2,7 +2,10 @@ package main
 
 import (
 	"ZetaDB/container"
+	"ZetaDB/execution"
+	its "ZetaDB/execution/querySubOperator"
 	. "ZetaDB/utility"
+	"fmt"
 	"strconv"
 )
 
@@ -239,8 +242,44 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 		tableString += tupleString + "\n"
 	}
 
+	//insert emptyLine if result is empty
+	if tupleNum == 0 {
+		emptyLine := "|"
+		for i := 0; i < fieldsNum; i++ {
+			for j := 0; j < maxLengths[i]+2; j++ {
+				emptyLine += " "
+			}
+			emptyLine += "|"
+		}
+
+		tableString += emptyLine + "\n"
+	}
+
 	//add last frameLine
 	tableString += frameLine
 
 	return tableString
+}
+
+//ignore if tableId > 16
+func PrintKeyTable(tableId uint32) {
+	if tableId > 16 {
+		return
+	}
+
+	ktm := execution.GetKeytableManager()
+	schema := ktm.GetKeyTableSchema(tableId)
+
+	seqIt := its.NewSequentialFileReaderIterator(tableId, schema)
+	seqIt.Open(nil, nil)
+
+	var tuples []*container.Tuple
+
+	for seqIt.HasNext() {
+		tuple, _ := seqIt.GetNext()
+		tuples = append(tuples, tuple)
+	}
+
+	result := TableToString(schema, tuples)
+	fmt.Println(result)
 }

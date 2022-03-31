@@ -8,6 +8,7 @@ import (
 	"ZetaDB/storage"
 	. "ZetaDB/utility"
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -27,7 +28,24 @@ func GetKeytableManager() *KeytableManager {
 	return instance
 }
 
-//get table info (tableId & schema) from dataFile according to tableName, k_tableId_schema table 8
+//from utility instead of from disk
+//ignore if tableId >16
+func (ktm *KeytableManager) GetKeyTableSchema(tableId uint32) *container.Schema {
+	rewriter := optimizer.GetRewriter()
+	parser := parser.GetParser()
+
+	//throw error if tableId >16
+	if tableId > 16 {
+		return nil
+	}
+
+	ast := parser.ParseSql(DEFAULT_KEYTABLES_SCHEMA[tableId])
+	schema, _ := rewriter.ASTNodeToSchema(ast)
+
+	return schema
+}
+
+//get tableId & schema from dataFile according to tableName, k_tableId_schema table 8
 //throw error if no such table
 func (ktm *KeytableManager) Query_k_tableId_schema_FromTableName(tableName string) (uint32, *container.Schema, error) {
 	astOfCreateTable8 := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
@@ -129,8 +147,147 @@ func (ktm *KeytableManager) Query_k_tableId_schema_FromTableId(tableId uint32) (
 	return nil, errors.New("execution/keyTableManager.go    GetTableSchema() no such table")
 }
 
+//if corresponding table is not in k_tableId_schema, ignore
+//TODO unfinished
+func (ktm *KeytableManager) Update_k_tableId_schema(tableId uint32, newSchemaString string) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema8
+	schema8 := ktm.GetKeyTableSchema(8)
+
+	//get headPage8
+	headPage8, _ := se.GetDataPage(8, schema8)
+
+	targetPage := headPage8
+	var targetTuple *container.Tuple
+
+	//loop until find targetTuple or reach tailPage
+	for {
+		var targetTableId uint32
+
+		for i := 0; i < int(targetPage.DpGetTupleNum()); i++ {
+			targetTuple, _ = targetPage.GetTupleAt(i)
+
+			targetTableIdBytes, _ := targetTuple.TupleGetFieldValue(0)
+			targetTableIdInt32, _ := BytesToINT(targetTableIdBytes)
+			targetTableId = uint32(targetTableIdInt32)
+
+			if targetTableId == tableId {
+				break
+			}
+		}
+
+		if targetTableId == tableId {
+			break
+		}
+
+		nextPageId, _ := targetPage.DpGetNextPageId()
+		if nextPageId == targetPage.DpGetPageId() { //reach tailPage, end loop
+			return
+		}
+
+		targetPage, _ = se.GetDataPage(nextPageId, schema8)
+	}
+
+	targetPage.DpDeleteTuple(targetTuple.TupleGetTupleId())
+
+	field0Bytes := INTToBytes(int32(tableId))
+	field1Bytes, _ := VARCHARToBytes(newSchemaString)
+	field0, _ := container.NewFieldFromBytes(field0Bytes)
+	field1, _ := container.NewFieldFromBytes(field1Bytes)
+	var fields []*container.Field
+	fields = append(fields, field0)
+	fields = append(fields, field1)
+	newTuple, _ := container.NewTuple(8, targetTuple.TupleGetTupleId(), schema8, fields)
+
+	targetPage.InsertTuple(newTuple)
+
+	//insert targetPage into transaction
+	transaction.InsertDataPage(targetPage)
+}
+
+//if corresponding table is not in k_tableId_schema, ignore
+//if tableId <=16, ignore
+//TODO unfinished
+func (ktm *KeytableManager) Delete_k_tableId_schema(tableId uint32) {
+	//if tableId <=16, ignore
+	if tableId <= 16 {
+		return
+	}
+
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema8
+	schema8 := ktm.GetKeyTableSchema(8)
+
+	//get headPage8
+	headPage8, _ := se.GetDataPage(8, schema8)
+
+	targetPage := headPage8
+	var targetTuple *container.Tuple
+
+	//loop until find targetTuple or reach tailPage
+	for {
+		var targetTableId uint32
+
+		for i := 0; i < int(targetPage.DpGetTupleNum()); i++ {
+			targetTuple, _ = targetPage.GetTupleAt(i)
+
+			targetTableIdBytes, _ := targetTuple.TupleGetFieldValue(0)
+			targetTableIdInt32, _ := BytesToINT(targetTableIdBytes)
+			targetTableId = uint32(targetTableIdInt32)
+
+			if targetTableId == tableId {
+				break
+			}
+		}
+
+		if targetTableId == tableId {
+			break
+		}
+
+		nextPageId, _ := targetPage.DpGetNextPageId()
+		if nextPageId == targetPage.DpGetPageId() { //reach tailPage, end loop
+			return
+		}
+
+		targetPage, _ = se.GetDataPage(nextPageId, schema8)
+	}
+
+	targetPage.DpDeleteTuple(targetTuple.TupleGetTupleId())
+	transaction.InsertDataPage(targetPage)
+
+	//if targetPage is empty, delete it
+	if targetPage.DpGetTupleNum() != 0 {
+		return
+	}
+	ktm.InsertVacantDataPageId(targetPage.DpGetPageId()) //return pageId
+	priorPageId, _ := targetPage.DpGetPriorPageId()
+	priorPage, _ := se.GetDataPage(priorPageId, schema8)
+	nextPageId, _ := targetPage.DpGetNextPageId()
+	nextPage, _ := se.GetDataPage(nextPageId, schema8)
+
+	if nextPageId == targetPage.DpGetPageId() { //tailPage is goint to be deleted
+		priorPage.DpSetNextPageId(priorPage.DpGetPageId())
+		transaction.InsertDataPage(priorPage)
+	} else {
+		priorPage.DpSetNextPageId(nextPage.DpGetPageId())
+		nextPage.DpSetPriorPageId(priorPage.DpGetPageId())
+		transaction.InsertDataPage(priorPage)
+		transaction.InsertDataPage(nextPage)
+	}
+
+	//update k_table
+}
+
+//be careful not to insert an appeared tableId, this would not be checked
+//TODO unfinished
+func (ktm *KeytableManager) Insert_k_tableId_schema(tableId uint32, newSchemaString string)
+
 //get headPageId, tailPageId, lastTupleId, tupleNum by tableId
-func (ktm *KeytableManager) Query_k_table_FromTableId(tableId uint32) (uint32, uint32, uint32, int32, error) {
+func (ktm *KeytableManager) Query_k_table(tableId uint32) (uint32, uint32, uint32, int32, error) {
 	astOfCreateTable9 := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[9])
 	schemaOfCreateTable9, err := optimizer.GetRewriter().ASTNodeToSchema(astOfCreateTable9)
 	if err != nil {
@@ -174,39 +331,205 @@ func (ktm *KeytableManager) Query_k_table_FromTableId(tableId uint32) (uint32, u
 	return 0, 0, 0, 0, errors.New("execution/keyTableManager.go    Query_k_table_FromTableId() no such table")
 }
 
-//throw error if tableId >16
-func (ktm *KeytableManager) GetKeyTableSchema(tableId uint32) (*container.Schema, error) {
-	rewriter := optimizer.GetRewriter()
-	parser := parser.GetParser()
-
-	//throw error if tableId >16
-	if tableId > 16 {
-		return nil, errors.New("execution/keyTableManager.go    GetKeyTableSchema() tableId invalid")
-	}
-
-	ast := parser.ParseSql(DEFAULT_KEYTABLES_SCHEMA[tableId])
-	schema, _ := rewriter.ASTNodeToSchema(ast)
-
-	return schema, nil
-}
-
-//update tuple for key table according to tableId
-//ignore if tableId is beyond[0,16]
-func (ktm *KeytableManager) Update_k_table_ForKeyTable(tableId uint32, tailPageId uint32, lastTupleId uint32, tupleNum int32) {
-	se := storage.GetStorageEngine()
-	transaction := storage.GetTransaction()
-
-	//ignore if tableId is beyond[0,16]
-	if tableId > 16 {
+//if no corresponding tuple, ignore
+//if tableId <= 16, ignore
+func (ktm *KeytableManager) Delete_k_table(tableId uint32) {
+	//if tableId <= 16, ignore
+	if tableId <= 16 {
 		return
 	}
 
-	//get headPage of k_table
-	schema9, _ := ktm.GetKeyTableSchema(9)
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema9
+	schema9 := ktm.GetKeyTableSchema(9)
+
+	//get headPage9
 	headPage9, _ := se.GetDataPage(9, schema9)
 
-	//delete related tuple
-	headPage9.DpDeleteTuple(tableId)
+	currentPage := headPage9
+	var targetTuple *container.Tuple
+	var targetPage *storage.DataPage
+	var largestTupleId uint32 = 0
+	var secondLargestTupleId uint32 = 0
+
+	//loop until targetTuple is found or reach tailPage
+	for {
+		for i := 0; i < int(currentPage.DpGetTupleNum()); i++ {
+			currentTuple, _ := currentPage.GetTupleAt(i)
+
+			//update largestTupleId, secondLargestTupleId
+			if currentTuple.TupleGetTupleId() > largestTupleId {
+				secondLargestTupleId = largestTupleId
+				largestTupleId = currentTuple.TupleGetTupleId()
+			} else if currentTuple.TupleGetTupleId() > secondLargestTupleId {
+				secondLargestTupleId = currentTuple.TupleGetTupleId()
+			}
+
+			//check if found targetTuple
+			currentTableIdBytes, _ := currentTuple.TupleGetFieldValue(0)
+			currentTableIdInt32, _ := BytesToINT(currentTableIdBytes)
+			currentTableId := uint32(currentTableIdInt32)
+
+			if currentTableId == tableId { //find targetTuple
+				targetPage = currentPage
+				targetTuple = currentTuple
+			}
+		}
+
+		nextPageId, _ := currentPage.DpGetNextPageId()
+		if nextPageId == currentPage.DpGetPageId() { //reach tailPage
+			break
+		}
+
+		currentPage, _ = se.GetDataPage(nextPageId, schema9)
+	}
+
+	if targetTuple == nil || targetPage == nil { //targetTuple is not found
+		return
+	}
+
+	targetPage.DpDeleteTuple(targetTuple.TupleGetTupleId())
+	transaction.InsertDataPage(targetPage)
+
+	//check if lastTupleId in k_table is tupleId of deleted tuple
+	//if it is, set lastTupleId to secondLargestTupleId
+	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(9)
+	if largestTupleId == targetTuple.TupleGetTupleId() {
+		lastTupleId = secondLargestTupleId
+	}
+
+	//check if targetPage is empty
+	if targetPage.DpGetTupleNum() == 0 {
+
+		priorPageId, _ := targetPage.DpGetPriorPageId()
+		nextPageId, _ := targetPage.DpGetNextPageId()
+		priorPage, _ := se.GetDataPage(priorPageId, schema9)
+		nextPage, _ := se.GetDataPage(nextPageId, schema9)
+
+		//return pageId
+		ktm.InsertVacantDataPageId(targetPage.DpGetPageId())
+
+		if nextPageId == targetPage.DpGetPageId() { //targetPage is tailPage
+			priorPage.DpSetNextPageId(priorPageId)
+			transaction.InsertDataPage(priorPage)
+
+			targetPage.DpSetPriorPageId(targetPage.DpGetPageId())
+
+			tailPageId = priorPageId
+		} else {
+			priorPage.DpSetNextPageId(nextPageId)
+			nextPage.DpSetPriorPageId(priorPageId)
+			transaction.InsertDataPage(priorPage)
+			transaction.InsertDataPage(nextPage)
+
+			targetPage.DpSetPriorPageId(targetPage.DpGetPageId())
+			targetPage.DpSetNextPageId(targetPage.DpGetPageId())
+		}
+	}
+
+	//update k_table
+	ktm.Update_k_table(9, tailPageId, lastTupleId, tupleNum-1)
+}
+
+//if tableId has appeared, ignore
+func (ktm *KeytableManager) Insert_k_table(tableId uint32, headPageId uint32, tailPageId uint32, lastTupleId uint32, tupleNum int32) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//if tableId has appeared, ignore
+	_, _, _, _, err := ktm.Query_k_table(tableId)
+	if err == nil {
+		return
+	}
+
+	//get schema9
+	schema9 := ktm.GetKeyTableSchema(9)
+
+	//get k_table tuple info
+	_, tailPageId9, lastTupleId9, tupleNum9, _ := ktm.Query_k_table(9)
+	oldTailPage9, _ := se.GetDataPage(tailPageId9, schema9)
+
+	//create newTuple
+	newTupleId := lastTupleId9 + 1
+
+	//create fields
+	field_tableId, _ := container.NewFieldFromBytes(INTToBytes(int32(tableId)))
+	field_headPageId, _ := container.NewFieldFromBytes(INTToBytes(int32(headPageId)))
+	field_tailPageId, _ := container.NewFieldFromBytes(INTToBytes(int32(tailPageId)))
+	field_lastTupleId, _ := container.NewFieldFromBytes(INTToBytes(int32(lastTupleId)))
+	field_tupleNum, _ := container.NewFieldFromBytes(INTToBytes(tupleNum))
+	var fields []*container.Field
+	fields = append(fields, field_tableId)
+	fields = append(fields, field_headPageId)
+	fields = append(fields, field_tailPageId)
+	fields = append(fields, field_lastTupleId)
+	fields = append(fields, field_tupleNum)
+
+	//create newTuple
+	newTuple, _ := container.NewTuple(9, newTupleId, schema9, fields)
+
+	//check if oldTailPage9 is full
+	if oldTailPage9.DpVacantByteNum() >= newTuple.TupleSizeInBytes() { //oldTailPage9 can hold this new tuple
+		oldTailPage9.InsertTuple(newTuple)
+		transaction.InsertDataPage(oldTailPage9)
+	} else { //create a new tail page to hold the tuple
+		//get a vacant pageId
+		vacantPageId := ktm.GetVacantDataPageId()
+		newTailPage9 := storage.NewDataPageMode0(vacantPageId, 9, oldTailPage9.DpGetPageId(), vacantPageId)
+
+		oldTailPage9.DpSetNextPageId(vacantPageId)
+		transaction.InsertDataPage(oldTailPage9)
+
+		newTailPage9.InsertTuple(newTuple)
+		se.InsertDataPage(newTailPage9)
+		transaction.InsertDataPage(newTailPage9)
+
+		tailPageId9 = vacantPageId
+	}
+
+	//update k_table
+	ktm.Update_k_table(9, tailPageId9, newTupleId, tupleNum9+1)
+}
+
+//update a tuple in k_table
+//if no such old tuple, just ignore it
+//TODO update: use index to accelerate
+func (ktm *KeytableManager) Update_k_table(tableId uint32, tailPageId uint32, lastTupleId uint32, tupleNum int32) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get headPage of k_table
+	schema9 := ktm.GetKeyTableSchema(9)
+	headPage9, _ := se.GetDataPage(9, schema9)
+
+	//find the target page
+	targetPage := headPage9
+	var targetTuple *container.Tuple
+	var searchErr error
+	for { //loop until find the page holding target tuple
+		targetTuple, searchErr = targetPage.GetTuple(tableId)
+		nextPageId, _ := targetPage.DpGetNextPageId()
+
+		//TODO delete
+		fmt.Println("searchErr")
+		fmt.Println(searchErr)
+
+		if searchErr == nil || nextPageId == targetPage.DpGetPageId() {
+			break
+		}
+
+		targetPage, _ = se.GetDataPage(nextPageId, schema9)
+	}
+
+	//if targetTuple is not nil (related tuple already in k_table), delete it
+	//if no such target tuple, just ignore
+	if targetTuple != nil {
+		targetPage.DpDeleteTuple(tableId)
+	} else {
+		return
+	}
 
 	//insert tuple
 	//tableId INT, headPageId INT, tailPageId INT, lastTupleId INT, tupleNum INT
@@ -222,10 +545,266 @@ func (ktm *KeytableManager) Update_k_table_ForKeyTable(tableId uint32, tailPageI
 	fields = append(fields, field_lastTupleId)
 	fields = append(fields, field_tupleNum)
 	newTuple, _ := container.NewTuple(9, tableId, schema9, fields)
-	headPage9.InsertTuple(newTuple)
+	targetPage.InsertTuple(newTuple)
 
-	//insert headPage9 into transaction
-	transaction.InsertDataPage(headPage9)
+	//insert targetPage into transaction
+	transaction.InsertDataPage(targetPage)
+}
+
+//get a vacant dataPageId and delete it from k_emptyDataPageSlot
+//in k_emptyDataPageSlot (key table 15), tuple 0 is the id after&include which all dataPages are vacant
+//tuple 0 should never be deleted
+//if there are more than one tuple in k_emptyDataPageSlot, find the end one, return and delete it
+func (ktm *KeytableManager) GetVacantDataPageId() uint32 {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema of key table 15
+	schema15 := ktm.GetKeyTableSchema(15)
+
+	//get headPageId, tailPageId, lastTupleId, tupleNum
+	headPageId, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(15)
+
+	//get headPage & tailPage
+	headPage, _ := se.GetDataPage(headPageId, schema15)
+	tailPage, _ := se.GetDataPage(tailPageId, schema15)
+
+	var returnValue uint32
+
+	//check if there is only tuple0
+	if tupleNum == 1 {
+		//get tuple0 and returnValue
+		tuple0, _ := headPage.GetTuple(0)
+		bytes, _ := tuple0.TupleGetFieldValue(0)
+		returnValueInt32, _ := BytesToINT(bytes)
+		returnValue = uint32(returnValueInt32)
+
+		//delete tuple0
+		headPage.DpDeleteTuple(0)
+
+		//create a new tuple0 and insert it into headPage
+		newField, _ := container.NewFieldFromBytes(INTToBytes(returnValueInt32 + 1))
+		var fields []*container.Field
+		fields = append(fields, newField)
+		newTuple0, _ := container.NewTuple(15, 0, schema15, fields)
+		headPage.InsertTuple(newTuple0)
+		transaction.InsertDataPage(headPage)
+
+	} else { //delete the last tuple, if tail page is empty, delete the page as well
+
+		//get lastTuple & returnValue
+		lastTuple, _ := tailPage.GetTuple(lastTupleId)
+		bytes, _ := lastTuple.TupleGetFieldValue(0)
+		returnValueInt32, _ := BytesToINT(bytes)
+		returnValue = uint32(returnValueInt32)
+
+		//delete lastTuple
+		tailPage.DpDeleteTuple(lastTupleId)
+		transaction.InsertDataPage(tailPage)
+
+		//check if tailPage is empty
+		if tailPage.DpGetTupleNum() == 0 { //this is already an empty page, delete it
+			//get newTailPageId
+			newTailPageId, _ := tailPage.DpGetPriorPageId()
+
+			//set old tailPage to isolate
+			tailPage.DpSetPriorPageId(tailPageId)
+
+			//recycle pageId of old tailPage
+			ktm.InsertVacantDataPageId(tailPageId)
+
+			//update nexPageId of newTailPage
+			newTailPage, _ := se.GetDataPage(newTailPageId, schema15)
+			newTailPage.DpSetNextPageId(newTailPageId)
+			transaction.InsertDataPage(newTailPage)
+
+			//update k_table
+			ktm.Update_k_table(15, newTailPageId, lastTupleId-1, tupleNum-1)
+		} else {
+			//update k_table
+			ktm.Update_k_table(15, tailPageId, lastTupleId-1, tupleNum-1)
+		}
+	}
+	return returnValue
+}
+
+//get a vacant indexPageId and delete it from k_emptyIndexPageSlot
+//in k_emptyIndexPageSlot (key table 16), tuple 0 is the id after&include which all indexPages are vacant
+//tuple 0 should never be deleted
+//if there are more than one tuple in k_emptyIndexPageSlot, find the end one, return and delete it
+func (ktm *KeytableManager) GetVacantIndexPageId() uint32 {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema of key table 16
+	schema16 := ktm.GetKeyTableSchema(16)
+
+	//get headPageId, tailPageId, lastTupleId, tupleNum
+	headPageId, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(16)
+
+	//get headPage & tailPage
+	headPage, _ := se.GetDataPage(headPageId, schema16)
+	tailPage, _ := se.GetDataPage(tailPageId, schema16)
+
+	var returnValue uint32
+
+	//check if there is only tuple0
+	if tupleNum == 1 {
+		//get tuple0 and returnValue
+		tuple0, _ := headPage.GetTuple(0)
+		bytes, _ := tuple0.TupleGetFieldValue(0)
+		returnValueInt32, _ := BytesToINT(bytes)
+		returnValue = uint32(returnValueInt32)
+
+		//delete tuple0
+		headPage.DpDeleteTuple(0)
+
+		//create a new tuple0 and insert it into headPage
+		newField, _ := container.NewFieldFromBytes(INTToBytes(returnValueInt32 + 1))
+		var fields []*container.Field
+		fields = append(fields, newField)
+		newTuple0, _ := container.NewTuple(16, 0, schema16, fields)
+		headPage.InsertTuple(newTuple0)
+		transaction.InsertDataPage(headPage)
+
+	} else { //delete the last tuple, if tail page is empty, delete the page as well
+
+		//get lastTuple & returnValue
+		lastTuple, _ := tailPage.GetTuple(lastTupleId)
+		bytes, _ := lastTuple.TupleGetFieldValue(0)
+		returnValueInt32, _ := BytesToINT(bytes)
+		returnValue = uint32(returnValueInt32)
+
+		//delete lastTuple
+		tailPage.DpDeleteTuple(lastTupleId)
+		transaction.InsertDataPage(tailPage)
+
+		//check if tailPage is empty
+		if tailPage.DpGetTupleNum() == 0 { //this is already an empty page, delete it
+			//get newTailPageId
+			newTailPageId, _ := tailPage.DpGetPriorPageId()
+
+			//set old tailPage to isolate
+			tailPage.DpSetPriorPageId(tailPageId)
+
+			//recycle pageId of old tailPage
+			ktm.InsertVacantDataPageId(tailPageId)
+
+			//update nexPageId of newTailPage
+			newTailPage, _ := se.GetDataPage(newTailPageId, schema16)
+			newTailPage.DpSetNextPageId(newTailPageId)
+			transaction.InsertDataPage(newTailPage)
+
+			//update k_table
+			ktm.Update_k_table(16, newTailPageId, lastTupleId-1, tupleNum-1)
+		} else {
+			//update k_table
+			ktm.Update_k_table(16, tailPageId, lastTupleId-1, tupleNum-1)
+		}
+	}
+	return returnValue
+}
+
+//insert pageId at the end of k_emptyDataPageSlot
+func (ktm *KeytableManager) InsertVacantDataPageId(pageId uint32) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema of k_emptyDataPageSlot
+	schema15 := ktm.GetKeyTableSchema(15)
+
+	//get tailPageId,lastTupleId,tupleNum of k_emptyDataPageSlot
+	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(15)
+
+	//create newTuple for pageId
+	field, _ := container.NewFieldFromBytes(INTToBytes(int32(pageId)))
+	var fields []*container.Field
+	fields = append(fields, field)
+	newTuple, _ := container.NewTuple(15, lastTupleId+1, schema15, fields)
+
+	//get tailPage of k_emptyDataPageSlot
+	tailPage15, _ := se.GetDataPage(tailPageId, schema15)
+
+	//check if tailPage can not hold new tuple
+	//TODO maintain: index could change is schema of k_emptyDataPageSlot changes
+	if tailPage15.DpVacantByteNum() >= newTuple.TupleSizeInBytes() { // enough space
+
+		//insert pageId into k_emptyDataPageSlot
+		tailPage15.InsertTuple(newTuple)
+		transaction.InsertDataPage(tailPage15)
+
+		//update k_table, tuple for k_emptyDataPageSlot
+		ktm.Update_k_table(15, tailPageId, lastTupleId+1, tupleNum+1)
+
+	} else { //no enough space, should create a new page
+		newTailPageId := ktm.GetVacantDataPageId()
+		newTailPage := storage.NewDataPageMode0(newTailPageId, 15, tailPageId, newTailPageId)
+
+		//insert newTailPage into dataBuffer
+		se.InsertDataPage(newTailPage)
+
+		//set old tailPage nextPageId
+		tailPage15.DpSetNextPageId(newTailPageId)
+		transaction.InsertDataPage(tailPage15)
+
+		//insert pageId into k_emptyDataPageSlot
+		newTailPage.InsertTuple(newTuple)
+		transaction.InsertDataPage(newTailPage)
+
+		//update k_table, tuple for k_emptyDataPageSlot
+		ktm.Update_k_table(15, newTailPageId, lastTupleId+1, tupleNum+1)
+	}
+}
+
+//insert pageId at the end of k_emptyIndexPageSlot
+func (ktm *KeytableManager) InsertVacantIndexPageId(pageId uint32) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+
+	//get schema of k_emptyIndexPageSlot
+	schema16 := ktm.GetKeyTableSchema(16)
+
+	//get tailPageId,lastTupleId,tupleNum of k_emptyIndexPageSlot
+	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(16)
+
+	//create newTuple for pageId
+	field, _ := container.NewFieldFromBytes(INTToBytes(int32(pageId)))
+	var fields []*container.Field
+	fields = append(fields, field)
+	newTuple, _ := container.NewTuple(16, lastTupleId+1, schema16, fields)
+
+	//get tailPage of k_emptyIndexPageSlot
+	tailPage16, _ := se.GetDataPage(tailPageId, schema16)
+
+	//check if tailPage can not hold new tuple
+	//TODO maintain: index could change is schema of k_emptyIndexPageSlot changes
+	if tailPage16.DpVacantByteNum() >= newTuple.TupleSizeInBytes() { // enough space
+
+		//insert pageId into k_emptyIndexPageSlot
+		tailPage16.InsertTuple(newTuple)
+		transaction.InsertDataPage(tailPage16)
+
+		//update k_table, tuple for k_emptyIndexPageSlot
+		ktm.Update_k_table(16, tailPageId, lastTupleId+1, tupleNum+1)
+
+	} else { //no enough space, should create a new page
+		newTailPageId := ktm.GetVacantDataPageId()
+		newTailPage := storage.NewDataPageMode0(newTailPageId, 16, tailPageId, newTailPageId)
+
+		//insert newTailPage into dataBuffer
+		se.InsertDataPage(newTailPage)
+
+		//set old tailPage nextPageId
+		tailPage16.DpSetNextPageId(newTailPageId)
+		transaction.InsertDataPage(tailPage16)
+
+		//insert pageId into k_emptyIndexPageSlot
+		newTailPage.InsertTuple(newTuple)
+		transaction.InsertDataPage(newTailPage)
+
+		//update k_table, tuple for k_emptyIndexPageSlot
+		ktm.Update_k_table(16, newTailPageId, lastTupleId+1, tupleNum+1)
+	}
 }
 
 //initialize the whole system
@@ -425,260 +1004,4 @@ func (ktm *KeytableManager) InitializeSystem() {
 	transaction.InsertDataPage(p15)
 	transaction.InsertDataPage(p16)
 	transaction.PushTransactionIntoDisk()
-}
-
-//get a vacant dataPageId and delete it from k_emptyDataPageSlot
-//in k_emptyDataPageSlot (key table 15), tuple 0 is the id after&include which all dataPages are vacant
-//tuple 0 should never be deleted
-//if there are more than one tuple in k_emptyDataPageSlot, find the end one, return and delete it
-func (ktm *KeytableManager) GetVacantDataPageId() uint32 {
-	se := storage.GetStorageEngine()
-	transaction := storage.GetTransaction()
-
-	//get schema of key table 15
-	schema15, _ := ktm.GetKeyTableSchema(15)
-
-	//get headPageId, tailPageId, lastTupleId, tupleNum
-	headPageId, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table_FromTableId(15)
-
-	//get headPage & tailPage
-	headPage, _ := se.GetDataPage(headPageId, schema15)
-	tailPage, _ := se.GetDataPage(tailPageId, schema15)
-
-	var returnValue uint32
-
-	//check if there is only tuple0
-	if tupleNum == 1 {
-		//get tuple0 and returnValue
-		tuple0, _ := headPage.GetTuple(0)
-		bytes, _ := tuple0.TupleGetFieldValue(0)
-		returnValueInt32, _ := BytesToINT(bytes)
-		returnValue = uint32(returnValueInt32)
-
-		//delete tuple0
-		headPage.DpDeleteTuple(0)
-
-		//create a new tuple0 and insert it into headPage
-		newField, _ := container.NewFieldFromBytes(INTToBytes(returnValueInt32 + 1))
-		var fields []*container.Field
-		fields = append(fields, newField)
-		newTuple0, _ := container.NewTuple(15, 0, schema15, fields)
-		headPage.InsertTuple(newTuple0)
-		transaction.InsertDataPage(headPage)
-
-	} else { //delete the last tuple, if tail page is empty, delete the page as well
-
-		//get lastTuple & returnValue
-		lastTuple, _ := tailPage.GetTuple(lastTupleId)
-		bytes, _ := lastTuple.TupleGetFieldValue(0)
-		returnValueInt32, _ := BytesToINT(bytes)
-		returnValue = uint32(returnValueInt32)
-
-		//delete lastTuple
-		tailPage.DpDeleteTuple(lastTupleId)
-		transaction.InsertDataPage(tailPage)
-
-		//check if tailPage is empty
-		if tailPage.DpGetTupleNum() == 0 { //this is already an empty page, delete it
-			//get newTailPageId
-			newTailPageId, _ := tailPage.DpGetPriorPageId()
-
-			//set old tailPage to isolate
-			tailPage.DpSetPriorPageId(tailPageId)
-
-			//recycle pageId of old tailPage
-			ktm.InsertVacantDataPageId(tailPageId)
-
-			//update nexPageId of newTailPage
-			newTailPage, _ := se.GetDataPage(newTailPageId, schema15)
-			newTailPage.DpSetNextPageId(newTailPageId)
-			transaction.InsertDataPage(newTailPage)
-
-			//update k_table
-			ktm.Update_k_table_ForKeyTable(15, newTailPageId, lastTupleId-1, tupleNum-1)
-		} else {
-			//update k_table
-			ktm.Update_k_table_ForKeyTable(15, tailPageId, lastTupleId-1, tupleNum-1)
-		}
-	}
-	return returnValue
-}
-
-//get a vacant indexPageId and delete it from k_emptyIndexPageSlot
-//in k_emptyIndexPageSlot (key table 16), tuple 0 is the id after&include which all indexPages are vacant
-//tuple 0 should never be deleted
-//if there are more than one tuple in k_emptyIndexPageSlot, find the end one, return and delete it
-func (ktm *KeytableManager) GetVacantIndexPageId() uint32 {
-	se := storage.GetStorageEngine()
-	transaction := storage.GetTransaction()
-
-	//get schema of key table 16
-	schema16, _ := ktm.GetKeyTableSchema(16)
-
-	//get headPageId, tailPageId, lastTupleId, tupleNum
-	headPageId, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table_FromTableId(16)
-
-	//get headPage & tailPage
-	headPage, _ := se.GetDataPage(headPageId, schema16)
-	tailPage, _ := se.GetDataPage(tailPageId, schema16)
-
-	var returnValue uint32
-
-	//check if there is only tuple0
-	if tupleNum == 1 {
-		//get tuple0 and returnValue
-		tuple0, _ := headPage.GetTuple(0)
-		bytes, _ := tuple0.TupleGetFieldValue(0)
-		returnValueInt32, _ := BytesToINT(bytes)
-		returnValue = uint32(returnValueInt32)
-
-		//delete tuple0
-		headPage.DpDeleteTuple(0)
-
-		//create a new tuple0 and insert it into headPage
-		newField, _ := container.NewFieldFromBytes(INTToBytes(returnValueInt32 + 1))
-		var fields []*container.Field
-		fields = append(fields, newField)
-		newTuple0, _ := container.NewTuple(16, 0, schema16, fields)
-		headPage.InsertTuple(newTuple0)
-		transaction.InsertDataPage(headPage)
-
-	} else { //delete the last tuple, if tail page is empty, delete the page as well
-
-		//get lastTuple & returnValue
-		lastTuple, _ := tailPage.GetTuple(lastTupleId)
-		bytes, _ := lastTuple.TupleGetFieldValue(0)
-		returnValueInt32, _ := BytesToINT(bytes)
-		returnValue = uint32(returnValueInt32)
-
-		//delete lastTuple
-		tailPage.DpDeleteTuple(lastTupleId)
-		transaction.InsertDataPage(tailPage)
-
-		//check if tailPage is empty
-		if tailPage.DpGetTupleNum() == 0 { //this is already an empty page, delete it
-			//get newTailPageId
-			newTailPageId, _ := tailPage.DpGetPriorPageId()
-
-			//set old tailPage to isolate
-			tailPage.DpSetPriorPageId(tailPageId)
-
-			//recycle pageId of old tailPage
-			ktm.InsertVacantDataPageId(tailPageId)
-
-			//update nexPageId of newTailPage
-			newTailPage, _ := se.GetDataPage(newTailPageId, schema16)
-			newTailPage.DpSetNextPageId(newTailPageId)
-			transaction.InsertDataPage(newTailPage)
-
-			//update k_table
-			ktm.Update_k_table_ForKeyTable(16, newTailPageId, lastTupleId-1, tupleNum-1)
-		} else {
-			//update k_table
-			ktm.Update_k_table_ForKeyTable(16, tailPageId, lastTupleId-1, tupleNum-1)
-		}
-	}
-	return returnValue
-}
-
-//insert pageId at the end of k_emptyDataPageSlot
-func (ktm *KeytableManager) InsertVacantDataPageId(pageId uint32) {
-	se := storage.GetStorageEngine()
-	transaction := storage.GetTransaction()
-
-	//get schema of k_emptyDataPageSlot
-	schema15, _ := ktm.GetKeyTableSchema(15)
-
-	//get tailPageId,lastTupleId,tupleNum of k_emptyDataPageSlot
-	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table_FromTableId(15)
-
-	//create newTuple for pageId
-	field, _ := container.NewFieldFromBytes(INTToBytes(int32(pageId)))
-	var fields []*container.Field
-	fields = append(fields, field)
-	newTuple, _ := container.NewTuple(15, lastTupleId+1, schema15, fields)
-
-	//get tailPage of k_emptyDataPageSlot
-	tailPage15, _ := se.GetDataPage(tailPageId, schema15)
-
-	//check if tailPage can not hold new tuple
-	//TODO maintain: index could change is schema of k_emptyDataPageSlot changes
-	if tailPage15.DpVacantByteNum() >= newTuple.TupleSizeInBytes() { // enough space
-
-		//insert pageId into k_emptyDataPageSlot
-		tailPage15.InsertTuple(newTuple)
-		transaction.InsertDataPage(tailPage15)
-
-		//update k_table, tuple for k_emptyDataPageSlot
-		ktm.Update_k_table_ForKeyTable(15, tailPageId, lastTupleId+1, tupleNum+1)
-
-	} else { //no enough space, should create a new page
-		newTailPageId := ktm.GetVacantDataPageId()
-		newTailPage := storage.NewDataPageMode0(newTailPageId, 15, tailPageId, newTailPageId)
-
-		//insert newTailPage into dataBuffer
-		se.InsertDataPage(newTailPage)
-
-		//set old tailPage nextPageId
-		tailPage15.DpSetNextPageId(newTailPageId)
-		transaction.InsertDataPage(tailPage15)
-
-		//insert pageId into k_emptyDataPageSlot
-		newTailPage.InsertTuple(newTuple)
-		transaction.InsertDataPage(newTailPage)
-
-		//update k_table, tuple for k_emptyDataPageSlot
-		ktm.Update_k_table_ForKeyTable(15, newTailPageId, lastTupleId+1, tupleNum+1)
-	}
-}
-
-//insert pageId at the end of k_emptyIndexPageSlot
-func (ktm *KeytableManager) InsertVacantIndexPageId(pageId uint32) {
-	se := storage.GetStorageEngine()
-	transaction := storage.GetTransaction()
-
-	//get schema of k_emptyIndexPageSlot
-	schema16, _ := ktm.GetKeyTableSchema(16)
-
-	//get tailPageId,lastTupleId,tupleNum of k_emptyIndexPageSlot
-	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table_FromTableId(16)
-
-	//create newTuple for pageId
-	field, _ := container.NewFieldFromBytes(INTToBytes(int32(pageId)))
-	var fields []*container.Field
-	fields = append(fields, field)
-	newTuple, _ := container.NewTuple(16, lastTupleId+1, schema16, fields)
-
-	//get tailPage of k_emptyIndexPageSlot
-	tailPage16, _ := se.GetDataPage(tailPageId, schema16)
-
-	//check if tailPage can not hold new tuple
-	//TODO maintain: index could change is schema of k_emptyIndexPageSlot changes
-	if tailPage16.DpVacantByteNum() >= newTuple.TupleSizeInBytes() { // enough space
-
-		//insert pageId into k_emptyIndexPageSlot
-		tailPage16.InsertTuple(newTuple)
-		transaction.InsertDataPage(tailPage16)
-
-		//update k_table, tuple for k_emptyIndexPageSlot
-		ktm.Update_k_table_ForKeyTable(16, tailPageId, lastTupleId+1, tupleNum+1)
-
-	} else { //no enough space, should create a new page
-		newTailPageId := ktm.GetVacantDataPageId()
-		newTailPage := storage.NewDataPageMode0(newTailPageId, 16, tailPageId, newTailPageId)
-
-		//insert newTailPage into dataBuffer
-		se.InsertDataPage(newTailPage)
-
-		//set old tailPage nextPageId
-		tailPage16.DpSetNextPageId(newTailPageId)
-		transaction.InsertDataPage(tailPage16)
-
-		//insert pageId into k_emptyIndexPageSlot
-		newTailPage.InsertTuple(newTuple)
-		transaction.InsertDataPage(newTailPage)
-
-		//update k_table, tuple for k_emptyIndexPageSlot
-		ktm.Update_k_table_ForKeyTable(16, newTailPageId, lastTupleId+1, tupleNum+1)
-	}
 }
