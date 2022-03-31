@@ -6,17 +6,21 @@ import (
 	"strconv"
 )
 
-type Displayer struct {
-}
-
-func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*container.Tuple) string {
+func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 	tableString := ""
 
-	var maxLengths []int
-	var domainTypes []container.DomainType
-	var domainNames []string
-	var tupleStrings [][]string
-	var domains []*container.Domain
+	fieldsNum := schema.GetSchemaDomainNum()
+	tupleNum := len(tuples)
+
+	var maxLengths []int = make([]int, fieldsNum)
+	var domainTypes []container.DomainType = make([]container.DomainType, fieldsNum)
+	var domainNames []string = make([]string, fieldsNum)
+	var tupleStrings [][]string = make([][]string, tupleNum)
+	var domains []*container.Domain = make([]*container.Domain, fieldsNum)
+
+	for i := 0; i < tupleNum; i++ {
+		tupleStrings[i] = make([]string, fieldsNum)
+	}
 
 	for i, d := range schema.GetSchemaDomains() {
 		domainName := d.GetDomainName()
@@ -62,7 +66,7 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 			case container.BIT:
 
 				if nullErr == nil { //not null
-					fieldString = "bit_type_value"
+					fieldString = BytesToHexString(fieldBytes)
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -70,7 +74,7 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 			case container.BITVARYING:
 
 				if nullErr == nil { //not null
-					fieldString = "bitvarying_type_value"
+					fieldString = BytesToHexString(fieldBytes)
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -80,9 +84,9 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 				if nullErr == nil { //not null
 					boolValue := ByteToBOOLEAN(fieldBytes[0])
 					if boolValue {
-						fieldString = "true"
+						fieldString = "TRUE"
 					} else {
-						fieldString = "false"
+						fieldString = "FALSE"
 					}
 				} else { //null
 					fieldString = "NULL"
@@ -92,7 +96,9 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 
 				if nullErr == nil { //not null
 					intValue, _ := BytesToINT(fieldBytes)
-					fieldString = string(intValue)
+
+					fieldString = strconv.Itoa(int(intValue))
+
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -101,7 +107,7 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 
 				if nullErr == nil { //not null
 					intValue, _ := BytesToInteger(fieldBytes)
-					fieldString = string(intValue)
+					fieldString = strconv.Itoa(int(intValue))
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -110,8 +116,7 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 
 				if nullErr == nil { //not null
 					int16Value, _ := BytesToSHORTINT(fieldBytes)
-					intValue := int(int16Value)
-					fieldString = string(intValue)
+					fieldString = strconv.Itoa(int(int16Value))
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -121,7 +126,7 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 				if nullErr == nil { //not null
 					floatValue, _ := BytesToFLOAT(fieldBytes)
 					float64Value := float64(floatValue)
-					fieldString = strconv.FormatFloat(float64Value, 'E', -1, 32)
+					fieldString = strconv.FormatFloat(float64Value, 'E', -1, 64)
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -131,7 +136,7 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 				if nullErr == nil { //not null
 					floatValue, _ := BytesToREAL(fieldBytes)
 					float64Value := float64(floatValue)
-					fieldString = strconv.FormatFloat(float64Value, 'E', -1, 32)
+					fieldString = strconv.FormatFloat(float64Value, 'E', -1, 64)
 				} else { //null
 					fieldString = "NULL"
 				}
@@ -188,8 +193,8 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 			if maxLengths[fieldIndex] < len(fieldString) {
 				maxLengths[fieldIndex] = len(fieldString)
 			}
-			tupleStrings[tupleIndex][fieldIndex] = fieldString
 
+			tupleStrings[tupleIndex][fieldIndex] = fieldString
 		}
 	}
 
@@ -215,22 +220,23 @@ func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*co
 	}
 
 	//add schemaLine into tableString
-	tableString += frameLine
-	tableString += schemaLine
-	tableString += frameLine
+	tableString += frameLine + "\n"
+	tableString += schemaLine + "\n"
+	tableString += frameLine + "\n"
 
 	//loop and insert tupleLine
 	for _, tuple := range tupleStrings {
-		tupleString := "| "
+		tupleString := "|"
 		for i, field := range tuple {
+			tupleString += " "
 			tupleString += field
-			remainSpaces := maxLengths[i] - len(tupleString)
+			remainSpaces := maxLengths[i] - len(field)
 			for i := 0; i < remainSpaces+1; i++ {
 				tupleString += " "
 			}
 			tupleString += "|"
 		}
-		tableString += tupleString
+		tableString += tupleString + "\n"
 	}
 
 	//add last frameLine
