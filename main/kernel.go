@@ -33,13 +33,8 @@ func GetInstance() *Kernel {
 func main() {
 	transaction := storage.GetTransaction()
 
-	ee := execution.GetExecutionEngine()
-	ee.InitializeSystem()
-
-	/* 	ktm := execution.GetKeytableManager()
-	   	for i := 0; i < 1000; i++ {
-	   		ktm.InsertVacantIndexPageId(uint32(i))
-	   	} */
+	/* 	ee := execution.GetExecutionEngine()
+	   	ee.InitializeSystem() */
 
 	transaction.PushTransactionIntoDisk()
 }

@@ -44,6 +44,7 @@ storage
             1. call InsertDataPage() & InsertIndexPage() of transaction, if these pages are to be pushed into disk
             2. always call PushTransactionIntoDisk() after each transaction, no matter whether InsertDataPage() or InsertIndexPage() is called before
             3.everytime the system boosters, call Recovery()
+            4.whenever a page is newly created, insert it into buffers
 
 execution/querySubOperator
     remember open these iterator
