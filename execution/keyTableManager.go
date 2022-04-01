@@ -8,7 +8,6 @@ import (
 	"ZetaDB/storage"
 	. "ZetaDB/utility"
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -511,10 +510,6 @@ func (ktm *KeytableManager) Update_k_table(tableId uint32, tailPageId uint32, la
 	for { //loop until find the page holding target tuple
 		targetTuple, searchErr = targetPage.GetTuple(tableId)
 		nextPageId, _ := targetPage.DpGetNextPageId()
-
-		//TODO delete
-		fmt.Println("searchErr")
-		fmt.Println(searchErr)
 
 		if searchErr == nil || nextPageId == targetPage.DpGetPageId() {
 			break

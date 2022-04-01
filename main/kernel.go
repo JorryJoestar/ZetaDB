@@ -29,5 +29,11 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	PrintKeyTable(8)
+	trans := storage.GetTransaction()
+	ktm := execution.GetKeytableManager()
+	ktm.Update_k_table(22, 12, 16, 100)
+
+	trans.PushTransactionIntoDisk()
+
+	PrintKeyTable(9)
 }

@@ -257,7 +257,6 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 
 	//add last frameLine
 	tableString += frameLine
-
 	return tableString
 }
 
