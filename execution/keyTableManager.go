@@ -284,7 +284,7 @@ func (ktm *KeytableManager) Delete_k_tableId_schema(tableId uint32) {
 
 //be careful not to insert an appeared tableId, this would not be checked
 //TODO unfinished
-func (ktm *KeytableManager) Insert_k_tableId_schema(tableId uint32, newSchemaString string)
+func (ktm *KeytableManager) Insert_k_tableId_schema(tableId uint32, newSchemaString string) {}
 
 //get headPageId, tailPageId, lastTupleId, tupleNum by tableId
 func (ktm *KeytableManager) Query_k_table(tableId uint32) (uint32, uint32, uint32, int32, error) {
