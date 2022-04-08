@@ -29,12 +29,13 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	transaction := storage.GetTransaction()
-	ktm := execution.GetKeytableManager()
 
-	ktm.Delete_k_table(107)
+	ktm := execution.GetKeytableManager()
+	transaction := storage.GetTransaction()
+
+	ktm.InitializeSystem()
 
 	transaction.PushTransactionIntoDisk()
 
-	PrintKeyTable(9)
+	PrintKeyTable(8)
 }
