@@ -71,7 +71,9 @@ func (tm *TableManipulator) NewTailPageMode12GroupToTable(tableId uint32, data [
 	mode1Page := storage.NewDataPageMode1(mode1PageId, tableId, tailPageId, mode1PageId, mode1PageId, data[:utility.DEFAULT_PAGE_SIZE-32])
 	se.InsertDataPage(mode1Page)
 	transaction.InsertDataPage(mode1Page)
+
 	data = data[utility.DEFAULT_PAGE_SIZE-32:]
+
 	oldTailPage.DpSetNextPageId(mode1PageId)
 	transaction.InsertDataPage(oldTailPage)
 
@@ -101,10 +103,11 @@ func (tm *TableManipulator) NewTailPageMode12GroupToTable(tableId uint32, data [
 		transaction.InsertDataPage(linkPrePage)
 
 		linkPrePage = newMode2Page
+		linkPrePageId = newMode2PageId
 	}
 
 	//update k_table
-	ktm.Update_k_table(tableId, mode1PageId, lastTupleId+1, tupleNum+1)
+	ktm.Update_k_table(tableId, mode1PageId, lastTupleId, tupleNum)
 }
 
 //delete a mode 0 page from this table
@@ -230,8 +233,29 @@ func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId 
 	ktm.Update_k_table(tableId, tailPageId, lastTupleId, tupleNum-1)
 }
 
+//insert a tuple into a table
+//assign a new tupleId according to k_table
+//if this tuple is too long and can not be pushed in one page, push it into a group of pages in mode1 and mode2
 func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *container.Tuple) {
+	ktm := GetKeytableManager()
 
+	//get tailPageId, lastTupleId, tupleNum
+	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(tableId)
+
+	//update tupleId of this inputed tuple
+	tuple.TupleSetTupleId(lastTupleId + 1)
+
+	//if this tuple is over large, create a group of mode1 and mode2 pages to hold it
+	if tuple.TupleSizeInBytes() > utility.DEFAULT_PAGE_SIZE-32 {
+		newPageMode0 := tm.NewTailPageMode0ToTable(tableId)
+		newPageMode0.InsertTuple(tuple)
+
+	} else {
+
+	}
+
+	//update k_table
+	ktm.Update_k_table(tableId, tailPageId, lastTupleId+1, tupleNum+1)
 }
 
 func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, pageId uint32, tupleId uint32) {
