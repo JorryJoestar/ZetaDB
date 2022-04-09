@@ -3,6 +3,7 @@ package execution
 import (
 	"ZetaDB/container"
 	"ZetaDB/storage"
+	"ZetaDB/utility"
 )
 
 type TableManipulator struct {
@@ -48,8 +49,66 @@ func (tm *TableManipulator) NewTailPageMode0ToTable(tableId uint32) *storage.Dat
 	return newTailPage
 }
 
+//create a new tail page in mode1 for this table, insert data into this page
+//if current page can not hold whole data, create new mode2 page to hold remain data
+//TODO unchecked
+func (tm *TableManipulator) NewTailPageMode12GroupToTable(tableId uint32, data []byte) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+	ktm := GetKeytableManager()
+
+	//get schema
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
+
+	//get tailPageId, lastTupleId, tupleNum
+	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(tableId)
+
+	//get oldTailPageId
+	oldTailPage, _ := se.GetDataPage(tailPageId, schema)
+
+	//create mode1Page
+	mode1PageId := ktm.GetVacantDataPageId()
+	mode1Page := storage.NewDataPageMode1(mode1PageId, tableId, tailPageId, mode1PageId, mode1PageId, data[:utility.DEFAULT_PAGE_SIZE-32])
+	se.InsertDataPage(mode1Page)
+	transaction.InsertDataPage(mode1Page)
+	data = data[utility.DEFAULT_PAGE_SIZE-32:]
+	oldTailPage.DpSetNextPageId(mode1PageId)
+	transaction.InsertDataPage(oldTailPage)
+
+	//loop, create new mode2Page and keep pushing data into new pages
+	linkPrePage := mode1Page
+	linkPrePageId := mode1PageId
+	for {
+		if len(data) == 0 { //all data pushed into pages
+			break
+		}
+
+		var dataToPush []byte
+		if len(data) > utility.DEFAULT_PAGE_SIZE-32 {
+			dataToPush = data[:utility.DEFAULT_PAGE_SIZE-32]
+			data = data[utility.DEFAULT_PAGE_SIZE-32:]
+		} else {
+			dataToPush = data
+			data = data[0:0]
+		}
+
+		newMode2PageId := ktm.GetVacantDataPageId()
+		newMode2Page := storage.NewDataPageMode2(newMode2PageId, tableId, int32(len(dataToPush)), linkPrePageId, newMode2PageId, dataToPush)
+		se.InsertDataPage(newMode2Page)
+		transaction.InsertDataPage(newMode2Page)
+
+		linkPrePage.DpSetLinkNextPageId(newMode2PageId)
+		transaction.InsertDataPage(linkPrePage)
+
+		linkPrePage = newMode2Page
+	}
+
+	//update k_table
+	ktm.Update_k_table(tableId, mode1PageId, lastTupleId+1, tupleNum+1)
+}
+
 //delete a mode 0 page from this table
-//update k_table if tuple number is changed
+//update k_table if tuple number or tailPageId is changed
 //TODO unchecked
 func (tm *TableManipulator) DeletePageMode0FromTable(tableId uint32, pageId uint32) {
 	se := storage.GetStorageEngine()
@@ -67,6 +126,9 @@ func (tm *TableManipulator) DeletePageMode0FromTable(tableId uint32, pageId uint
 
 	//update tupleNum
 	tupleNum -= deletedPage.DpGetTupleNum()
+
+	//return pageId of deletedPage
+	ktm.InsertVacantDataPageId(pageId)
 
 	//get prior and next page of deletedPage
 	priorPageId, _ := deletedPage.DpGetPriorPageId()
@@ -98,11 +160,74 @@ func (tm *TableManipulator) DeletePageMode0FromTable(tableId uint32, pageId uint
 
 	//update k_table
 	ktm.Update_k_table(tableId, tailPageId, lastTupleId, tupleNum)
-
 }
 
+//delete a group of mode1 and mode2 pages
+//inputed pageId is the pageId of mode1 page
+//TODO unchecked
 func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId uint32) {
+	se := storage.GetStorageEngine()
+	transaction := storage.GetTransaction()
+	ktm := GetKeytableManager()
 
+	//get tailPageId, lastTupleId, tupleNum
+	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(tableId)
+
+	//get schema
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
+
+	//get mode1Page
+	mode1Page, _ := se.GetDataPage(pageId, schema)
+
+	//get priorPage and tailPage of this mode1Page
+	priorPageId, _ := mode1Page.DpGetPriorPageId()
+	nextPageId, _ := mode1Page.DpGetNextPageId()
+	priorPage, _ := se.GetDataPage(priorPageId, schema)
+	nextPage, _ := se.GetDataPage(nextPageId, schema)
+
+	//delete mode1Page from this table
+	if pageId == tailPageId { //this mode1Page is the tailPage of this table
+		//update tailPageId
+		tailPageId = priorPageId
+
+		priorPage.DpSetNextPageId(priorPageId)
+		transaction.InsertDataPage(priorPage)
+
+		mode1Page.DpSetPriorPageId(pageId)
+		mode1Page.DpSetNextPageId(pageId)
+		transaction.InsertDataPage(mode1Page)
+	} else { //this mode1Page is not tailPage, no need to update tailPageId
+		priorPage.DpSetNextPageId(nextPageId)
+		transaction.InsertDataPage(priorPage)
+
+		nextPage.DpSetPriorPageId(priorPageId)
+		transaction.InsertDataPage(nextPage)
+
+		mode1Page.DpSetPriorPageId(pageId)
+		mode1Page.DpSetNextPageId(pageId)
+		transaction.InsertDataPage(mode1Page)
+	}
+
+	//loop and delete all mode2 pages in this group
+	currentGroupPage := mode1Page
+	for {
+		linkNextPageId, _ := currentGroupPage.DpGetLinkNextPageId()
+		if currentGroupPage.DpGetPageId() == linkNextPageId {
+			break
+		}
+
+		currentGroupPage.DpSetLinkPrePageId(currentGroupPage.DpGetPageId())
+		currentGroupPage.DpSetLinkNextPageId(currentGroupPage.DpGetPageId())
+		transaction.InsertDataPage(currentGroupPage)
+
+		//return pageId
+		ktm.InsertVacantDataPageId(currentGroupPage.DpGetPageId())
+
+		currentGroupPage, _ = se.GetDataPage(linkNextPageId, schema)
+	}
+
+	//update k_table
+	ktm.Update_k_table(tableId, tailPageId, lastTupleId, tupleNum-1)
 }
 
 func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *container.Tuple) {

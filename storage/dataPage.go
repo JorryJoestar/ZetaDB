@@ -318,10 +318,10 @@ func NewDataPageMode0(pageId uint32, tableId uint32, priorPageId uint32, nextPag
 	dp.ModifyDataPage()
 
 	return dp
-
 }
 
 //create a new data page in mode 1
+//data size should be (DEFAULT_PAGE_SIZE - 32)
 func NewDataPageMode1(pageId uint32, tableId uint32, priorPageId uint32, nextPageId uint32, linkNextPageId uint32, data []byte) *DataPage {
 	dp := &DataPage{
 		pageId:         pageId,
