@@ -4,6 +4,7 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
+	"errors"
 )
 
 type TableManipulator struct {
@@ -273,18 +274,82 @@ func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *containe
 	ktm.Update_k_table(tableId, tailPageId, lastTupleId+1, tupleNum+1)
 }
 
-func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, pageId uint32, tupleId uint32) {
+//delete the tuple according to its tupleId
+//return deletedTuple
+//TODO unchecked
+func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, tupleId uint32) *container.Tuple {
+	se := storage.GetStorageEngine()
+	ktm := GetKeytableManager()
 
+	//get deletedTuple and pageId
+	deletedTuple, pageId, _ := tm.QueryTupleFromTableByTupleId(tableId, tupleId)
+
+	//get schema
+	schema := ktm.GetKeyTableSchema(tableId)
+
+	//delete the tuple from corresponding page
+	deletedFromPage, _ := se.GetDataPage(pageId, schema)
+	if deletedFromPage.DataPageMode() == 1 {
+		tm.DeletePageMode1And2FromTable(tableId, deletedFromPage.DpGetPageId())
+	} else { //mode is 0
+		deletedFromPage.DpDeleteTuple(tupleId)
+		if deletedFromPage.DpGetTupleNum() == 0 {
+			tm.DeletePageMode0FromTable(tableId, deletedFromPage.DpGetTableId())
+		}
+	}
+
+	return deletedTuple
 }
 
-func (tm *TableManipulator) UpdateTupleFromTable(tableId uint32, tupleId uint32, pageId uint32, newTuple *container.Tuple) {
+//replace the tuple with tupleId by newTuple
+//TODO unchecked
+func (tm *TableManipulator) UpdateTupleFromTable(tableId uint32, tupleId uint32, newTuple *container.Tuple) {
+	//delete the tuple
+	tm.DeleteTupleFromTable(tableId, tupleId)
 
+	//update new inserted tupleId
+	newTuple.TupleSetTupleId(tupleId)
+
+	//insert the newTuple into table
+	tm.InsertTupleIntoTable(tableId, newTuple)
 }
 
 //query a tuple according to its tupleId
 //return the tuple and the pageId
-//TODO use index to accalarate
+//throw error if no such tuple
+//TODO update use index to accalarate
 //TODO unchecked
-func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId uint32) (*container.Tuple, uint32) {
-	return nil, 0
+func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId uint32) (*container.Tuple, uint32, error) {
+	se := storage.GetStorageEngine()
+	ktm := GetKeytableManager()
+
+	//get headPageId, tailPageId of this table
+	headPageId, tailPageId, _, _, _ := ktm.Query_k_table(tableId)
+
+	//get schema
+	schema := ktm.GetKeyTableSchema(tableId)
+
+	//loop until find the target tuple
+	var targetPage *storage.DataPage
+	var targetTuple *container.Tuple
+	currentPage, _ := se.GetDataPage(headPageId, schema)
+	for {
+		var currentTuple *container.Tuple = nil
+		for i := 0; i < int(currentPage.DpGetTupleNum()); i++ {
+			currentTuple, _ = currentPage.GetTupleAt(i)
+			if currentTuple.TupleGetTupleId() == tupleId {
+				targetPage = currentPage
+				targetTuple = currentTuple
+				return targetTuple, targetPage.DpGetPageId(), nil
+			}
+		}
+
+		if currentPage.DpGetPageId() == tailPageId { //no such tuple in this table
+			return nil, 0, errors.New("execution/tableManipulator.go    QueryTupleFromTableByTupleId() no such tuple")
+		}
+
+		//update currentPage to next page
+		nextPageId, _ := currentPage.DpGetNextPageId()
+		currentPage, _ = se.GetDataPage(nextPageId, schema)
+	}
 }
