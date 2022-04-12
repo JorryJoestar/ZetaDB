@@ -1,11 +1,9 @@
 package main
 
 import (
-	"ZetaDB/container"
 	"ZetaDB/execution"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
-	"ZetaDB/utility"
 	"sync"
 )
 
@@ -32,14 +30,16 @@ func GetInstance() *Kernel {
 
 func main() {
 
+
 	transaction := storage.GetTransaction()
 
 	transaction.PushTransactionIntoDisk()
 
+	
 	PrintKeyTable(0)
 }
 
-func getNewTuple(tupleId uint32, userId int32, userName string) *container.Tuple {
+/* func getNewTuple(tupleId uint32, userId int32, userName string) *container.Tuple {
 	ktm := execution.GetKeytableManager()
 
 	schema0 := ktm.GetKeyTableSchema(0)
@@ -52,4 +52,4 @@ func getNewTuple(tupleId uint32, userId int32, userName string) *container.Tuple
 	fields = append(fields, field1)
 	tuple, _ := container.NewTuple(0, tupleId, schema0, fields)
 	return tuple
-}
+} */
