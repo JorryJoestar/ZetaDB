@@ -6,6 +6,7 @@ import (
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
+	"fmt"
 	"sync"
 )
 
@@ -31,30 +32,33 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	//ktm := execution.GetKeytableManager()
+	ktm := execution.GetKeytableManager()
 	//ee := execution.GetExecutionEngine()
-	tm := execution.GetTableManipulator()
+	//tm := execution.GetTableManipulator()
 
 	transaction := storage.GetTransaction()
 
-	//ee.CreateTableOperator(0, "create table testTable(id int primary key, name varchar(20));")
+	//ee.CreateTableOperator(10, "create table longString(id int primary key, longString varchar(100000));")
 	//ktm.InitializeSystem()
-	//ee.DropTableOperator("testTable")
 
-	/* 	for i := 1; i <= 1000; i++ {
-		newTuple := getNewTuple(uint32(i), int32(i), "ClaireMao")
-		tm.InsertTupleIntoTable(17, newTuple)
-	} */
+	/* 	var longS string
+	   	for i := 1; i <= 5000; i++ {
+	   		longS += "b"
+	   	} */
 
-	for i := 11; i <= 1000; i++ {
-		tm.DeleteTupleFromTable(17, uint32(i))
-	}
+	/* 	newTuple := getNewTuple(0, 0, "simeon")
+	   	tm.InsertTupleIntoTable(17, newTuple) */
+
+	//tm.DeleteTupleFromTable(17, 1)
 
 	transaction.PushTransactionIntoDisk()
 
-	for i := 0; i < 18; i++ {
+	for i := 0; i <= 17; i++ {
 		PrintTable(uint32(i))
 	}
+
+	fmt.Println(ktm.Query_k_table(17))
+
 }
 
 func getNewTuple(tupleId uint32, id int32, name string) *container.Tuple {

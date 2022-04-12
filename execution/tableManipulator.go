@@ -261,7 +261,7 @@ func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *containe
 	transaction := storage.GetTransaction()
 
 	//get schema
-	schema := ktm.GetKeyTableSchema(tableId)
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
 
 	//get tailPageId, lastTupleId, tupleNum
 	_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(tableId)
@@ -276,7 +276,7 @@ func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *containe
 		tailPageId = newPageMode1.DpGetPageId()
 	} else {
 		oldTailPage, _ := se.GetDataPage(tailPageId, schema)
-		if oldTailPage.DpVacantByteNum() > tuple.TupleSizeInBytes() { //current tailPage can hold this tuple
+		if oldTailPage.DataPageMode() == 0 && oldTailPage.DpVacantByteNum() > tuple.TupleSizeInBytes() { //current tailPage can hold this tuple
 			oldTailPage.InsertTuple(tuple)
 			transaction.InsertDataPage(oldTailPage)
 		} else {
@@ -319,6 +319,15 @@ func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, tupleId uint32)
 		if deletedFromPage.DpGetTupleNum() == 0 && deletedFromPage.DpGetPageId() != headPageId {
 			tm.DeletePageMode0FromTable(tableId, deletedFromPage.DpGetTableId())
 		}
+	}
+
+	if deletedTuple != nil {
+		//update k_table, tupleNum = tupleNum - 1
+		_, tailPageId, lastTupleId, tupleNum, _ := ktm.Query_k_table(tableId)
+		if deletedTuple.TupleGetTupleId() == lastTupleId {
+			lastTupleId--
+		}
+		ktm.Update_k_table(tableId, tailPageId, lastTupleId, tupleNum-1)
 	}
 
 	return deletedTuple
