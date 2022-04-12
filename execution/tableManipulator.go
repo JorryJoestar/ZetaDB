@@ -5,15 +5,23 @@ import (
 	"ZetaDB/storage"
 	"ZetaDB/utility"
 	"errors"
+	"sync"
 )
 
 type TableManipulator struct {
 }
 
-//DataPageManipulator generator
+//for singleton pattern
+var tmInstance *TableManipulator
+var tmOnce sync.Once
+
+//to get TableManipulator, call this function
 func GetTableManipulator() *TableManipulator {
-	tm := &TableManipulator{}
-	return tm
+	tmOnce.Do(func() {
+		tmInstance = &TableManipulator{}
+	})
+
+	return tmInstance
 }
 
 //create a new tail page in mode0 for this table, return this newly created page
@@ -216,12 +224,13 @@ func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId 
 	}
 
 	//loop and delete all mode2 pages in this group
-	currentGroupPage := mode1Page
+	linkNextPageId, _ := mode1Page.DpGetLinkNextPageId()
+	mode1Page.DpSetLinkNextPageId(pageId)
+	transaction.InsertDataPage(mode1Page)
+	ktm.InsertVacantDataPageId(pageId)
+	var currentGroupPage *storage.DataPage
 	for {
-		linkNextPageId, _ := currentGroupPage.DpGetLinkNextPageId()
-		if currentGroupPage.DpGetPageId() == linkNextPageId {
-			break
-		}
+		currentGroupPage, _ = se.GetDataPage(linkNextPageId, schema)
 
 		currentGroupPage.DpSetLinkPrePageId(currentGroupPage.DpGetPageId())
 		currentGroupPage.DpSetLinkNextPageId(currentGroupPage.DpGetPageId())
@@ -230,7 +239,12 @@ func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId 
 		//return pageId
 		ktm.InsertVacantDataPageId(currentGroupPage.DpGetPageId())
 
-		currentGroupPage, _ = se.GetDataPage(linkNextPageId, schema)
+		//update linkNextPageId
+		linkNextPageId, _ = currentGroupPage.DpGetLinkNextPageId()
+
+		if currentGroupPage.DpGetPageId() == linkNextPageId {
+			break
+		}
 	}
 
 	//update k_table

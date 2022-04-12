@@ -15,16 +15,16 @@ type KeytableManager struct {
 }
 
 //for singleton pattern
-var instance *KeytableManager
-var once sync.Once
+var ktmInstance *KeytableManager
+var ktmOnce sync.Once
 
 //to get KeytableManager, call this function
 func GetKeytableManager() *KeytableManager {
-	once.Do(func() {
-		instance = &KeytableManager{}
+	ktmOnce.Do(func() {
+		ktmInstance = &KeytableManager{}
 	})
 
-	return instance
+	return ktmInstance
 }
 
 //from utility instead of from disk
