@@ -2,6 +2,7 @@ package execution
 
 import (
 	"ZetaDB/container"
+	subOperator "ZetaDB/execution/querySubOperator"
 	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
@@ -45,6 +46,7 @@ func (ee *ExecutionEngine) InitializeSystem() {
 //insert a tuple into key table 2: k_tableId_userId
 //insert a tuple into key table 8: k_tableId_schema
 //assign an empty headPage for this table
+//TODO unchecked
 func (ee *ExecutionEngine) CreateTableOperator(userId int32, schemaString string) {
 	transaction := storage.GetTransaction()
 
@@ -72,16 +74,103 @@ func (ee *ExecutionEngine) CreateTableOperator(userId int32, schemaString string
 	ee.tm.InsertTupleIntoTable(2, tuple2)
 
 	//insert a tuple into key table 8: k_tableId_schema
-	_, _, lastTupleId8, _, _ := ee.ktm.Query_k_table(8)
+	ee.ktm.Insert_k_tableId_schema(newTableId, schemaString)
+}
+
+//drop a table by its name
+//delete a tuple in key table 9: k_table
+//delete a tuple in key table 2: k_tableId_userId
+//delete a tuple in key table 8: k_tableId_schema
+//delete all pages belong to this table
+//TODO update: use index to accelerate
+//TODO unchecked
+func (ee *ExecutionEngine) DropTableOperator(tableName string) {
+	var tableId int32
+	var tableSchema *container.Schema
+
+	//delete a tuple in key table 8: k_tableId_schema
+	//get tableId and tableSchema
 	schema8 := ee.ktm.GetKeyTableSchema(8)
-	fields80, _ := container.NewFieldFromBytes(utility.INTToBytes(int32(newTableId)))
-	fields81Bytes, _ := utility.VARCHARToBytes(schemaString)
-	fields81, _ := container.NewFieldFromBytes(fields81Bytes)
-	var fields8 []*container.Field
-	fields8 = append(fields8, fields80)
-	fields8 = append(fields8, fields81)
-	tuple8, _ := container.NewTuple(8, lastTupleId8+1, schema8, fields8)
-	ee.tm.InsertTupleIntoTable(8, tuple8)
+	seqIt8 := subOperator.NewSequentialFileReaderIterator(8, schema8)
+	seqIt8.Open(nil, nil)
+	for seqIt8.HasNext() {
+		tuple8, _ := seqIt8.GetNext()
+		bytes0, _ := tuple8.TupleGetFieldValue(0)
+		bytes1, _ := tuple8.TupleGetFieldValue(1)
+		tableId8, _ := utility.BytesToInteger(bytes0)
+		tableSchemaString8, _ := utility.BytesToVARCHAR(bytes1)
+		ast := ee.parser.ParseSql(tableSchemaString8)
+		tableSchema8, _ := ee.rewriter.ASTNodeToSchema(ast)
+		if tableSchema8.GetSchemaTableName() == tableName {
+			tableId = tableId8
+			tableSchema = tableSchema8
+			ee.ktm.Delete_k_tableId_schema(uint32(tableId))
+			break
+		}
+	}
+
+	//if tableSchema is nil, no such table in database, return immediately
+	if tableSchema == nil {
+		return
+	}
+
+	//get headPageId of this table
+	headPageId, _, _, _, _ := ee.ktm.Query_k_table(uint32(tableId))
+
+	//delete a tuple in key table 9: k_table
+	ee.ktm.Delete_k_table(uint32(tableId))
+
+	//delete a tuple in key table 2: k_tableId_userId
+	schema2 := ee.ktm.GetKeyTableSchema(2)
+	seqIt2 := subOperator.NewSequentialFileReaderIterator(2, schema2)
+	seqIt2.Open(nil, nil)
+	for seqIt2.HasNext() {
+		tuple2, _ := seqIt2.GetNext()
+		bytes0, _ := tuple2.TupleGetFieldValue(0)
+		tableId2, _ := utility.BytesToINT(bytes0)
+		if tableId2 == tableId {
+			tupleId2 := tuple2.TupleGetTupleId()
+			ee.tm.DeleteTupleFromTable(2, tupleId2)
+			break
+		}
+	}
+
+	//delete all pages belong to this table
+	headPage, _ := ee.se.GetDataPage(headPageId, tableSchema)
+	nextPageId, _ := headPage.DpGetNextPageId()
+	ee.ktm.InsertVacantDataPageId(headPage.DpGetPageId())
+
+	var currentPage *storage.DataPage
+	if headPage.DpGetPageId() == nextPageId {
+		return
+	} else {
+		currentPage, _ = ee.se.GetDataPage(nextPageId, tableSchema)
+	}
+
+	for {
+		ee.ktm.InsertVacantDataPageId(currentPage.DpGetPageId())
+
+		if currentPage.DataPageMode() == 1 {
+			nextLinkPageId, _ := currentPage.DpGetLinkNextPageId()
+			linkPage, _ := ee.se.GetDataPage(nextLinkPageId, tableSchema)
+			for {
+				ee.ktm.InsertVacantDataPageId(linkPage.DpGetPageId())
+				nextLinkPageId, _ = linkPage.DpGetLinkNextPageId()
+				if nextLinkPageId == linkPage.DpGetPageId() {
+					break
+				} else {
+					linkPage, _ = ee.se.GetDataPage(nextLinkPageId, tableSchema)
+				}
+			}
+		}
+
+		nextPageId, _ := currentPage.DpGetNextPageId()
+		if nextPageId == currentPage.DpGetPageId() {
+			return
+		} else {
+			currentPage, _ = ee.se.GetDataPage(nextPageId, tableSchema)
+		}
+	}
 }
 
 func (ee *ExecutionEngine) DeleteOperator() {}
@@ -89,7 +178,6 @@ func (ee *ExecutionEngine) InsertOperator() {}
 func (ee *ExecutionEngine) UpdateOperator() {}
 
 //TODO
-func (ee *ExecutionEngine) DropTableOperator()      {}
 func (ee *ExecutionEngine) AlterTableAddOperator()  {}
 func (ee *ExecutionEngine) AlterTableDropOperator() {}
 func (ee *ExecutionEngine) CreateAssertOperator()   {}

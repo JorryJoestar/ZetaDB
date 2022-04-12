@@ -471,7 +471,7 @@ func (ktm *KeytableManager) Insert_k_table(tableId uint32, headPageId uint32, ta
 	newTuple, _ := container.NewTuple(9, newTupleId, schema9, fields)
 
 	//check if oldTailPage9 is full
-	if oldTailPage9.DpVacantByteNum() >= newTuple.TupleSizeInBytes() { //oldTailPage9 can hold this new tuple
+	if oldTailPage9.DpVacantByteNum() > newTuple.TupleSizeInBytes() { //oldTailPage9 can hold this new tuple
 		//update k_table
 		ktm.Update_k_table(9, tailPageId9, newTupleId, tupleNum9+1)
 
