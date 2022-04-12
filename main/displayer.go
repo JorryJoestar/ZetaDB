@@ -260,14 +260,10 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 	return tableString
 }
 
-//ignore if tableId > 16
-func PrintKeyTable(tableId uint32) {
-	if tableId > 16 {
-		return
-	}
+func PrintTable(tableId uint32) {
 
 	ktm := execution.GetKeytableManager()
-	schema := ktm.GetKeyTableSchema(tableId)
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
 
 	seqIt := its.NewSequentialFileReaderIterator(tableId, schema)
 	seqIt.Open(nil, nil)

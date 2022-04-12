@@ -305,10 +305,11 @@ func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, tupleId uint32)
 	headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
 
 	//get schema
-	schema := ktm.GetKeyTableSchema(tableId)
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
 
 	//delete the tuple from corresponding page
 	deletedFromPage, _ := se.GetDataPage(pageId, schema)
+
 	if deletedFromPage.DataPageMode() == 1 {
 		tm.DeletePageMode1And2FromTable(tableId, deletedFromPage.DpGetPageId())
 	} else { //mode is 0
@@ -346,17 +347,20 @@ func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId
 	ktm := GetKeytableManager()
 
 	//get headPageId, tailPageId of this table
-	headPageId, tailPageId, _, _, _ := ktm.Query_k_table(tableId)
+	headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
 
 	//get schema
-	schema := ktm.GetKeyTableSchema(tableId)
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
 
 	//loop until find the target tuple
 	var targetPage *storage.DataPage
 	var targetTuple *container.Tuple
+
 	currentPage, _ := se.GetDataPage(headPageId, schema)
+
 	for {
 		var currentTuple *container.Tuple = nil
+
 		for i := 0; i < int(currentPage.DpGetTupleNum()); i++ {
 			currentTuple, _ = currentPage.GetTupleAt(i)
 			if currentTuple.TupleGetTupleId() == tupleId {
@@ -366,12 +370,13 @@ func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId
 			}
 		}
 
-		if currentPage.DpGetPageId() == tailPageId { //no such tuple in this table
+		//update currentPage to next page
+		nextPageId, _ := currentPage.DpGetNextPageId()
+
+		if currentPage.DpGetPageId() == nextPageId { //no such tuple in this table
 			return nil, 0, errors.New("execution/tableManipulator.go    QueryTupleFromTableByTupleId() no such tuple")
 		}
 
-		//update currentPage to next page
-		nextPageId, _ := currentPage.DpGetNextPageId()
 		currentPage, _ = se.GetDataPage(nextPageId, schema)
 	}
 }
