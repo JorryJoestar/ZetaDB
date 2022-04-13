@@ -3,6 +3,7 @@ package main
 import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
+	"ZetaDB/network"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
@@ -31,6 +32,9 @@ func GetInstance() *Kernel {
 }
 
 func main() {
+	socket := network.GetSocket()
+	socket.Listen()
+
 	//ktm := execution.GetKeytableManager()
 	ee := execution.GetExecutionEngine()
 	//tm := execution.GetTableManipulator()

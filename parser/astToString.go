@@ -1,11 +1,10 @@
-package main
+package parser
 
 import (
-	"ZetaDB/parser"
 	"strconv"
 )
 
-func ASTToString(ast *parser.ASTNode) string {
+func ASTToString(ast *ASTNode) string {
 	if ast == nil {
 		return "ast nil"
 	}
@@ -14,82 +13,82 @@ func ASTToString(ast *parser.ASTNode) string {
 	tabs := ""
 
 	switch ast.Type {
-	case parser.AST_DDL:
+	case AST_DDL:
 		s += "Type: AST_DDL\n"
 		s += DDLToString(ast.Ddl, tabs+"\t")
-	case parser.AST_DML:
+	case AST_DML:
 		s += "Type: AST_DML\n"
 		s += DMLToString(ast.Dml, tabs+"\t")
-	case parser.AST_DCL:
+	case AST_DCL:
 		s += "Type: AST_DCL\n"
 		s += DCLToString(ast.Dcl, tabs+"\t")
-	case parser.AST_DQL:
+	case AST_DQL:
 		s += "Type: AST_DQL\n"
 		s += DQLToString(ast.Dql, tabs+"\t")
 	}
 	return s
 }
 
-func DDLToString(ddl *parser.DDLNode, tabs string) string {
+func DDLToString(ddl *DDLNode, tabs string) string {
 	s := ""
 
 	s += tabs
 	s += "DDLNode\n"
 
 	switch ddl.Type {
-	case parser.DDL_TABLE_CREATE:
+	case DDL_TABLE_CREATE:
 		s += tabs
 		s += "Type: DDL_TABLE_CREATE\n"
 		s += TableCreateToString(ddl.Table, tabs+"\t")
-	case parser.DDL_TABLE_DROP:
+	case DDL_TABLE_DROP:
 		s += tabs
 		s += "Type: DDL_TABLE_DROP\n"
 		s += TableDropToString(ddl.Table, tabs+"\t")
-	case parser.DDL_TABLE_ALTER_ADD:
+	case DDL_TABLE_ALTER_ADD:
 		s += tabs
 		s += "Type: DDL_TABLE_ALTER_ADD\n"
 		s += TableAlterAddToString(ddl.Table, tabs+"\t")
-	case parser.DDL_TABLE_ALTER_DROP:
+	case DDL_TABLE_ALTER_DROP:
 		s += tabs
 		s += "Type: DDL_TABLE_ALTER_DROP\n"
 		s += TableAlterDropToString(ddl.Table, tabs+"\t")
-	case parser.DDL_ASSERT_CREATE:
+	case DDL_ASSERT_CREATE:
 		s += tabs
 		s += "Type: DDL_ASSERT_CREATE\n"
 		s += AssertCreateToString(ddl.Assert, tabs+"\t")
-	case parser.DDL_ASSERT_DROP:
+	case DDL_ASSERT_DROP:
 		s += tabs
 		s += "Type: DDL_ASSERT_DROP\n"
 		s += AssertDropToString(ddl.Assert, tabs+"\t")
-	case parser.DDL_VIEW_CREATE:
+	case DDL_VIEW_CREATE:
 		s += tabs
 		s += "Type: DDL_VIEW_CREATE\n"
 		s += ViewCreateToString(ddl.View, tabs+"\t")
-	case parser.DDL_VIEW_DROP:
+	case DDL_VIEW_DROP:
 		s += tabs
 		s += "Type: DDL_VIEW_DROP\n"
 		s += ViewDropToString(ddl.View, tabs+"\t")
-	case parser.DDL_INDEX_CREATE:
+	case DDL_INDEX_CREATE:
 		s += tabs
 		s += "Type: DDL_INDEX_CREATE\n"
 		s += IndexCreateToString(ddl.Index, tabs+"\t")
-	case parser.DDL_INDEX_DROP:
+	case DDL_INDEX_DROP:
 		s += tabs
 		s += "Type: DDL_INDEX_DROP\n"
 		s += IndexDropToString(ddl.Index, tabs+"\t")
-	case parser.DDL_TRIGGER_CREATE:
+	case DDL_TRIGGER_CREATE:
 		s += tabs
 		s += "Type: DDL_TRIGGER_CREATE\n"
 		s += TriggerCreateToString(ddl.Trigger, tabs+"\t")
-	case parser.DDL_TRIGGER_DROP:
+	case DDL_TRIGGER_DROP:
 		s += tabs
 		s += "Type: DDL_TRIGGER_DROP\n"
 		s += TriggerDropToString(ddl.Trigger, tabs+"\t")
-	case parser.DDL_PSM_CREATE:
+	case DDL_PSM_CREATE:
 		s += tabs
 		s += "Type: DDL_PSM_CREATE\n"
 		s += PsmCreateToString(ddl.Psm, tabs+"\t")
-	case parser.DDL_PSM_DROP:
+	case DDL_PSM_DROP:
 		s += tabs
 		s += "Type: DDL_PSM_DROP\n"
 		s += PsmDropToString(ddl.Psm, tabs+"\t")
@@ -98,21 +97,21 @@ func DDLToString(ddl *parser.DDLNode, tabs string) string {
 	return s
 }
 
-func DMLToString(dml *parser.DMLNode, tabs string) string {
+func DMLToString(dml *DMLNode, tabs string) string {
 	s := tabs + "DMLNode\n"
 	switch dml.Type {
-	case parser.DML_INSERT:
+	case DML_INSERT:
 		s += InsertToString(dml.Insert, tabs+"\t")
-	case parser.DML_UPDATE:
+	case DML_UPDATE:
 		s += UpdateToString(dml.Update, tabs+"\t")
-	case parser.DML_DELETE:
+	case DML_DELETE:
 		s += DeleteToString(dml.Delete, tabs+"\t")
 
 	}
 	return s
 }
 
-func InsertToString(insert *parser.InsertNode, tabs string) string {
+func InsertToString(insert *InsertNode, tabs string) string {
 	s := tabs + "InsertNode\n"
 	s += tabs + "TableName: " + insert.TableName + "\n"
 
@@ -124,10 +123,10 @@ func InsertToString(insert *parser.InsertNode, tabs string) string {
 	}
 
 	switch insert.Type {
-	case parser.INSERT_FROM_SUBQUERY:
+	case INSERT_FROM_SUBQUERY:
 		s += tabs + "Type: INSERT_FROM_SUBQUERY\n"
 		s += QueryToString(insert.Query, tabs+"\t")
-	case parser.INSERT_FROM_VALUELIST:
+	case INSERT_FROM_VALUELIST:
 		s += tabs + "Type: INSERT_FROM_VALUELIST\n"
 		s += tabs + "ElementaryValueList:\n"
 		for _, v := range insert.ElementaryValueList {
@@ -137,7 +136,7 @@ func InsertToString(insert *parser.InsertNode, tabs string) string {
 	return s
 }
 
-func UpdateToString(update *parser.UpdateNode, tabs string) string {
+func UpdateToString(update *UpdateNode, tabs string) string {
 	s := tabs + "UpdateNode\n"
 
 	s += tabs + "TableName: " + update.TableName + "\n"
@@ -152,16 +151,16 @@ func UpdateToString(update *parser.UpdateNode, tabs string) string {
 	return s
 }
 
-func UpdateListEntryToString(entry *parser.UpdateListEntryNode, tabs string) string {
+func UpdateListEntryToString(entry *UpdateListEntryNode, tabs string) string {
 	s := tabs + "UpdateListEntryNode\n"
 	s += tabs + "AttributeName" + entry.AttributeName + "\n"
 
 	switch entry.Type {
-	case parser.UPDATE_LIST_ENTRY_EXPRESSION:
+	case UPDATE_LIST_ENTRY_EXPRESSION:
 		s += tabs + "Type: UPDATE_LIST_ENTRY_EXPRESSION\n"
 		s += tabs + "Expression:\n"
 		s += ExpressionToString(entry.Expression, tabs+"\t")
-	case parser.UPDATE_LIST_ENTRY_ELEMENTARY_VALUE:
+	case UPDATE_LIST_ENTRY_ELEMENTARY_VALUE:
 		s += tabs + "Type: UPDATE_LIST_ENTRY_ELEMENTARY_VALUE\n"
 		s += tabs + "ElementaryValue:\n"
 		s += ElementaryValueToString(entry.ElementaryValue, tabs+"\t")
@@ -169,66 +168,66 @@ func UpdateListEntryToString(entry *parser.UpdateListEntryNode, tabs string) str
 	return s
 }
 
-func DeleteToString(delete *parser.DeleteNode, tabs string) string {
+func DeleteToString(delete *DeleteNode, tabs string) string {
 	s := tabs + "DeleteNode\n"
 	s += tabs + "TableName: " + delete.TableName + "\n"
 	s += ConditionToString(delete.Condition, tabs+"\t")
 	return s
 }
 
-func DCLToString(dcl *parser.DCLNode, tabs string) string {
+func DCLToString(dcl *DCLNode, tabs string) string {
 	s := tabs + "DCLNode\n"
 	switch dcl.Type {
-	case parser.DCL_TRANSACTION_BEGIN:
+	case DCL_TRANSACTION_BEGIN:
 		s += tabs + "Type: DCL_TRANSACTION_BEGIN\n"
-	case parser.DCL_TRANSACTION_COMMIT:
+	case DCL_TRANSACTION_COMMIT:
 		s += tabs + "Type: DCL_TRANSACTION_COMMIT\n"
-	case parser.DCL_TRANSACTION_ROLLBACK:
+	case DCL_TRANSACTION_ROLLBACK:
 		s += tabs + "Type: DCL_TRANSACTION_ROLLBACK\n"
-	case parser.DCL_SHOW_TABLES:
+	case DCL_SHOW_TABLES:
 		s += tabs + "Type: DCL_SHOW_TABLES\n"
-	case parser.DCL_SHOW_ASSERTIONS:
+	case DCL_SHOW_ASSERTIONS:
 		s += tabs + "Type: DCL_SHOW_ASSERTIONS\n"
-	case parser.DCL_SHOW_VIEWS:
+	case DCL_SHOW_VIEWS:
 		s += tabs + "Type: DCL_SHOW_VIEWS\n"
-	case parser.DCL_SHOW_INDEXS:
+	case DCL_SHOW_INDEXS:
 		s += tabs + "Type: DCL_SHOW_INDEXS\n"
-	case parser.DCL_SHOW_TRIGGERS:
+	case DCL_SHOW_TRIGGERS:
 		s += tabs + "Type: DCL_SHOW_TRIGGERS\n"
-	case parser.DCL_SHOW_FUNCTIONS:
+	case DCL_SHOW_FUNCTIONS:
 		s += tabs + "Type: DCL_SHOW_FUNCTIONS\n"
-	case parser.DCL_SHOW_PROCEDURES:
+	case DCL_SHOW_PROCEDURES:
 		s += tabs + "Type: DCL_SHOW_PROCEDURES\n"
-	case parser.DCL_CREATE_USER:
+	case DCL_CREATE_USER:
 		s += tabs + "Type: DCL_CREATE_USER\n"
-	case parser.DCL_LOG_USER:
+	case DCL_LOG_USER:
 		s += tabs + "Type: DCL_LOG_USER\n"
-	case parser.DCL_PSMCALL:
+	case DCL_PSMCALL:
 		s += tabs + "Type: DCL_PSMCALL\n"
 	}
-	if dcl.Type == parser.DCL_CREATE_USER || dcl.Type == parser.DCL_LOG_USER {
+	if dcl.Type == DCL_CREATE_USER || dcl.Type == DCL_LOG_USER {
 		s += tabs + "UserName: " + dcl.UserName + "\n"
 		s += tabs + "Password: " + dcl.Password + "\n"
 	}
-	if dcl.Type == parser.DCL_PSMCALL {
+	if dcl.Type == DCL_PSMCALL {
 		s += PsmCallStmtToString(dcl.PsmCall, tabs+"\t")
 	}
 	return s
 }
 
-func DQLToString(dql *parser.DQLNode, tabs string) string {
+func DQLToString(dql *DQLNode, tabs string) string {
 	s := tabs + "DQLNode\n"
 	switch dql.Type {
-	case parser.DQL_DIFFERENCE:
+	case DQL_DIFFERENCE:
 		s += tabs + "Type: DQL_DIFFERENCE\n"
-	case parser.DQL_INTERSECTION:
+	case DQL_INTERSECTION:
 		s += tabs + "Type: DQL_INTERSECTION\n"
-	case parser.DQL_UNION:
+	case DQL_UNION:
 		s += tabs + "Type: DQL_UNION\n"
-	case parser.DQL_SINGLE_QUERY:
+	case DQL_SINGLE_QUERY:
 		s += tabs + "Type: DQL_SINGLE_QUERY\n"
 	}
-	if dql.Type == parser.DQL_SINGLE_QUERY {
+	if dql.Type == DQL_SINGLE_QUERY {
 		s += tabs + "Query:\n"
 		s += QueryToString(dql.Query, tabs+"\t")
 	} else {
@@ -241,7 +240,7 @@ func DQLToString(dql *parser.DQLNode, tabs string) string {
 	return s
 }
 
-func TableCreateToString(table *parser.TableNode, tabs string) string {
+func TableCreateToString(table *TableNode, tabs string) string {
 	s := ""
 	s += tabs
 	s += "TableNode\n"
@@ -273,13 +272,13 @@ func TableCreateToString(table *parser.TableNode, tabs string) string {
 	return s
 }
 
-func TableDropToString(table *parser.TableNode, tabs string) string {
+func TableDropToString(table *TableNode, tabs string) string {
 	s := tabs + "TableNode\n"
 	s += tabs + "TableName: " + table.TableName + "\n"
 	return s
 }
 
-func TableAlterAddToString(table *parser.TableNode, tabs string) string {
+func TableAlterAddToString(table *TableNode, tabs string) string {
 	s := tabs + "TableNode\n"
 	s += tabs + "TableName: " + table.TableName + "\n"
 	if len(table.AttributeNameList) != 0 {
@@ -303,7 +302,7 @@ func TableAlterAddToString(table *parser.TableNode, tabs string) string {
 	return s
 }
 
-func TableAlterDropToString(table *parser.TableNode, tabs string) string {
+func TableAlterDropToString(table *TableNode, tabs string) string {
 	s := tabs + "TableNode\n"
 	s += tabs + "TableName: " + table.TableName + "\n"
 	if len(table.AttributeNameList) != 0 {
@@ -317,7 +316,7 @@ func TableAlterDropToString(table *parser.TableNode, tabs string) string {
 	return s
 }
 
-func AssertCreateToString(assert *parser.AssertNode, tabs string) string {
+func AssertCreateToString(assert *AssertNode, tabs string) string {
 	s := tabs + "AssertNode\n"
 	s += tabs + "AssertName: " + assert.AssertName + "\n"
 	s += tabs + "Condition:\n"
@@ -325,13 +324,13 @@ func AssertCreateToString(assert *parser.AssertNode, tabs string) string {
 	return s
 }
 
-func AssertDropToString(assert *parser.AssertNode, tabs string) string {
+func AssertDropToString(assert *AssertNode, tabs string) string {
 	s := tabs + "AssertNode\n"
 	s += tabs + "AssertName: " + assert.AssertName + "\n"
 	return s
 }
 
-func ViewCreateToString(view *parser.ViewNode, tabs string) string {
+func ViewCreateToString(view *ViewNode, tabs string) string {
 	s := tabs + "ViewNode\n"
 	s += tabs + "ViewName: " + view.ViewName + "\n"
 	if view.AttributeNameListValid {
@@ -345,13 +344,13 @@ func ViewCreateToString(view *parser.ViewNode, tabs string) string {
 	return s
 }
 
-func ViewDropToString(view *parser.ViewNode, tabs string) string {
+func ViewDropToString(view *ViewNode, tabs string) string {
 	s := tabs + "ViewNode\n"
 	s += tabs + "ViewName: " + view.ViewName + "\n"
 	return s
 }
 
-func IndexCreateToString(index *parser.IndexNode, tabs string) string {
+func IndexCreateToString(index *IndexNode, tabs string) string {
 	s := tabs + "IndexNode\n"
 	s += tabs + "IndexName: " + index.IndexName + "\n"
 	s += tabs + "TableName: " + index.TableName + "\n"
@@ -362,42 +361,42 @@ func IndexCreateToString(index *parser.IndexNode, tabs string) string {
 	return s
 }
 
-func IndexDropToString(index *parser.IndexNode, tabs string) string {
+func IndexDropToString(index *IndexNode, tabs string) string {
 	s := tabs + "IndexNode\n"
 	s += tabs + "IndexName: " + index.IndexName + "\n"
 	return s
 }
 
-func TriggerCreateToString(trigger *parser.TriggerNode, tabs string) string {
+func TriggerCreateToString(trigger *TriggerNode, tabs string) string {
 	s := tabs + "TriggerNode\n"
 	s += tabs + "BeforeAfterType: "
 	switch trigger.BeforeAfterType {
-	case parser.BEFORE_UPDATE_OF:
+	case BEFORE_UPDATE_OF:
 		s += "BEFORE_UPDATE_OF\n"
 		s += tabs + "BeforeAfterAttriName: " + trigger.BeforeAfterAttriName + "\n"
-	case parser.BEFORE_UPDATE:
+	case BEFORE_UPDATE:
 		s += "BEFORE_UPDATE\n"
-	case parser.AFTER_UPDATE_OF:
+	case AFTER_UPDATE_OF:
 		s += "AFTER_UPDATE_OF\n"
 		s += tabs + "BeforeAfterAttriName: " + trigger.BeforeAfterAttriName + "\n"
-	case parser.AFTER_UPDATE:
+	case AFTER_UPDATE:
 		s += "AFTER_UPDATE\n"
-	case parser.INSTEAD_UPDATE_OF:
+	case INSTEAD_UPDATE_OF:
 		s += "INSTEAD_UPDATE_OF\n"
 		s += tabs + "BeforeAfterAttriName: " + trigger.BeforeAfterAttriName + "\n"
-	case parser.INSTEAD_UPDATE:
+	case INSTEAD_UPDATE:
 		s += "INSTEAD_UPDATE\n"
-	case parser.BEFORE_INSERT:
+	case BEFORE_INSERT:
 		s += "BEFORE_INSERT\n"
-	case parser.AFTER_INSERT:
+	case AFTER_INSERT:
 		s += "AFTER_INSERT\n"
-	case parser.INSTEAD_INSERT:
+	case INSTEAD_INSERT:
 		s += "INSTEAD_INSERT\n"
-	case parser.BEFORE_DELETE:
+	case BEFORE_DELETE:
 		s += "BEFORE_DELETE\n"
-	case parser.AFTER_DELETE:
+	case AFTER_DELETE:
 		s += "AFTER_DELETE\n"
-	case parser.INSTEAD_DELETE:
+	case INSTEAD_DELETE:
 		s += "INSTEAD_DELETE\n"
 	}
 	s += tabs + "BeforeAfterTableName: " + trigger.BeforeAfterTableName + "\n"
@@ -410,9 +409,9 @@ func TriggerCreateToString(trigger *parser.TriggerNode, tabs string) string {
 	}
 
 	switch trigger.ForEachType {
-	case parser.FOR_EACH_ROW:
+	case FOR_EACH_ROW:
 		s += tabs + "ForEachType: FOR_EACH_ROW\n"
-	case parser.FOR_EACH_STATEMENT:
+	case FOR_EACH_STATEMENT:
 		s += tabs + "ForEachType: FOR_EACH_STATEMENT\n"
 	}
 
@@ -429,19 +428,19 @@ func TriggerCreateToString(trigger *parser.TriggerNode, tabs string) string {
 	return s
 }
 
-func TriggerDropToString(trigger *parser.TriggerNode, tabs string) string {
+func TriggerDropToString(trigger *TriggerNode, tabs string) string {
 	s := tabs + "TriggerNode\n"
 	s += tabs + "TriggerName: " + trigger.TriggerName + "\n"
 	return s
 }
 
-func PsmCreateToString(psm *parser.PsmNode, tabs string) string {
+func PsmCreateToString(psm *PsmNode, tabs string) string {
 	s := tabs + "PsmNode\n"
 
 	switch psm.Type {
-	case parser.PSM_FUNCTION:
+	case PSM_FUNCTION:
 		s += tabs + "Type: PSM_FUNCTION\n"
-	case parser.PSM_PROCEDURE:
+	case PSM_PROCEDURE:
 		s += tabs + "Type: PSM_PROCEDURE\n"
 	}
 
@@ -469,15 +468,15 @@ func PsmCreateToString(psm *parser.PsmNode, tabs string) string {
 	return s
 }
 
-func PsmParameterEntryToString(entry *parser.PsmParameterEntryNode, tabs string) string {
+func PsmParameterEntryToString(entry *PsmParameterEntryNode, tabs string) string {
 	s := tabs + "PsmParameterEntryNode\n"
 
 	switch entry.Type {
-	case parser.PSM_PARAMETER_IN:
+	case PSM_PARAMETER_IN:
 		s += tabs + "Type: PSM_PARAMETER_IN\n"
-	case parser.PSM_PARAMETER_OUT:
+	case PSM_PARAMETER_OUT:
 		s += tabs + "Type: PSM_PARAMETER_OUT\n"
-	case parser.PSM_PARAMETER_INOUT:
+	case PSM_PARAMETER_INOUT:
 		s += tabs + "Type: PSM_PARAMETER_INOUT\n"
 	}
 
@@ -489,7 +488,7 @@ func PsmParameterEntryToString(entry *parser.PsmParameterEntryNode, tabs string)
 	return s
 }
 
-func PsmLocalDeclarationEntryToString(entry *parser.PsmLocalDeclarationEntryNode, tabs string) string {
+func PsmLocalDeclarationEntryToString(entry *PsmLocalDeclarationEntryNode, tabs string) string {
 	s := tabs + "PsmLocalDeclarationEntryNode\n"
 	s += tabs + "Name: " + entry.Name + "\n"
 	s += tabs + "Domain:\n"
@@ -498,34 +497,34 @@ func PsmLocalDeclarationEntryToString(entry *parser.PsmLocalDeclarationEntryNode
 	return s
 }
 
-func PsmExecEntryToString(entry *parser.PsmExecEntryNode, tabs string) string {
+func PsmExecEntryToString(entry *PsmExecEntryNode, tabs string) string {
 	s := tabs + "PsmExecEntryNode\n"
 	switch entry.Type {
-	case parser.PSM_EXEC_RETURN:
+	case PSM_EXEC_RETURN:
 		s += tabs + "Type: PSM_EXEC_RETURN\n"
 		s += tabs + "PsmValue:\n"
 		s += PsmValueToString(entry.PsmValue, tabs+"\t")
-	case parser.PSM_EXEC_SET:
+	case PSM_EXEC_SET:
 		s += tabs + "Type: PSM_EXEC_SET\n"
 		s += tabs + "VariableName: " + entry.VariableName + "\n"
 		s += tabs + "PsmValue:\n"
 		s += PsmValueToString(entry.PsmValue, tabs+"\t")
-	case parser.PSM_EXEC_FOR_LOOP:
+	case PSM_EXEC_FOR_LOOP:
 		s += tabs + "Type: PSM_EXEC_FOR_LOOP\n"
 		s += tabs + "PsmForLoop:\n"
 		s += PsmForLoopToString(entry.PsmForLoop, tabs+"\t")
-	case parser.PSM_EXEC_BRANCH:
+	case PSM_EXEC_BRANCH:
 		s += tabs + "Type: PSM_EXEC_BRANCH\n"
 		s += tabs + "PsmBranch:\n"
 		s += PsmBranchToString(entry.PsmBranch, tabs+"\n")
-	case parser.PSM_EXEC_DML:
+	case PSM_EXEC_DML:
 		s += tabs + "Type: PSM_EXEC_DML\n"
 		s += DMLToString(entry.Dml, tabs+"\t")
 	}
 	return s
 }
 
-func PsmBranchToString(branch *parser.PsmBranchNode, tabs string) string {
+func PsmBranchToString(branch *PsmBranchNode, tabs string) string {
 	s := tabs + "PsmBranchNode\n"
 
 	s += tabs + "Condition:\n"
@@ -553,7 +552,7 @@ func PsmBranchToString(branch *parser.PsmBranchNode, tabs string) string {
 	return s
 }
 
-func PsmElseifEntryToString(entry *parser.PsmElseifEntryNode, tabs string) string {
+func PsmElseifEntryToString(entry *PsmElseifEntryNode, tabs string) string {
 	s := tabs + "PsmElseifEntryNode\n"
 
 	s += tabs + "Condition:\n"
@@ -566,7 +565,7 @@ func PsmElseifEntryToString(entry *parser.PsmElseifEntryNode, tabs string) strin
 	return s
 }
 
-func PsmForLoopToString(ForLoop *parser.PsmForLoopNode, tabs string) string {
+func PsmForLoopToString(ForLoop *PsmForLoopNode, tabs string) string {
 	s := tabs + "PsmForLoopNode\n"
 	s += tabs + "LoopName: " + ForLoop.LoopName + "\n"
 	s += tabs + "CursorName" + ForLoop.CursorName + "\n"
@@ -579,19 +578,19 @@ func PsmForLoopToString(ForLoop *parser.PsmForLoopNode, tabs string) string {
 	return s
 }
 
-func PsmValueToString(value *parser.PsmValueNode, tabs string) string {
+func PsmValueToString(value *PsmValueNode, tabs string) string {
 	s := tabs + "PsmValueNode\n"
 	switch value.Type {
-	case parser.PSMVALUE_ELEMENTARY_VALUE:
+	case PSMVALUE_ELEMENTARY_VALUE:
 		s += tabs + "Type: PSMVALUE_ELEMENTARY_VALUE\n"
 		s += ElementaryValueToString(value.ElementaryValue, tabs+"\t")
-	case parser.PSMVALUE_CALL:
+	case PSMVALUE_CALL:
 		s += tabs + "Type: PSMVALUE_CALL\n"
 		s += PsmCallStmtToString(value.PsmCall, tabs+"\t")
-	case parser.PSMVALUE_EXPRESSION:
+	case PSMVALUE_EXPRESSION:
 		s += tabs + "Type: PSMVALUE_EXPRESSION\n"
 		s += ExpressionToString(value.Expression, tabs+"\t")
-	case parser.PSMVALUE_ID:
+	case PSMVALUE_ID:
 		s += tabs + "Type: PSMVALUE_ID\n"
 		s += tabs + "Id: " + value.Id + "\n"
 	}
@@ -599,19 +598,19 @@ func PsmValueToString(value *parser.PsmValueNode, tabs string) string {
 	return s
 }
 
-func ExpressionToString(expression *parser.ExpressionNode, tabs string) string {
+func ExpressionToString(expression *ExpressionNode, tabs string) string {
 	s := tabs + "ExpressionNode\n"
 
 	switch expression.Type {
-	case parser.EXPRESSION_OPERATOR_PLUS:
+	case EXPRESSION_OPERATOR_PLUS:
 		s += tabs + "Type: EXPRESSION_OPERATOR_PLUS\n"
-	case parser.EXPRESSION_OPERATOR_MINUS:
+	case EXPRESSION_OPERATOR_MINUS:
 		s += tabs + "Type: EXPRESSION_OPERATOR_MINUS\n"
-	case parser.EXPRESSION_OPERATOR_DIVISION:
+	case EXPRESSION_OPERATOR_DIVISION:
 		s += tabs + "Type: EXPRESSION_OPERATOR_DIVISION\n"
-	case parser.EXPRESSION_OPERATOR_MULTIPLY:
+	case EXPRESSION_OPERATOR_MULTIPLY:
 		s += tabs + "Type: EXPRESSION_OPERATOR_MULTIPLY\n"
-	case parser.EXPRESSION_OPERATOR_CONCATENATION:
+	case EXPRESSION_OPERATOR_CONCATENATION:
 		s += tabs + "Type: EXPRESSION_OPERATOR_CONCATENATION\n"
 	}
 
@@ -624,40 +623,40 @@ func ExpressionToString(expression *parser.ExpressionNode, tabs string) string {
 	return s
 }
 
-func ExpressionEntryToString(entry *parser.ExpressionEntryNode, tabs string) string {
+func ExpressionEntryToString(entry *ExpressionEntryNode, tabs string) string {
 	s := tabs + "ExpressionEntryNode\n"
 	switch entry.Type {
-	case parser.EXPRESSION_ENTRY_ELEMENTARY_VALUE:
+	case EXPRESSION_ENTRY_ELEMENTARY_VALUE:
 		s += tabs + "Type: EXPRESSION_ENTRY_ELEMENTARY_VALUE\n"
 		s += ElementaryValueToString(entry.ElementaryValue, tabs+"\t")
-	case parser.EXPRESSION_ENTRY_ATTRIBUTE_NAME:
+	case EXPRESSION_ENTRY_ATTRIBUTE_NAME:
 		s += tabs + "Type: EXPRESSION_ENTRY_ATTRIBUTE_NAME\n"
 		s += AttriNameOptionTableNameToString(entry.AttriNameOptionTableName, tabs+"\t")
-	case parser.EXPRESSION_ENTRY_AGGREGATION:
+	case EXPRESSION_ENTRY_AGGREGATION:
 		s += tabs + "Type: EXPRESSION_ENTRY_AGGREGATION\n"
 		s += AggregationToString(entry.Aggregation, tabs+"\t")
-	case parser.EXPRESSION_ENTRY_EXPRESSION:
+	case EXPRESSION_ENTRY_EXPRESSION:
 		s += tabs + "Type: EXPRESSION_ENTRY_EXPRESSION\n"
 		s += ExpressionToString(entry.Expression, tabs+"\t")
 	}
 	return s
 }
 
-func AggregationToString(aggregation *parser.AggregationNode, tabs string) string {
+func AggregationToString(aggregation *AggregationNode, tabs string) string {
 	s := tabs + "AggregationNode\n"
 
 	switch aggregation.Type {
-	case parser.AGGREGATION_SUM:
+	case AGGREGATION_SUM:
 		s += tabs + "Type: AGGREGATION_SUM\n"
-	case parser.AGGREGATION_AVG:
+	case AGGREGATION_AVG:
 		s += tabs + "Type: AGGREGATION_AVG\n"
-	case parser.AGGREGATION_MIN:
+	case AGGREGATION_MIN:
 		s += tabs + "Type: AGGREGATION_MIN\n"
-	case parser.AGGREGATION_MAX:
+	case AGGREGATION_MAX:
 		s += tabs + "Type: AGGREGATION_MAX\n"
-	case parser.AGGREGATION_COUNT:
+	case AGGREGATION_COUNT:
 		s += tabs + "Type: AGGREGATION_COUNT\n"
-	case parser.AGGREGATION_COUNT_ALL:
+	case AGGREGATION_COUNT_ALL:
 		s += tabs + "Type: AGGREGATION_COUNT_ALL\n"
 	}
 
@@ -665,7 +664,7 @@ func AggregationToString(aggregation *parser.AggregationNode, tabs string) strin
 		s += tabs + "DistinctValid\n"
 	}
 
-	if aggregation.Type != parser.AGGREGATION_COUNT_ALL {
+	if aggregation.Type != AGGREGATION_COUNT_ALL {
 		s += AttriNameOptionTableNameToString(aggregation.AttriNameOptionTableName, tabs+"\t")
 	}
 
@@ -673,7 +672,7 @@ func AggregationToString(aggregation *parser.AggregationNode, tabs string) strin
 
 }
 
-func PsmCallStmtToString(psmCall *parser.PsmNode, tabs string) string {
+func PsmCallStmtToString(psmCall *PsmNode, tabs string) string {
 	s := tabs + "PsmNode\n"
 	s += tabs + "PsmName: " + psmCall.PsmName + "\n"
 	if psmCall.PsmValueListValid {
@@ -685,13 +684,13 @@ func PsmCallStmtToString(psmCall *parser.PsmNode, tabs string) string {
 	return s
 }
 
-func PsmDropToString(psm *parser.PsmNode, tabs string) string {
+func PsmDropToString(psm *PsmNode, tabs string) string {
 	s := tabs + "PsmNode\n"
 
 	switch psm.Type {
-	case parser.PSM_PROCEDURE:
+	case PSM_PROCEDURE:
 		s += tabs + "Type: PSM_PROCEDURE\n"
-	case parser.PSM_FUNCTION:
+	case PSM_FUNCTION:
 		s += tabs + "Type: PSM_FUNCTION\n"
 	}
 
@@ -700,7 +699,7 @@ func PsmDropToString(psm *parser.PsmNode, tabs string) string {
 	return s
 }
 
-func DomainToString(domain *parser.DomainNode, tabs string) string {
+func DomainToString(domain *DomainNode, tabs string) string {
 	s := ""
 
 	s += tabs
@@ -710,38 +709,38 @@ func DomainToString(domain *parser.DomainNode, tabs string) string {
 	s += "Type: "
 
 	switch domain.Type {
-	case parser.DOMAIN_CHAR:
+	case DOMAIN_CHAR:
 		s += "DOMAIN_CHAR\n"
-	case parser.DOMAIN_VARCHAR:
+	case DOMAIN_VARCHAR:
 		s += "DOMAIN_VARCHAR\n"
 
 		s += tabs
 		s += "n: " + strconv.Itoa(domain.N) + "\n"
-	case parser.DOMAIN_BIT:
+	case DOMAIN_BIT:
 		s += "DOMAIN_BIT\n"
 
 		s += tabs
 		s += "n: " + strconv.Itoa(domain.N) + "\n"
-	case parser.DOMAIN_BITVARYING:
+	case DOMAIN_BITVARYING:
 		s += "DOMAIN_BITVARYING\n"
 
 		s += tabs
 		s += "n: " + strconv.Itoa(domain.N) + "\n"
-	case parser.DOMAIN_BOOLEAN:
+	case DOMAIN_BOOLEAN:
 		s += "DOMAIN_BOOLEAN\n"
-	case parser.DOMAIN_INT:
+	case DOMAIN_INT:
 		s += "DOMAIN_INT\n"
-	case parser.DOMAIN_INTEGER:
+	case DOMAIN_INTEGER:
 		s += "DOMAIN_INTEGER\n"
-	case parser.DOMAIN_SHORTINT:
+	case DOMAIN_SHORTINT:
 		s += "DOMAIN_SHORTINT\n"
-	case parser.DOMAIN_FLOAT:
+	case DOMAIN_FLOAT:
 		s += "DOMAIN_FLOAT\n"
-	case parser.DOMAIN_REAL:
+	case DOMAIN_REAL:
 		s += "DOMAIN_REAL\n"
-	case parser.DOMAIN_DOUBLEPRECISION:
+	case DOMAIN_DOUBLEPRECISION:
 		s += "DOMAIN_DOUBLEPRECISION\n"
-	case parser.DOMAIN_DECIMAL:
+	case DOMAIN_DECIMAL:
 		s += "DOMAIN_DECIMAL\n"
 
 		s += tabs
@@ -749,7 +748,7 @@ func DomainToString(domain *parser.DomainNode, tabs string) string {
 
 		s += tabs
 		s += "d: " + strconv.Itoa(domain.D) + "\n"
-	case parser.DOMAIN_NUMERIC:
+	case DOMAIN_NUMERIC:
 		s += "DOMAIN_NUMERIC\n"
 
 		s += tabs
@@ -757,16 +756,16 @@ func DomainToString(domain *parser.DomainNode, tabs string) string {
 
 		s += tabs
 		s += "d: " + strconv.Itoa(domain.D) + "\n"
-	case parser.DOMAIN_DATE:
+	case DOMAIN_DATE:
 		s += "DOMAIN_DATE\n"
-	case parser.DOMAIN_TIME:
+	case DOMAIN_TIME:
 		s += "DOMAIN_TIME\n"
 	}
 
 	return s
 }
 
-func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
+func ConstraintToString(constraint *ConstraintNode, tabs string) string {
 	s := ""
 
 	s += tabs
@@ -782,7 +781,7 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 	s += "Type: "
 
 	switch constraint.Type {
-	case parser.CONSTRAINT_UNIQUE:
+	case CONSTRAINT_UNIQUE:
 		s += "CONSTRAINT_UNIQUE\n"
 		s += tabs
 		s += "AttriNameList:\n"
@@ -790,7 +789,7 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 			s += tabs + "\t"
 			s += v + "\n"
 		}
-	case parser.CONSTRAINT_PRIMARY_KEY:
+	case CONSTRAINT_PRIMARY_KEY:
 		s += "CONSTRAINT_PRIMARY_KEY\n"
 		s += tabs
 		s += "AttriNameList:\n"
@@ -798,7 +797,7 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 			s += tabs + "\t"
 			s += v + "\n"
 		}
-	case parser.CONSTRAINT_FOREIGN_KEY:
+	case CONSTRAINT_FOREIGN_KEY:
 		s += "CONSTRAINT_FOREIGN_KEY\n"
 		s += tabs
 		s += "AttributeNameLocal: " + constraint.AttributeNameLocal + "\n"
@@ -810,11 +809,11 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 			s += tabs
 			s += "Deferrable: "
 			switch constraint.Deferrable {
-			case parser.CONSTRAINT_NOT_DEFERRABLE:
+			case CONSTRAINT_NOT_DEFERRABLE:
 				s += "CONSTRAINT_NOT_DEFERRABLE\n"
-			case parser.CONSTRAINT_INITIALLY_DEFERRED:
+			case CONSTRAINT_INITIALLY_DEFERRED:
 				s += "CONSTRAINT_INITIALLY_DEFERRED\n"
-			case parser.CONSTRAINT_INITIALLY_IMMEDIATE:
+			case CONSTRAINT_INITIALLY_IMMEDIATE:
 				s += "CONSTRAINT_INITIALLY_IMMEDIATE\n"
 			}
 		}
@@ -822,9 +821,9 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 			s += tabs
 			s += "UpdateSet: "
 			switch constraint.UpdateSet {
-			case parser.CONSTRAINT_UPDATE_SET_NULL:
+			case CONSTRAINT_UPDATE_SET_NULL:
 				s += "CONSTRAINT_UPDATE_SET_NULL\n"
-			case parser.CONSTRAINT_UPDATE_SET_CASCADE:
+			case CONSTRAINT_UPDATE_SET_CASCADE:
 				s += "CONSTRAINT_UPDATE_SET_CASCADE\n"
 			}
 		}
@@ -832,24 +831,24 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 			s += tabs
 			s += "DeleteSet: "
 			switch constraint.DeleteSet {
-			case parser.CONSTRAINT_DELETE_SET_NULL:
+			case CONSTRAINT_DELETE_SET_NULL:
 				s += "CONSTRAINT_DELETE_SET_NULL\n"
-			case parser.CONSTRAINT_DELETE_SET_CASCADE:
+			case CONSTRAINT_DELETE_SET_CASCADE:
 				s += "CONSTRAINT_DELETE_SET_CASCADE\n"
 			}
 		}
-	case parser.CONSTRAINT_NOT_NULL:
+	case CONSTRAINT_NOT_NULL:
 		s += "CONSTRAINT_NOT_NULL\n"
 		s += tabs
 		s += "AttributeNameLocal: " + constraint.AttributeNameLocal + "\n"
-	case parser.CONSTRAINT_DEFAULT:
+	case CONSTRAINT_DEFAULT:
 		s += "CONSTRAINT_DEFAULT\n"
 		s += tabs
 		s += "AttributeNameLocal: " + constraint.AttributeNameLocal + "\n"
 		s += tabs
 		s += "ElementaryValue:\n"
 		s += ElementaryValueToString(constraint.ElementaryValue, tabs+"\t")
-	case parser.CONSTRAINT_CHECK:
+	case CONSTRAINT_CHECK:
 		s += "CONSTRAINT_CHECK\n"
 		s += ConditionToString(constraint.Condition, tabs+"\t")
 	}
@@ -857,7 +856,7 @@ func ConstraintToString(constraint *parser.ConstraintNode, tabs string) string {
 	return s
 }
 
-func ElementaryValueToString(elementaryValue *parser.ElementaryValueNode, tabs string) string {
+func ElementaryValueToString(elementaryValue *ElementaryValueNode, tabs string) string {
 	s := ""
 
 	s += tabs
@@ -866,25 +865,25 @@ func ElementaryValueToString(elementaryValue *parser.ElementaryValueNode, tabs s
 	s += "Type: "
 
 	switch elementaryValue.Type {
-	case parser.ELEMENTARY_VALUE_INT:
+	case ELEMENTARY_VALUE_INT:
 		s += "ELEMENTARY_VALUE_INT\n"
 		s += tabs
 		s += "IntValue: "
 		s += strconv.Itoa(elementaryValue.IntValue)
 		s += "\n"
-	case parser.ELEMENTARY_VALUE_FLOAT:
+	case ELEMENTARY_VALUE_FLOAT:
 		s += "ELEMENTARY_VALUE_FLOAT\n"
 		s += tabs
 		s += "FloatValue: "
 		s += strconv.FormatFloat(elementaryValue.FloatValue, 'g', -1, 64)
 		s += "\n"
-	case parser.ELEMENTARY_VALUE_STRING:
+	case ELEMENTARY_VALUE_STRING:
 		s += "ELEMENTARY_VALUE_STRING\n"
 		s += tabs
 		s += "StringValue: "
 		s += elementaryValue.StringValue
 		s += "\n"
-	case parser.ELEMENTARY_VALUE_BOOLEAN:
+	case ELEMENTARY_VALUE_BOOLEAN:
 		s += "ELEMENTARY_VALUE_BOOLEAN\n"
 		s += tabs
 		s += "BooleanValue: "
@@ -897,19 +896,19 @@ func ElementaryValueToString(elementaryValue *parser.ElementaryValueNode, tabs s
 	return s
 }
 
-func ConditionToString(condition *parser.ConditionNode, tabs string) string {
+func ConditionToString(condition *ConditionNode, tabs string) string {
 	s := tabs
 	s += "ConditionNode\n"
 
 	s += tabs
 	s += "Type: "
 	switch condition.Type {
-	case parser.CONDITION_PREDICATE:
+	case CONDITION_PREDICATE:
 		s += "CONDITION_PREDICATE\n"
 		s += tabs
 		s += "Predicate:\n"
 		s += PredicateToString(condition.Predicate, tabs+"\t")
-	case parser.CONDITION_AND:
+	case CONDITION_AND:
 		s += "CONDITION_AND\n"
 		s += tabs
 		s += "ConditionL:\n"
@@ -917,7 +916,7 @@ func ConditionToString(condition *parser.ConditionNode, tabs string) string {
 		s += tabs
 		s += "ConditionR:\n"
 		s += ConditionToString(condition.ConditionR, tabs+"\t")
-	case parser.CONDITION_OR:
+	case CONDITION_OR:
 		s += "CONDITION_OR\n"
 		s += tabs
 		s += "ConditionL:\n"
@@ -930,7 +929,7 @@ func ConditionToString(condition *parser.ConditionNode, tabs string) string {
 	return s
 }
 
-func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
+func PredicateToString(predicate *PredicateNode, tabs string) string {
 	s := ""
 	s += tabs
 	s += "PredicateNode\n"
@@ -938,7 +937,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 	s += tabs
 	s += "Type: "
 	switch predicate.Type {
-	case parser.PREDICATE_COMPARE_ELEMENTARY_VALUE:
+	case PREDICATE_COMPARE_ELEMENTARY_VALUE:
 		s += "PREDICATE_COMPARE_ELEMENTARY_VALUE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -949,7 +948,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_LIKE_STRING_VALUE:
+	case PREDICATE_LIKE_STRING_VALUE:
 		s += "PREDICATE_LIKE_STRING_VALUE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -957,7 +956,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "ElementaryValue:\n"
 		s += ElementaryValueToString(predicate.ElementaryValue, tabs+"\t")
-	case parser.PREDICATE_IN_SUBQUERY:
+	case PREDICATE_IN_SUBQUERY:
 		s += "PREDICATE_IN_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -965,7 +964,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "Query:\n"
 		s += QueryToString(predicate.Query, tabs+"\t")
-	case parser.PREDICATE_NOT_IN_SUBQUERY:
+	case PREDICATE_NOT_IN_SUBQUERY:
 		s += "PREDICATE_NOT_IN_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -973,7 +972,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "Query:\n"
 		s += QueryToString(predicate.Query, tabs+"\t")
-	case parser.PREDICATE_IN_TABLE:
+	case PREDICATE_IN_TABLE:
 		s += "PREDICATE_IN_TABLE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -981,7 +980,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "TableName: "
 		s += predicate.TableName + "\n"
-	case parser.PREDICATE_NOT_IN_TABLE:
+	case PREDICATE_NOT_IN_TABLE:
 		s += "PREDICATE_NOT_IN_TABLE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -989,7 +988,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "TableName: "
 		s += predicate.TableName + "\n"
-	case parser.PREDICATE_COMPARE_ALL_SUBQUERY:
+	case PREDICATE_COMPARE_ALL_SUBQUERY:
 		s += "PREDICATE_COMPARE_ALL_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1000,7 +999,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_NOT_ALL_SUBQUERY:
+	case PREDICATE_COMPARE_NOT_ALL_SUBQUERY:
 		s += "PREDICATE_COMPARE_NOT_ALL_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1011,7 +1010,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_ANY_SUBQUERY:
+	case PREDICATE_COMPARE_ANY_SUBQUERY:
 		s += "PREDICATE_COMPARE_ANY_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1022,7 +1021,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_NOT_ANY_SUBQUERY:
+	case PREDICATE_COMPARE_NOT_ANY_SUBQUERY:
 		s += "PREDICATE_COMPARE_NOT_ANY_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1033,7 +1032,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_ALL_TABLE:
+	case PREDICATE_COMPARE_ALL_TABLE:
 		s += "PREDICATE_COMPARE_ALL_TABLE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1044,7 +1043,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_NOT_ALL_TABLE:
+	case PREDICATE_COMPARE_NOT_ALL_TABLE:
 		s += "PREDICATE_COMPARE_NOT_ALL_TABLE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1055,7 +1054,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_ANY_TABLE:
+	case PREDICATE_COMPARE_ANY_TABLE:
 		s += "PREDICATE_COMPARE_ANY_TABLE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1066,7 +1065,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_COMPARE_NOT_ANY_TABLE:
+	case PREDICATE_COMPARE_NOT_ANY_TABLE:
 		s += "PREDICATE_COMPARE_NOT_ANY_TABLE\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
@@ -1077,17 +1076,17 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "CompareMark: "
 		s += CompareMarkToString(predicate.CompareMark) + "\n"
-	case parser.PREDICATE_IS_NULL:
+	case PREDICATE_IS_NULL:
 		s += "PREDICATE_IS_NULL\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
-	case parser.PREDICATE_IS_NOT_NULL:
+	case PREDICATE_IS_NOT_NULL:
 		s += "PREDICATE_IS_NOT_NULL\n"
 		s += tabs
 		s += "AttriNameWithTableNameL:\n"
 		s += AttriNameOptionTableNameToString(predicate.AttriNameWithTableNameL, tabs+"\t")
-	case parser.PREDICATE_TUPLE_IN_SUBQUERY:
+	case PREDICATE_TUPLE_IN_SUBQUERY:
 		s += "PREDICATE_TUPLE_IN_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameOptionTableNameList:\n"
@@ -1097,7 +1096,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "Query:\n"
 		s += QueryToString(predicate.Query, tabs+"\t")
-	case parser.PREDICATE_TUPLE_NOT_IN_SUBQUERY:
+	case PREDICATE_TUPLE_NOT_IN_SUBQUERY:
 		s += "PREDICATE_TUPLE_NOT_IN_SUBQUERY\n"
 		s += tabs
 		s += "AttriNameOptionTableNameList:\n"
@@ -1107,7 +1106,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "Query:\n"
 		s += QueryToString(predicate.Query, tabs+"\t")
-	case parser.PREDICATE_TUPLE_IN_TABLE:
+	case PREDICATE_TUPLE_IN_TABLE:
 		s += "PREDICATE_TUPLE_IN_TABLE\n"
 		s += tabs
 		s += "AttriNameOptionTableNameList:\n"
@@ -1117,7 +1116,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "TableName: "
 		s += predicate.TableName + "\n"
-	case parser.PREDICATE_TUPLE_NOT_IN_TABLE:
+	case PREDICATE_TUPLE_NOT_IN_TABLE:
 		s += "PREDICATE_TUPLE_NOT_IN_TABLE\n"
 		s += tabs
 		s += "AttriNameOptionTableNameList:\n"
@@ -1127,12 +1126,12 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 		s += tabs
 		s += "TableName: "
 		s += predicate.TableName + "\n"
-	case parser.PREDICATE_SUBQUERY_EXISTS:
+	case PREDICATE_SUBQUERY_EXISTS:
 		s += "PREDICATE_SUBQUERY_EXISTS\n"
 		s += tabs
 		s += "Query:\n"
 		s += QueryToString(predicate.Query, tabs+"\t")
-	case parser.PREDICATE_SUBQUERY_NOT_EXISTS:
+	case PREDICATE_SUBQUERY_NOT_EXISTS:
 		s += "PREDICATE_SUBQUERY_NOT_EXISTS\n"
 		s += tabs
 		s += "Query:\n"
@@ -1142,7 +1141,7 @@ func PredicateToString(predicate *parser.PredicateNode, tabs string) string {
 	return s
 }
 
-func AttriNameOptionTableNameToString(attriNameOpsTableName *parser.AttriNameOptionTableNameNode, tabs string) string {
+func AttriNameOptionTableNameToString(attriNameOpsTableName *AttriNameOptionTableNameNode, tabs string) string {
 	s := tabs
 	s += "AttriNameOptionTableNameNode\n"
 	if attriNameOpsTableName.TableNameValid {
@@ -1156,25 +1155,25 @@ func AttriNameOptionTableNameToString(attriNameOpsTableName *parser.AttriNameOpt
 	return s
 }
 
-func CompareMarkToString(compareMark parser.CompareMarkEnum) string {
+func CompareMarkToString(compareMark CompareMarkEnum) string {
 	switch compareMark {
-	case parser.COMPAREMARK_EQUAL:
+	case COMPAREMARK_EQUAL:
 		return "COMPAREMARK_EQUAL"
-	case parser.COMPAREMARK_NOTEQUAL:
+	case COMPAREMARK_NOTEQUAL:
 		return "COMPAREMARK_NOTEQUAL"
-	case parser.COMPAREMARK_LESS:
+	case COMPAREMARK_LESS:
 		return "COMPAREMARK_LESS"
-	case parser.COMPAREMARK_GREATER:
+	case COMPAREMARK_GREATER:
 		return "COMPAREMARK_GREATER"
-	case parser.COMPAREMARK_LESSEQUAL:
+	case COMPAREMARK_LESSEQUAL:
 		return "COMPAREMARK_LESSEQUAL"
-	case parser.COMPAREMARK_GREATEREQUAL:
+	case COMPAREMARK_GREATEREQUAL:
 		return "COMPAREMARK_GREATEREQUAL"
 	}
 	return ""
 }
 
-func QueryToString(query *parser.QueryNode, tabs string) string {
+func QueryToString(query *QueryNode, tabs string) string {
 	s := tabs + "QueryNode\n"
 	if query.StarValid {
 		s += tabs + "StarValid\n"
@@ -1230,66 +1229,66 @@ func QueryToString(query *parser.QueryNode, tabs string) string {
 	return s
 }
 
-func OrderByListEntryToString(entry *parser.OrderByListEntryNode, tabs string) string {
+func OrderByListEntryToString(entry *OrderByListEntryNode, tabs string) string {
 	s := tabs + "OrderByListEntryNode\n"
 	switch entry.Type {
-	case parser.ORDER_BY_LIST_ENTRY_EXPRESSION:
+	case ORDER_BY_LIST_ENTRY_EXPRESSION:
 		s += "Type: ORDER_BY_LIST_ENTRY_EXPRESSION\n"
 		s += "Expression:\n"
 		s += ExpressionToString(entry.Expression, tabs+"\t")
-	case parser.ORDER_BY_LIST_ENTRY_ATTRIBUTE:
+	case ORDER_BY_LIST_ENTRY_ATTRIBUTE:
 		s += "Type: ORDER_BY_LIST_ENTRY_ATTRIBUTE\n"
 		s += AttriNameOptionTableNameToString(entry.AttriNameOptionTableName, tabs+"\t")
 	}
 
 	switch entry.Trend {
-	case parser.ORDER_BY_LIST_ENTRY_ASC:
+	case ORDER_BY_LIST_ENTRY_ASC:
 		s += tabs + "Trend: ORDER_BY_LIST_ENTRY_ASC\n"
-	case parser.ORDER_BY_LIST_ENTRY_DESC:
+	case ORDER_BY_LIST_ENTRY_DESC:
 		s += tabs + "Trend: ORDER_BY_LIST_ENTRY_DESC\n"
 	}
 
 	return s
 }
 
-func JoinToString(join *parser.JoinNode, tabs string) string {
+func JoinToString(join *JoinNode, tabs string) string {
 	s := tabs + "JoinNode\n"
 	s += tabs + "JoinTableNameL: " + join.JoinTableNameL + "\n"
 	s += tabs + "JoinTableNameR: " + join.JoinTableNameR + "\n"
 
 	switch join.Type {
-	case parser.CROSS_JOIN:
+	case CROSS_JOIN:
 		s += tabs + "Type: CROSS_JOIN\n"
-	case parser.JOIN_ON:
+	case JOIN_ON:
 		s += tabs + "Type: JOIN_ON\n"
 		s += tabs + "OnList:\n"
 		for _, v := range join.OnList {
 			s += OnListEntryToString(v, tabs+"\t")
 		}
 
-	case parser.NATURAL_JOIN:
+	case NATURAL_JOIN:
 		s += tabs + "Type: NATURAL_JOIN\n"
-	case parser.NATURAL_FULL_OUTER_JOIN:
+	case NATURAL_FULL_OUTER_JOIN:
 		s += tabs + "Type: NATURAL_FULL_OUTER_JOIN\n"
-	case parser.NATURAL_LEFT_OUTER_JOIN:
+	case NATURAL_LEFT_OUTER_JOIN:
 		s += tabs + "Type: NATURAL_LEFT_OUTER_JOIN\n"
-	case parser.NATURAL_RIGHT_OUTER_JOIN:
+	case NATURAL_RIGHT_OUTER_JOIN:
 		s += tabs + "Type: NATURAL_RIGHT_OUTER_JOIN\n"
-	case parser.FULL_OUTER_JOIN_ON:
+	case FULL_OUTER_JOIN_ON:
 		s += tabs + "Type: FULL_OUTER_JOIN_ON\n"
 		s += tabs + "OnList:\n"
 		for _, v := range join.OnList {
 			s += OnListEntryToString(v, tabs+"\t")
 		}
 
-	case parser.LEFT_OUTER_JOIN_ON:
+	case LEFT_OUTER_JOIN_ON:
 		s += tabs + "Type: LEFT_OUTER_JOIN_ON\n"
 		s += tabs + "OnList:\n"
 		for _, v := range join.OnList {
 			s += OnListEntryToString(v, tabs+"\t")
 		}
 
-	case parser.RIGHT_OUTER_JOIN_ON:
+	case RIGHT_OUTER_JOIN_ON:
 		s += tabs + "Type: RIGHT_OUTER_JOIN_ON\n"
 		s += tabs + "OnList:\n"
 		for _, v := range join.OnList {
@@ -1301,7 +1300,7 @@ func JoinToString(join *parser.JoinNode, tabs string) string {
 	return s
 }
 
-func OnListEntryToString(entry *parser.OnListEntryNode, tabs string) string {
+func OnListEntryToString(entry *OnListEntryNode, tabs string) string {
 	s := tabs + "OnListEntryNode\n"
 
 	s += tabs + "AttriNameWithTableNameL:\n"
@@ -1313,14 +1312,14 @@ func OnListEntryToString(entry *parser.OnListEntryNode, tabs string) string {
 	return s
 }
 
-func FromListEntryToString(entry *parser.FromListEntryNode, tabs string) string {
+func FromListEntryToString(entry *FromListEntryNode, tabs string) string {
 	s := tabs + "FromListEntryNode\n"
 	switch entry.Type {
-	case parser.FROM_LIST_ENTRY_SUBQUERY:
+	case FROM_LIST_ENTRY_SUBQUERY:
 		s += tabs + "Type: FROM_LIST_ENTRY_SUBQUERY\n"
 		s += tabs + "Query:\n"
 		s += QueryToString(entry.Query, tabs+"\t")
-	case parser.FROM_LIST_ENTRY_TABLE:
+	case FROM_LIST_ENTRY_TABLE:
 		s += tabs + "Type: FROM_LIST_ENTRY_TABLE\n"
 		s += tabs + "TableName: " + entry.TableName + "\t"
 	}
@@ -1331,18 +1330,18 @@ func FromListEntryToString(entry *parser.FromListEntryNode, tabs string) string 
 	return s
 }
 
-func SelectListEntryToString(entry *parser.SelectListEntryNode, tabs string) string {
+func SelectListEntryToString(entry *SelectListEntryNode, tabs string) string {
 	s := tabs + "SelectListEntryNode\n"
 	switch entry.Type {
-	case parser.SELECT_LIST_ENTRY_ATTRIBUTE_NAME:
+	case SELECT_LIST_ENTRY_ATTRIBUTE_NAME:
 		s += tabs + "Type: SELECT_LIST_ENTRY_ATTRIBUTE_NAME\n"
 		s += tabs + "AttriNameOptionTableName:\n"
 		s += AttriNameOptionTableNameToString(entry.AttriNameOptionTableName, tabs+"\t")
-	case parser.SELECT_LIST_ENTRY_AGGREGATION:
+	case SELECT_LIST_ENTRY_AGGREGATION:
 		s += tabs + "Type: SELECT_LIST_ENTRY_AGGREGATION\n"
 		s += tabs + "Aggregation:\n"
 		s += AggregationToString(entry.Aggregation, tabs+"\t")
-	case parser.SELECT_LIST_ENTRY_EXPRESSION:
+	case SELECT_LIST_ENTRY_EXPRESSION:
 		s += tabs + "Type: SELECT_LIST_ENTRY_EXPRESSION\n"
 		s += tabs + "Expression:\n"
 		s += ExpressionToString(entry.Expression, tabs+"\t")
@@ -1355,16 +1354,16 @@ func SelectListEntryToString(entry *parser.SelectListEntryNode, tabs string) str
 	return s
 }
 
-func TriggerOldNewEntryToString(entry *parser.TriggerOldNewEntryNode, tabs string) string {
+func TriggerOldNewEntryToString(entry *TriggerOldNewEntryNode, tabs string) string {
 	s := tabs + "TriggerOldNewEntryNode\n"
 	switch entry.Type {
-	case parser.OLD_ROW_AS:
+	case OLD_ROW_AS:
 		s += tabs + "Type: OLD_ROW_AS\n"
-	case parser.NEW_ROW_AS:
+	case NEW_ROW_AS:
 		s += tabs + "Type: NEW_ROW_AS\n"
-	case parser.OLD_TABLE_AS:
+	case OLD_TABLE_AS:
 		s += tabs + "Type: OLD_TABLE_AS\n"
-	case parser.NEW_TABLE_AS:
+	case NEW_TABLE_AS:
 		s += tabs + "Type: NEW_TABLE_AS\n"
 	}
 	s += tabs + "Name: " + entry.Name + "\n"

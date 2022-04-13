@@ -391,5 +391,7 @@ func (p *calcLex) Error(s string) {
 	p.lastErr = errors.New("yacc: " + s)
 	if err := p.lastErr; err != nil {
 		log.Println(err)
+		Parser := GetParser()
+		Parser.err = err
 	}
 }

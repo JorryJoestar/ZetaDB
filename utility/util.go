@@ -1,6 +1,10 @@
 package utility
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"os"
+)
 
 /*
         type           elementType           elementLength
@@ -254,4 +258,12 @@ func InsertToOrderedSliceSplit(elementType uint32, slice *[][]byte, element []by
 	right := (*slice)[len(*slice)/2:]
 
 	return left, right, nil
+}
+
+//if err is not nil, print err to standard error
+func CheckError(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+		os.Exit(1)
+	}
 }

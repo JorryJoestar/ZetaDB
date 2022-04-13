@@ -5,7 +5,6 @@ import (
 )
 
 type Checker struct {
-	currentUserId int
 }
 
 //throw error if this table name already exists that belongs to current user

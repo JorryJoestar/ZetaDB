@@ -97,7 +97,7 @@ func (ee *ExecutionEngine) DropTableOperator(tableName string) {
 		bytes1, _ := tuple8.TupleGetFieldValue(1)
 		tableId8, _ := utility.BytesToInteger(bytes0)
 		tableSchemaString8, _ := utility.BytesToVARCHAR(bytes1)
-		ast := ee.parser.ParseSql(tableSchemaString8)
+		ast, _ := ee.parser.ParseSql(tableSchemaString8)
 		tableSchema8, _ := ee.rewriter.ASTNodeToSchema(ast)
 		if tableSchema8.GetSchemaTableName() == tableName {
 			tableId = tableId8
@@ -171,6 +171,12 @@ func (ee *ExecutionEngine) DropTableOperator(tableName string) {
 	}
 }
 
+//generate a tree of iterators from physicalPlan and execute it
+//return resultSchema and resultTuples
+func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) (*container.Schema, []*container.Tuple) {
+	return nil, nil
+}
+
 func (ee *ExecutionEngine) DeleteOperator() {}
 func (ee *ExecutionEngine) InsertOperator() {}
 func (ee *ExecutionEngine) UpdateOperator() {}
@@ -198,7 +204,3 @@ func (ee *ExecutionEngine) ShowProceduresOperator() {}
 func (ee *ExecutionEngine) CreateUserOperator()     {}
 func (ee *ExecutionEngine) LogUserOperator()        {}
 func (ee *ExecutionEngine) PsmCallOperator()        {}
-
-func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) {
-
-}

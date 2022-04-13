@@ -20,6 +20,8 @@ const (
 	DEFAULT_ADMINISTRATOR_NAME     string = "Zhenyu Jiang"
 	DEFAULT_ADMINISTRATOR_USER_ID  int    = 0
 	DEFAULT_ADMINISTRATOR_PASSWORD string = "4319633"
+
+	DEFAULT_SERVER_ADDRESS = "localhost:40320"
 )
 
 var (

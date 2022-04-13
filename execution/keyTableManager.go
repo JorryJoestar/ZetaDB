@@ -38,7 +38,7 @@ func (ktm *KeytableManager) GetKeyTableSchema(tableId uint32) *container.Schema 
 		return nil
 	}
 
-	ast := parser.ParseSql(DEFAULT_KEYTABLES_SCHEMA[tableId])
+	ast, _ := parser.ParseSql(DEFAULT_KEYTABLES_SCHEMA[tableId])
 	schema, _ := rewriter.ASTNodeToSchema(ast)
 
 	return schema
@@ -47,7 +47,7 @@ func (ktm *KeytableManager) GetKeyTableSchema(tableId uint32) *container.Schema 
 //get tableId & schema from dataFile according to tableName, k_tableId_schema table 8
 //throw error if no such table
 func (ktm *KeytableManager) Query_k_tableId_schema_FromTableName(tableName string) (uint32, *container.Schema, error) {
-	astOfCreateTable8 := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
+	astOfCreateTable8, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
 	schemaOfCreateTable8, err := optimizer.GetRewriter().ASTNodeToSchema(astOfCreateTable8)
 	if err != nil {
 		return 0, nil, err
@@ -80,7 +80,7 @@ func (ktm *KeytableManager) Query_k_tableId_schema_FromTableName(tableName strin
 		}
 
 		//parse this string to get schema
-		ast := parser.GetParser().ParseSql(schemaString)
+		ast, _ := parser.GetParser().ParseSql(schemaString)
 		currentSchema, err := optimizer.GetRewriter().ASTNodeToSchema(ast)
 		if err != nil {
 			return 0, nil, err
@@ -98,7 +98,7 @@ func (ktm *KeytableManager) Query_k_tableId_schema_FromTableName(tableName strin
 //get table schema from its tableId
 func (ktm *KeytableManager) Query_k_tableId_schema_FromTableId(tableId uint32) (*container.Schema, error) {
 
-	astOfCreateTable8 := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
+	astOfCreateTable8, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
 	schemaOfCreateTable8, err := optimizer.GetRewriter().ASTNodeToSchema(astOfCreateTable8)
 	if err != nil {
 		return nil, err
@@ -131,7 +131,7 @@ func (ktm *KeytableManager) Query_k_tableId_schema_FromTableId(tableId uint32) (
 		}
 
 		//parse this string to get schema
-		ast := parser.GetParser().ParseSql(schemaString)
+		ast, _ := parser.GetParser().ParseSql(schemaString)
 		currentSchema, err := optimizer.GetRewriter().ASTNodeToSchema(ast)
 		if err != nil {
 			return nil, err
@@ -291,7 +291,7 @@ func (ktm *KeytableManager) Insert_k_tableId_schema(tableId uint32, newSchemaStr
 
 //get headPageId, tailPageId, lastTupleId, tupleNum by tableId
 func (ktm *KeytableManager) Query_k_table(tableId uint32) (uint32, uint32, uint32, int32, error) {
-	astOfCreateTable9 := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[9])
+	astOfCreateTable9, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[9])
 	schemaOfCreateTable9, err := optimizer.GetRewriter().ASTNodeToSchema(astOfCreateTable9)
 	if err != nil {
 		return 0, 0, 0, 0, err
@@ -857,7 +857,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 
 	//insert tuple into page0
 	//DEFAULT_ADMINISTRATOR_USER_ID, DEFAULT_ADMINISTRATOR_NAME
-	table0CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[0])
+	table0CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[0])
 	table0Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table0CreateAst)
 
 	field000, _ := container.NewFieldFromBytes(INTToBytes(int32(DEFAULT_ADMINISTRATOR_USER_ID)))
@@ -873,7 +873,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 
 	//insert tuple into page1
 	//DEFAULT_ADMINISTRATOR_USER_ID, DEFAULT_ADMINISTRATOR_PASSWORD
-	table1CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[1])
+	table1CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[1])
 	table1Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table1CreateAst)
 
 	field100, _ := container.NewFieldFromBytes(INTToBytes(int32(DEFAULT_ADMINISTRATOR_USER_ID)))
@@ -890,7 +890,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 	//insert tuple into page2
 	//all key tabls belong to administrator
 	//0 to 16, DEFAULT_ADMINISTRATOR_USER_ID
-	table2CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[2])
+	table2CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[2])
 	table2Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table2CreateAst)
 
 	f2x1, _ := container.NewFieldFromBytes(INTToBytes(int32(DEFAULT_ADMINISTRATOR_USER_ID)))
@@ -906,7 +906,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 
 	//insert tuple into page8
 	//0 to 16, DEFAULT_KEY_TABLE_0_SCHEMA to DEFAULT_KEY_TABLE_16_SCHEMA
-	table8CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
+	table8CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[8])
 	table8Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table8CreateAst)
 
 	for i := 0; i <= 16; i++ {
@@ -925,7 +925,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 	//insert tuple into page9
 	//0 to 16, 0 to 16, depend on tableId, depend on tableId
 	//lastTupleId is invalid when tupleNum = 0
-	table9CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[9])
+	table9CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[9])
 	table9Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table9CreateAst)
 
 	for i := 0; i <= 16; i++ {
@@ -965,7 +965,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 	//tuple0 is important: it keeps a pageId, for all dataPages whose pageId >= this value, they are not allocated
 	//the first 17 pages have been occupied by key tables
 	//17
-	table15CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[15])
+	table15CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[15])
 	table15Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table15CreateAst)
 
 	field1500, _ := container.NewFieldFromBytes(INTToBytes(17))
@@ -977,7 +977,7 @@ func (ktm *KeytableManager) InitializeSystem() {
 	//insert tuple into page16
 	//tuple0 is important: it keeps a pageId, for all indexPages whose pageId >= this value, they are not allocated
 	//0
-	table16CreateAst := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[16])
+	table16CreateAst, _ := parser.GetParser().ParseSql(DEFAULT_KEYTABLES_SCHEMA[16])
 	table16Schema, _ := optimizer.GetRewriter().ASTNodeToSchema(table16CreateAst)
 
 	field1600, _ := container.NewFieldFromBytes(INTToBytes(0))
