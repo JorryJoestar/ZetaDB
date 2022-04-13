@@ -42,12 +42,12 @@ func main() {
 
 	//ee.CreateTableOperator(10, "create table x(id int primary key, longString varchar(100000));")
 
-	/* 	var longS string
-	   	for i := 1; i <= 5000; i++ {
-	   		longS += "b"
-	   	}
+	var longS string
+	for i := 1; i <= 5000; i++ {
+		longS += "b"
+	}
 
-	   	newTuple := getNewTuple(10, longS)
+	/* 	newTuple := getNewTuple(10, "ClaireMao")
 	   	tm.InsertTupleIntoTable(17, newTuple) */
 
 	tm.DeleteTupleFromTable(17, 2)

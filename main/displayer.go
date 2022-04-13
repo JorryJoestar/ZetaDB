@@ -228,7 +228,7 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 	tableString += frameLine + "\n"
 
 	//loop and insert tupleLine
-	for _, tuple := range tupleStrings {
+	for j, tuple := range tupleStrings {
 		tupleString := "|"
 		for i, field := range tuple {
 			tupleString += " "
@@ -239,6 +239,10 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 			}
 			tupleString += "|"
 		}
+		//tupleId
+		tupleId := tuples[j].TupleGetTupleId()
+		tupleString += " "
+		tupleString += strconv.FormatUint(uint64(tupleId), 10)
 		tableString += tupleString + "\n"
 	}
 

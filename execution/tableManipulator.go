@@ -139,9 +139,6 @@ func (tm *TableManipulator) DeletePageMode0FromTable(tableId uint32, pageId uint
 	//get page that is going to be deleted
 	deletedPage, _ := se.GetDataPage(pageId, schema)
 
-	//update tupleNum
-	tupleNum -= deletedPage.DpGetTupleNum()
-
 	//return pageId of deletedPage
 	ktm.InsertVacantDataPageId(pageId)
 
@@ -313,11 +310,12 @@ func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, tupleId uint32)
 	if deletedFromPage.DataPageMode() == 1 {
 		tm.DeletePageMode1And2FromTable(tableId, deletedFromPage.DpGetPageId())
 	} else { //mode is 0
+
 		deletedFromPage.DpDeleteTuple(tupleId)
 		transaction.InsertDataPage(deletedFromPage)
 
 		if deletedFromPage.DpGetTupleNum() == 0 && deletedFromPage.DpGetPageId() != headPageId {
-			tm.DeletePageMode0FromTable(tableId, deletedFromPage.DpGetTableId())
+			tm.DeletePageMode0FromTable(tableId, deletedFromPage.DpGetPageId())
 		}
 	}
 
@@ -368,11 +366,14 @@ func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId
 	currentPage, _ := se.GetDataPage(headPageId, schema)
 
 	for {
+
 		if currentPage.DataPageMode() == 0 { //mode 0
 			var currentTuple *container.Tuple = nil
 
 			for i := 0; i < int(currentPage.DpGetTupleNum()); i++ {
+
 				currentTuple, _ = currentPage.GetTupleAt(i)
+
 				if currentTuple.TupleGetTupleId() == tupleId {
 					targetPage = currentPage
 					targetTuple = currentTuple
@@ -398,7 +399,9 @@ func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId
 			}
 
 			currentTuple, _ := container.NewTupleFromBytes(data, schema, tableId)
-			return currentTuple, currentPage.DpGetPageId(), nil
+			if currentTuple.TupleGetTupleId() == tupleId {
+				return currentTuple, currentPage.DpGetPageId(), nil
+			}
 		}
 
 		//update currentPage to next page
