@@ -248,7 +248,7 @@ func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId 
 	}
 
 	//update k_table
-	ktm.Update_k_table(tableId, tailPageId, lastTupleId, tupleNum-1)
+	ktm.Update_k_table(tableId, tailPageId, lastTupleId, tupleNum)
 }
 
 //insert a tuple into a table
@@ -368,15 +368,37 @@ func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId
 	currentPage, _ := se.GetDataPage(headPageId, schema)
 
 	for {
-		var currentTuple *container.Tuple = nil
+		if currentPage.DataPageMode() == 0 { //mode 0
+			var currentTuple *container.Tuple = nil
 
-		for i := 0; i < int(currentPage.DpGetTupleNum()); i++ {
-			currentTuple, _ = currentPage.GetTupleAt(i)
-			if currentTuple.TupleGetTupleId() == tupleId {
-				targetPage = currentPage
-				targetTuple = currentTuple
-				return targetTuple, targetPage.DpGetPageId(), nil
+			for i := 0; i < int(currentPage.DpGetTupleNum()); i++ {
+				currentTuple, _ = currentPage.GetTupleAt(i)
+				if currentTuple.TupleGetTupleId() == tupleId {
+					targetPage = currentPage
+					targetTuple = currentTuple
+					return targetTuple, targetPage.DpGetPageId(), nil
+				}
 			}
+		} else { //mode 1
+			var data []byte
+			firstPageData, _ := currentPage.DpGetData()
+			data = append(data, firstPageData...)
+
+			firstMode2PageId, _ := currentPage.DpGetLinkNextPageId()
+			mode2Page, _ := se.GetDataPage(firstMode2PageId, schema)
+
+			for {
+				mode2PageData, _ := mode2Page.DpGetData()
+				data = append(data, mode2PageData...)
+
+				isListTail, _ := mode2Page.DpIsListTailPage()
+				if isListTail { //reach the list tail
+					break
+				}
+			}
+
+			currentTuple, _ := container.NewTupleFromBytes(data, schema, tableId)
+			return currentTuple, currentPage.DpGetPageId(), nil
 		}
 
 		//update currentPage to next page

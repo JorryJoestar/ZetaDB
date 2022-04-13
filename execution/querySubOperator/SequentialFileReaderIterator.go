@@ -45,46 +45,57 @@ func (rfi *SequentialFileReaderIterator) Open(iterator1 Iterator, iterator2 Iter
 		return err
 	}
 
-	if firstPage.DataPageMode() == 0 { // mode 0 page
-		if firstPage.DpGetTupleNum() != 0 { // not an empty table
-			rfi.currentTuple, err = firstPage.GetTupleAt(rfi.currentTuplesId)
-			if err != nil {
-				return err
-			}
-		} else {
+	if firstPage.DpGetTupleNum() != 0 {
+		rfi.currentTuple, err = firstPage.GetTupleAt(rfi.currentTuplesId)
+		if err != nil {
+			return err
+		}
+	} else {
+		isTailPage, _ := firstPage.DpIsTailPage()
+		if isTailPage { //only one empty page in this table
 			rfi.hasNext = false
 			rfi.currentTuple = nil
-		}
+		} else { //check next page
+			secondPageId, _ := firstPage.DpGetNextPageId()
+			nextPage, _ := rfi.se.GetDataPage(secondPageId, rfi.schema)
+			if nextPage.DataPageMode() == 0 {
+				if nextPage.DpGetTupleNum() != 0 {
+					rfi.currentTuple, err = nextPage.GetTupleAt(rfi.currentTuplesId)
+					if err != nil {
+						return err
+					}
+				} else {
+					rfi.hasNext = false
+					rfi.currentTuple = nil
+				}
+			} else {
+				var data []byte
+				firstPageData, _ := nextPage.DpGetData()
+				data = append(data, firstPageData...)
 
-	} else if firstPage.DataPageMode() == 1 { //mode 1 page, should iterate all following mode 2 page
+				firstMode2PageId, _ := nextPage.DpGetLinkNextPageId()
+				mode2Page, err := rfi.se.GetDataPage(firstMode2PageId, rfi.schema)
+				if err != nil {
+					return err
+				}
 
-		var data []byte
-		firstPageData, _ := firstPage.DpGetData()
-		data = append(data, firstPageData...)
+				for {
+					mode2PageData, _ := mode2Page.DpGetData()
+					data = append(data, mode2PageData...)
 
-		firstMode2PageId, _ := firstPage.DpGetLinkNextPageId()
-		mode2Page, err := rfi.se.GetDataPage(firstMode2PageId, rfi.schema)
-		if err != nil {
-			return err
-		}
+					isListTail, _ := mode2Page.DpIsListTailPage()
+					if isListTail { //reach the list tail
+						break
+					}
+				}
 
-		for {
-			mode2PageData, _ := mode2Page.DpGetData()
-			data = append(data, mode2PageData...)
-
-			isListTail, _ := mode2Page.DpIsListTailPage()
-			if isListTail { //reach the list tail
-				break
+				rfi.currentPageId = secondPageId
+				rfi.currentTuple, err = container.NewTupleFromBytes(data, rfi.schema, firstPage.DpGetTableId())
+				if err != nil {
+					return err
+				}
 			}
 		}
-
-		rfi.currentTuple, err = container.NewTupleFromBytes(data, rfi.schema, firstPage.DpGetTableId())
-		if err != nil {
-			return err
-		}
-
-	} else { //mode2 is invalid for being a head page
-		return errors.New("ReadFileIterator.go    Open() page mode invalid")
 	}
 
 	return nil

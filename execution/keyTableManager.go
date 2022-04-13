@@ -239,6 +239,9 @@ func (ktm *KeytableManager) Delete_k_tableId_schema(tableId uint32) {
 	}
 
 	//update k_table
+	if targetTuple.TupleGetTupleId() == lastTupleId {
+		lastTupleId--
+	}
 	ktm.Update_k_table(8, tailPageId, lastTupleId, tupleNum-1)
 }
 

@@ -34,34 +34,38 @@ func GetInstance() *Kernel {
 func main() {
 	ktm := execution.GetKeytableManager()
 	//ee := execution.GetExecutionEngine()
-	//tm := execution.GetTableManipulator()
+	tm := execution.GetTableManipulator()
 
 	transaction := storage.GetTransaction()
 
-	//ee.CreateTableOperator(10, "create table longString(id int primary key, longString varchar(100000));")
 	//ktm.InitializeSystem()
+
+	//ee.CreateTableOperator(10, "create table x(id int primary key, longString varchar(100000));")
 
 	/* 	var longS string
 	   	for i := 1; i <= 5000; i++ {
 	   		longS += "b"
-	   	} */
+	   	}
 
-	/* 	newTuple := getNewTuple(0, 0, "simeon")
+	   	newTuple := getNewTuple(10, longS)
 	   	tm.InsertTupleIntoTable(17, newTuple) */
 
-	//tm.DeleteTupleFromTable(17, 1)
+	tm.DeleteTupleFromTable(17, 2)
+
+	//ee.DropTableOperator("x")
 
 	transaction.PushTransactionIntoDisk()
 
-	for i := 0; i <= 17; i++ {
-		PrintTable(uint32(i))
-	}
-
+	PrintTable(2)
+	PrintTable(8)
+	PrintTable(9)
+	PrintTable(15)
+	PrintTable(17)
 	fmt.Println(ktm.Query_k_table(17))
 
 }
 
-func getNewTuple(tupleId uint32, id int32, name string) *container.Tuple {
+func getNewTuple(id int32, name string) *container.Tuple {
 	ktm := execution.GetKeytableManager()
 
 	schema0 := ktm.GetKeyTableSchema(0)
@@ -72,6 +76,6 @@ func getNewTuple(tupleId uint32, id int32, name string) *container.Tuple {
 	var fields []*container.Field
 	fields = append(fields, field0)
 	fields = append(fields, field1)
-	tuple, _ := container.NewTuple(0, tupleId, schema0, fields)
+	tuple, _ := container.NewTuple(0, 0, schema0, fields)
 	return tuple
 }
