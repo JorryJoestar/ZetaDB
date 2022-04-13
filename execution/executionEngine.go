@@ -46,7 +46,6 @@ func (ee *ExecutionEngine) InitializeSystem() {
 //insert a tuple into key table 2: k_tableId_userId
 //insert a tuple into key table 8: k_tableId_schema
 //assign an empty headPage for this table
-//TODO unchecked
 func (ee *ExecutionEngine) CreateTableOperator(userId int32, schemaString string) {
 	transaction := storage.GetTransaction()
 
@@ -83,7 +82,6 @@ func (ee *ExecutionEngine) CreateTableOperator(userId int32, schemaString string
 //delete a tuple in key table 8: k_tableId_schema
 //delete all pages belong to this table
 //TODO update: use index to accelerate
-//TODO unchecked
 func (ee *ExecutionEngine) DropTableOperator(tableName string) {
 	var tableId int32
 	var tableSchema *container.Schema

@@ -269,7 +269,9 @@ func PrintTable(tableId uint32) {
 	ktm := execution.GetKeytableManager()
 	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
 
-	seqIt := its.NewSequentialFileReaderIterator(tableId, schema)
+	headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
+
+	seqIt := its.NewSequentialFileReaderIterator(headPageId, schema)
 	seqIt.Open(nil, nil)
 
 	var tuples []*container.Tuple

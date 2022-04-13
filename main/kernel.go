@@ -6,7 +6,6 @@ import (
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
-	"fmt"
 	"sync"
 )
 
@@ -32,9 +31,9 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	ktm := execution.GetKeytableManager()
-	//ee := execution.GetExecutionEngine()
-	tm := execution.GetTableManipulator()
+	//ktm := execution.GetKeytableManager()
+	ee := execution.GetExecutionEngine()
+	//tm := execution.GetTableManipulator()
 
 	transaction := storage.GetTransaction()
 
@@ -42,17 +41,19 @@ func main() {
 
 	//ee.CreateTableOperator(10, "create table x(id int primary key, longString varchar(100000));")
 
-	var longS string
-	for i := 1; i <= 5000; i++ {
-		longS += "b"
-	}
+	/* 	ee.CreateTableOperator(10, "create table m(id int primary key, longString varchar(100000));") */
 
-	/* 	newTuple := getNewTuple(10, "ClaireMao")
+	/* 	var longS string
+	   	for i := 1; i <= 5000; i++ {
+	   		longS += "b"
+	   	}
+
+	   	newTuple := getNewTuple(2, "ClaireMao")
 	   	tm.InsertTupleIntoTable(17, newTuple) */
 
-	tm.DeleteTupleFromTable(17, 2)
+	//tm.DeleteTupleFromTable(17, 13)
 
-	//ee.DropTableOperator("x")
+	ee.DropTableOperator("m")
 
 	transaction.PushTransactionIntoDisk()
 
@@ -60,8 +61,6 @@ func main() {
 	PrintTable(8)
 	PrintTable(9)
 	PrintTable(15)
-	PrintTable(17)
-	fmt.Println(ktm.Query_k_table(17))
 
 }
 

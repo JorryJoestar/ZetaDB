@@ -25,7 +25,6 @@ func GetTableManipulator() *TableManipulator {
 }
 
 //create a new tail page in mode0 for this table, return this newly created page
-//TODO unchecked
 func (tm *TableManipulator) NewTailPageMode0ToTable(tableId uint32) *storage.DataPage {
 	ktm := GetKeytableManager()
 	se := storage.GetStorageEngine()
@@ -62,7 +61,6 @@ func (tm *TableManipulator) NewTailPageMode0ToTable(tableId uint32) *storage.Dat
 //if current page can not hold whole data, create new mode2 page to hold remain data
 //for k_table, only update tailPageId here
 //return mode1Page
-//TODO unchecked
 func (tm *TableManipulator) NewTailPageMode12GroupToTable(tableId uint32, data []byte) *storage.DataPage {
 	se := storage.GetStorageEngine()
 	transaction := storage.GetTransaction()
@@ -124,7 +122,6 @@ func (tm *TableManipulator) NewTailPageMode12GroupToTable(tableId uint32, data [
 
 //delete a mode 0 page from this table
 //update k_table if tuple number or tailPageId is changed
-//TODO unchecked
 func (tm *TableManipulator) DeletePageMode0FromTable(tableId uint32, pageId uint32) {
 	se := storage.GetStorageEngine()
 	transaction := storage.GetTransaction()
@@ -176,7 +173,6 @@ func (tm *TableManipulator) DeletePageMode0FromTable(tableId uint32, pageId uint
 
 //delete a group of mode1 and mode2 pages
 //inputed pageId is the pageId of mode1 page
-//TODO unchecked
 func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId uint32) {
 	se := storage.GetStorageEngine()
 	transaction := storage.GetTransaction()
@@ -251,7 +247,6 @@ func (tm *TableManipulator) DeletePageMode1And2FromTable(tableId uint32, pageId 
 //insert a tuple into a table
 //assign a new tupleId according to k_table
 //if this tuple is too long and can not be pushed in one page, push it into a group of pages in mode1 and mode2
-//TODO unchecked
 func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *container.Tuple) {
 	ktm := GetKeytableManager()
 	se := storage.GetStorageEngine()
@@ -289,7 +284,6 @@ func (tm *TableManipulator) InsertTupleIntoTable(tableId uint32, tuple *containe
 
 //delete the tuple according to its tupleId
 //return deletedTuple
-//TODO unchecked
 func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, tupleId uint32) *container.Tuple {
 	se := storage.GetStorageEngine()
 	ktm := GetKeytableManager()
@@ -332,7 +326,6 @@ func (tm *TableManipulator) DeleteTupleFromTable(tableId uint32, tupleId uint32)
 }
 
 //replace the tuple with tupleId by newTuple
-//TODO unchecked
 func (tm *TableManipulator) UpdateTupleFromTable(tableId uint32, tupleId uint32, newTuple *container.Tuple) {
 	//delete the tuple
 	tm.DeleteTupleFromTable(tableId, tupleId)
@@ -348,7 +341,6 @@ func (tm *TableManipulator) UpdateTupleFromTable(tableId uint32, tupleId uint32,
 //return the tuple and the pageId
 //throw error if no such tuple
 //TODO update use index to accalarate
-//TODO unchecked
 func (tm *TableManipulator) QueryTupleFromTableByTupleId(tableId uint32, tupleId uint32) (*container.Tuple, uint32, error) {
 	se := storage.GetStorageEngine()
 	ktm := GetKeytableManager()
