@@ -11,7 +11,7 @@ const (
 
 type Condition struct {
 	ConditionType ConditionEnum
-	Predicate     Predicate
+	Predicate     *Predicate
 	ConditionL    *Condition
 	ConditionR    *Condition
 }

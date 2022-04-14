@@ -24,6 +24,7 @@ func NewSelectionIterator(condition *container.Condition) *SelectionIterator {
 
 //throw error if iterator1 is nil or iterator2 is not nil
 func (si *SelectionIterator) Open(iterator1 Iterator, iterator2 Iterator) error {
+
 	//throw error if iterator1 is nil or iterator2 is not nil
 	if iterator1 == nil || iterator2 != nil {
 		return errors.New("selectionIterator.go    Open() parameter invalid")

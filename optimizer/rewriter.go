@@ -120,6 +120,146 @@ func (rw *Rewriter) ASTNodeToSchema(schemaAst *parser.ASTNode) (*container.Schem
 	return newSchema, nil
 }
 
+//turn a conditionNode in AST to a Condition struct
+func (rw *Rewriter) ConditionNodeToCondition(conditionNode *parser.ConditionNode, tableSchema *container.Schema) (*container.Condition, error) {
+	newCondition := &container.Condition{}
+
+	switch conditionNode.Type {
+	case parser.CONDITION_PREDICATE:
+		newCondition.ConditionType = container.CONDITION_PREDICATE
+		newPredicate, err := rw.PredicateNodeToPredicate(conditionNode.Predicate, tableSchema)
+		if err != nil {
+			return nil, err
+		} else {
+			newCondition.Predicate = newPredicate
+		}
+	case parser.CONDITION_AND:
+		newCondition.ConditionType = container.CONDITION_AND
+		newConditionL, errL := rw.ConditionNodeToCondition(conditionNode.ConditionL, tableSchema)
+		if errL != nil {
+			return nil, errL
+		}
+		newConditionR, errR := rw.ConditionNodeToCondition(conditionNode.ConditionR, tableSchema)
+		if errR != nil {
+			return nil, errR
+		}
+		newCondition.ConditionL = newConditionL
+		newCondition.ConditionR = newConditionR
+
+	case parser.CONDITION_OR:
+		newCondition.ConditionType = container.CONDITION_OR
+		newConditionL, errL := rw.ConditionNodeToCondition(conditionNode.ConditionL, tableSchema)
+		if errL != nil {
+			return nil, errL
+		}
+		newConditionR, errR := rw.ConditionNodeToCondition(conditionNode.ConditionR, tableSchema)
+		if errR != nil {
+			return nil, errR
+		}
+		newCondition.ConditionL = newConditionL
+		newCondition.ConditionR = newConditionR
+	}
+
+	return newCondition, nil
+}
+
+//turn a predicateNode in AST to a predicate struct
+//TODO unfinished RightAttributeIndex, AttributeIndexList, Relation
+func (rw *Rewriter) PredicateNodeToPredicate(predicateNode *parser.PredicateNode, tableSchema *container.Schema) (*container.Predicate, error) {
+	newPredicate := &container.Predicate{}
+
+	//set PredicateType
+	switch predicateNode.Type {
+	case parser.PREDICATE_COMPARE_ELEMENTARY_VALUE:
+		newPredicate.PredicateType = 1
+	case parser.PREDICATE_LIKE_STRING_VALUE:
+		newPredicate.PredicateType = 2
+	case parser.PREDICATE_IN_SUBQUERY:
+		newPredicate.PredicateType = 3
+	case parser.PREDICATE_NOT_IN_SUBQUERY:
+		newPredicate.PredicateType = 4
+	case parser.PREDICATE_IN_TABLE:
+		newPredicate.PredicateType = 3
+	case parser.PREDICATE_NOT_IN_TABLE:
+		newPredicate.PredicateType = 4
+	case parser.PREDICATE_COMPARE_ALL_SUBQUERY:
+		newPredicate.PredicateType = 5
+	case parser.PREDICATE_COMPARE_NOT_ALL_SUBQUERY:
+		newPredicate.PredicateType = 6
+	case parser.PREDICATE_COMPARE_ANY_SUBQUERY:
+		newPredicate.PredicateType = 7
+	case parser.PREDICATE_COMPARE_NOT_ANY_SUBQUERY:
+		newPredicate.PredicateType = 8
+	case parser.PREDICATE_COMPARE_ALL_TABLE:
+		newPredicate.PredicateType = 5
+	case parser.PREDICATE_COMPARE_NOT_ALL_TABLE:
+		newPredicate.PredicateType = 6
+	case parser.PREDICATE_COMPARE_ANY_TABLE:
+		newPredicate.PredicateType = 7
+	case parser.PREDICATE_COMPARE_NOT_ANY_TABLE:
+		newPredicate.PredicateType = 8
+	case parser.PREDICATE_IS_NULL:
+		newPredicate.PredicateType = 9
+	case parser.PREDICATE_IS_NOT_NULL:
+		newPredicate.PredicateType = 10
+	case parser.PREDICATE_TUPLE_IN_SUBQUERY:
+		newPredicate.PredicateType = 11
+	case parser.PREDICATE_TUPLE_NOT_IN_SUBQUERY:
+		newPredicate.PredicateType = 12
+	case parser.PREDICATE_TUPLE_IN_TABLE:
+		newPredicate.PredicateType = 11
+	case parser.PREDICATE_TUPLE_NOT_IN_TABLE:
+		newPredicate.PredicateType = 12
+	case parser.PREDICATE_SUBQUERY_EXISTS:
+		newPredicate.PredicateType = 13
+	case parser.PREDICATE_SUBQUERY_NOT_EXISTS:
+		newPredicate.PredicateType = 14
+	}
+
+	//set CompareMark
+	switch predicateNode.CompareMark {
+	case parser.COMPAREMARK_EQUAL:
+		newPredicate.CompareMark = 1
+	case parser.COMPAREMARK_NOTEQUAL:
+		newPredicate.CompareMark = 2
+	case parser.COMPAREMARK_LESS:
+		newPredicate.CompareMark = 3
+	case parser.COMPAREMARK_GREATER:
+		newPredicate.CompareMark = 4
+	case parser.COMPAREMARK_LESSEQUAL:
+		newPredicate.CompareMark = 5
+	case parser.COMPAREMARK_GREATEREQUAL:
+		newPredicate.CompareMark = 6
+	}
+
+	//set CompareValueType, CompareIntValue, CompareFloatValue, CompareStringValue, CompareBooleanValue
+	switch predicateNode.ElementaryValue.Type {
+	case parser.ELEMENTARY_VALUE_INT:
+		newPredicate.CompareValueType = 1
+		newPredicate.CompareIntValue = predicateNode.ElementaryValue.IntValue
+	case parser.ELEMENTARY_VALUE_FLOAT:
+		newPredicate.CompareValueType = 2
+		newPredicate.CompareFloatValue = predicateNode.ElementaryValue.FloatValue
+	case parser.ELEMENTARY_VALUE_STRING:
+		newPredicate.CompareValueType = 3
+		newPredicate.CompareStringValue = predicateNode.ElementaryValue.StringValue
+	case parser.ELEMENTARY_VALUE_BOOLEAN:
+		newPredicate.CompareValueType = 4
+		newPredicate.CompareBooleanValue = predicateNode.ElementaryValue.BooleanValue
+	}
+
+	//set LeftAttributeIndex
+	comparedDomainName := predicateNode.AttriNameWithTableNameL.AttributeName
+	for i, domain := range tableSchema.GetSchemaDomains() {
+		if domain.GetDomainName() == comparedDomainName {
+			newPredicate.LeftAttributeIndex = i
+			return newPredicate, nil
+		}
+	}
+
+	return nil, errors.New("rewriter.go    PredicateNodeToPredicate() can not find LeftAttributeIndex")
+}
+
 func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.PhysicalPlan {
 	switch astNode.Type {
 	case parser.AST_DDL: //DDL
@@ -148,9 +288,10 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 		}
 	case parser.AST_DML: //DML
 		switch astNode.Dml.Type {
-		case parser.DML_INSERT:
+		case parser.DML_INSERT: //TODO
 			var parameter []string
 
+			//insert tableName first
 			parameter = append(parameter, astNode.Dml.Insert.TableName)
 
 			for _, value := range astNode.Dml.Insert.ElementaryValueList {

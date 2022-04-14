@@ -59,7 +59,7 @@ func (predicator *Predicator) CheckPredicate(predicate *container.Predicate, tup
 func (predicator *Predicator) CheckCondition(condition *container.Condition, tuple *container.Tuple) bool {
 	switch condition.ConditionType {
 	case container.CONDITION_PREDICATE:
-		return predicator.CheckPredicate(&condition.Predicate, tuple)
+		return predicator.CheckPredicate(condition.Predicate, tuple)
 	case container.CONDITION_AND:
 		boolLeft := predicator.CheckCondition(condition.ConditionL, tuple)
 		boolRight := predicator.CheckCondition(condition.ConditionR, tuple)
