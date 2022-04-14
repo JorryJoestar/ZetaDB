@@ -3,11 +3,9 @@ package main
 import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
-	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
-	"fmt"
 	"sync"
 )
 
@@ -34,28 +32,30 @@ func GetInstance() *Kernel {
 
 func main() {
 	//ktm := execution.GetKeytableManager()
-	ee := execution.GetExecutionEngine()
+	//ee := execution.GetExecutionEngine()
 	//tm := execution.GetTableManipulator()
-	Parse := parser.GetParser()
-	rewriter := optimizer.GetRewriter()
+	//Parse := parser.GetParser()
+	//rewriter := optimizer.GetRewriter()
 
 	transaction := storage.GetTransaction()
 	//ktm.InitializeSystem()
 
-	//sql := "create table x(name varchar(20));"
-	sql := "drop table x;"
-	astNode, _ := Parse.ParseSql(sql)
-	pp := rewriter.ASTNodeToPhysicalPlan(1, astNode, sql)
-	result := ee.ExecutePhysicalPlan(pp)
-	fmt.Println(result)
+	//sql := "create table student(id int, name varchar(20));"
+	//sql := "drop table student;"
+	//sql := "insert into student values (4320, 'ClaireMao');"
+	//astNode, _ := Parse.ParseSql(sql)
+	//pp := rewriter.ASTNodeToPhysicalPlan(1, astNode, sql)
+	//result := ee.ExecutePhysicalPlan(pp)
+	//fmt.Println(result)
 
 	transaction.PushTransactionIntoDisk()
 
-	PrintTable(2)
-	PrintTable(8)
-	PrintTable(9)
-	PrintTable(15)
+	//PrintTable(2)
+	//PrintTable(8)
+	//PrintTable(9)
+	//PrintTable(15)
 
+	PrintTableByName("student")
 }
 
 func getNewTuple(id int32, name string) *container.Tuple {

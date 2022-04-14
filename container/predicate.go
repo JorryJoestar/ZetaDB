@@ -16,7 +16,6 @@ type Predicate struct {
 		AttriListNotInRelation PredicateType = 12
 		Exists                 PredicateType = 13
 		NotExists              PredicateType = 14
-
 	*/
 	PredicateType uint8
 

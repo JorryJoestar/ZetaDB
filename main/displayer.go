@@ -3,7 +3,7 @@ package main
 import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
-	its "ZetaDB/execution/querySubOperator"
+	its "ZetaDB/querySubOperator"
 	. "ZetaDB/utility"
 	"fmt"
 	"strconv"
@@ -283,4 +283,10 @@ func PrintTable(tableId uint32) {
 
 	result := TableToString(schema, tuples)
 	fmt.Println(result)
+}
+
+func PrintTableByName(tableName string) {
+	ktm := execution.GetKeytableManager()
+	tableId, _, _ := ktm.Query_k_tableId_schema_FromTableName(tableName)
+	PrintTable(tableId)
 }

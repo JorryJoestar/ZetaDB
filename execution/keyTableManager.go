@@ -2,9 +2,9 @@ package execution
 
 import (
 	"ZetaDB/container"
-	its "ZetaDB/execution/querySubOperator"
 	"ZetaDB/optimizer"
 	"ZetaDB/parser"
+	its "ZetaDB/querySubOperator"
 	"ZetaDB/storage"
 	. "ZetaDB/utility"
 	"errors"

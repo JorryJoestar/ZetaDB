@@ -150,14 +150,17 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 		switch astNode.Dml.Type {
 		case parser.DML_INSERT:
 			var parameter []string
+
+			parameter = append(parameter, astNode.Dml.Insert.TableName)
+
 			for _, value := range astNode.Dml.Insert.ElementaryValueList {
 				switch value.Type {
 				case parser.ELEMENTARY_VALUE_INT:
 					parameter = append(parameter, strconv.Itoa(value.IntValue))
 				case parser.ELEMENTARY_VALUE_FLOAT:
-					parameter = append(parameter)
+					parameter = append(parameter, strconv.FormatFloat(value.FloatValue, 'f', -1, 64))
 				case parser.ELEMENTARY_VALUE_STRING:
-					parameter = append(parameter)
+					parameter = append(parameter, value.StringValue)
 				case parser.ELEMENTARY_VALUE_BOOLEAN:
 					if value.BooleanValue {
 						parameter = append(parameter, "TRUE")
@@ -170,6 +173,14 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 			return container.NewPhysicalPlan(container.INSERT, parameter, nil)
 		case parser.DML_UPDATE:
 		case parser.DML_DELETE:
+			//insert tableName first
+			var parameter []string
+			parameter = append(parameter, astNode.Dml.Delete.TableName)
+			//find tupleIds of tuples that are about to be deleted
+			//var tuples []uint32
+			//TODO
+
+			return container.NewPhysicalPlan(container.DELETE, parameter, nil)
 		}
 	case parser.AST_DCL: //DCL
 	case parser.AST_DQL: //DQL

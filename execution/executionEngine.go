@@ -2,9 +2,9 @@ package execution
 
 import (
 	"ZetaDB/container"
-	subOperator "ZetaDB/execution/querySubOperator"
 	"ZetaDB/optimizer"
 	"ZetaDB/parser"
+	subOperator "ZetaDB/querySubOperator"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
 	"strconv"
@@ -41,6 +41,9 @@ func (ee *ExecutionEngine) ExecutePhysicalPlan(pp *container.PhysicalPlan) strin
 	switch pp.PlanType {
 	case container.INITIALIZE_SYSTEM:
 	case container.INSERT:
+		tableName := pp.Parameter[0]
+		fieldStrings := pp.Parameter[1:]
+		ee.InsertOperator(tableName, fieldStrings)
 	case container.DELETE:
 	case container.UPDATE:
 	case container.QUERY:
@@ -289,7 +292,10 @@ func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) (*container
 	return nil, nil
 }
 
-func (ee *ExecutionEngine) DeleteOperator() {}
+func (ee *ExecutionEngine) DeleteOperator(tableName string, tupleId uint32) {
+	tableId, _, _ := ee.ktm.Query_k_tableId_schema_FromTableName(tableName)
+	ee.tm.DeleteTupleFromTable(tableId, tupleId)
+}
 
 func (ee *ExecutionEngine) UpdateOperator() {}
 
