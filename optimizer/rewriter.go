@@ -147,6 +147,30 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 		case parser.DDL_PSM_DROP:
 		}
 	case parser.AST_DML: //DML
+		switch astNode.Dml.Type {
+		case parser.DML_INSERT:
+			var parameter []string
+			for _, value := range astNode.Dml.Insert.ElementaryValueList {
+				switch value.Type {
+				case parser.ELEMENTARY_VALUE_INT:
+					parameter = append(parameter, strconv.Itoa(value.IntValue))
+				case parser.ELEMENTARY_VALUE_FLOAT:
+					parameter = append(parameter)
+				case parser.ELEMENTARY_VALUE_STRING:
+					parameter = append(parameter)
+				case parser.ELEMENTARY_VALUE_BOOLEAN:
+					if value.BooleanValue {
+						parameter = append(parameter, "TRUE")
+					} else {
+						parameter = append(parameter, "FALSE")
+					}
+				}
+			}
+
+			return container.NewPhysicalPlan(container.INSERT, parameter, nil)
+		case parser.DML_UPDATE:
+		case parser.DML_DELETE:
+		}
 	case parser.AST_DCL: //DCL
 	case parser.AST_DQL: //DQL
 

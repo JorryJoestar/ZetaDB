@@ -214,6 +214,75 @@ func (ee *ExecutionEngine) DropTableOperator(tableName string) {
 	}
 }
 
+//insert
+func (ee *ExecutionEngine) InsertOperator(tableName string, fieldStrings []string) {
+	tableId, tableSchema, _ := ee.ktm.Query_k_tableId_schema_FromTableName(tableName)
+
+	var fields []*container.Field
+	for i, fieldString := range fieldStrings {
+		domain, _ := tableSchema.GetSchemaDomain(i)
+		var dataBytes []byte
+		switch domain.GetDomainType() {
+		case container.CHAR:
+			dataBytes, _ = utility.CHARToBytes(fieldString)
+		case container.VARCHAR:
+			dataBytes, _ = utility.VARCHARToBytes(fieldString)
+		case container.BIT:
+			dataBytes = []byte(fieldString)
+		case container.BITVARYING:
+			dataBytes = []byte(fieldString)
+		case container.BOOLEAN:
+			var boolValue bool
+			if fieldString == "FALSE" {
+				boolValue = false
+			} else {
+				boolValue = true
+			}
+			dataByte := utility.BOOLEANToByte(boolValue)
+			dataBytes[0] = dataByte
+		case container.INT:
+			i, _ := strconv.ParseInt(fieldString, 10, 32)
+			dataBytes = utility.INTToBytes(int32(i))
+		case container.INTEGER:
+			i, _ := strconv.ParseInt(fieldString, 10, 32)
+			dataBytes = utility.IntegerToBytes(int32(i))
+		case container.SHORTINT:
+			i, _ := strconv.ParseInt(fieldString, 10, 16)
+			dataBytes = utility.SHORTINTToBytes(int16(i))
+		case container.FLOAT:
+			f, _ := strconv.ParseFloat(fieldString, 32)
+			dataBytes = utility.FLOATToBytes(float32(f))
+		case container.REAL:
+			f, _ := strconv.ParseFloat(fieldString, 32)
+			dataBytes = utility.REALToBytes(float32(f))
+		case container.DOUBLEPRECISION:
+			f, _ := strconv.ParseFloat(fieldString, 64)
+			dataBytes = utility.DOUBLEPRECISIONToBytes(f)
+		case container.DECIMAL:
+			f, _ := strconv.ParseFloat(fieldString, 64)
+			n, _ := domain.GetDomainN()
+			d, _ := domain.GetDomainD()
+			dataBytes, _ = utility.DECIMALToBytes(f, int(n), int(d))
+		case container.NUMERIC:
+			f, _ := strconv.ParseFloat(fieldString, 64)
+			n, _ := domain.GetDomainN()
+			d, _ := domain.GetDomainD()
+			dataBytes, _ = utility.NUMERICToBytes(f, int(n), int(d))
+		case container.DATE:
+			dataBytes, _ = utility.DATEToBytes(fieldString)
+		case container.TIME:
+			dataBytes, _ = utility.TIMEToBytes(fieldString)
+		}
+
+		newField, _ := container.NewFieldFromBytes(dataBytes)
+		fields = append(fields, newField)
+	}
+
+	newTuple, _ := container.NewTuple(tableId, 0, tableSchema, fields)
+
+	ee.tm.InsertTupleIntoTable(tableId, newTuple)
+}
+
 //generate a tree of iterators from physicalPlan and execute it
 //return resultSchema and resultTuples
 func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) (*container.Schema, []*container.Tuple) {
@@ -221,7 +290,7 @@ func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) (*container
 }
 
 func (ee *ExecutionEngine) DeleteOperator() {}
-func (ee *ExecutionEngine) InsertOperator() {}
+
 func (ee *ExecutionEngine) UpdateOperator() {}
 
 //TODO
