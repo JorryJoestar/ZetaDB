@@ -4,6 +4,7 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
 	"errors"
+	"strconv"
 	"sync"
 )
 
@@ -117,4 +118,38 @@ func (rw *Rewriter) ASTNodeToSchema(schemaAst *parser.ASTNode) (*container.Schem
 	}
 
 	return newSchema, nil
+}
+
+func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.PhysicalPlan {
+	switch astNode.Type {
+	case parser.AST_DDL: //DDL
+		switch astNode.Ddl.Type {
+		case parser.DDL_TABLE_CREATE:
+			var parameter []string
+			parameter = append(parameter, strconv.Itoa(int(userId)))
+			parameter = append(parameter, sqlString)
+			return container.NewPhysicalPlan(container.CREATE_TABLE, parameter, nil)
+		case parser.DDL_TABLE_DROP:
+			var parameter []string
+			parameter = append(parameter, astNode.Ddl.Table.TableName)
+			return container.NewPhysicalPlan(container.DROP_TABLE, parameter, nil)
+		case parser.DDL_TABLE_ALTER_ADD:
+		case parser.DDL_TABLE_ALTER_DROP:
+		case parser.DDL_ASSERT_CREATE:
+		case parser.DDL_ASSERT_DROP:
+		case parser.DDL_VIEW_CREATE:
+		case parser.DDL_VIEW_DROP:
+		case parser.DDL_INDEX_CREATE:
+		case parser.DDL_INDEX_DROP:
+		case parser.DDL_TRIGGER_CREATE:
+		case parser.DDL_TRIGGER_DROP:
+		case parser.DDL_PSM_CREATE:
+		case parser.DDL_PSM_DROP:
+		}
+	case parser.AST_DML: //DML
+	case parser.AST_DCL: //DCL
+	case parser.AST_DQL: //DQL
+
+	}
+	return nil
 }

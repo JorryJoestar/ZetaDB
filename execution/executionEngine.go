@@ -7,6 +7,7 @@ import (
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
+	"strconv"
 	"sync"
 )
 
@@ -34,6 +35,48 @@ func GetExecutionEngine() *ExecutionEngine {
 	eeInstance.ktm = GetKeytableManager()
 
 	return eeInstance
+}
+
+func (ee *ExecutionEngine) ExecutePhysicalPlan(pp *container.PhysicalPlan) string {
+	switch pp.PlanType {
+	case container.INITIALIZE_SYSTEM:
+	case container.INSERT:
+	case container.DELETE:
+	case container.UPDATE:
+	case container.QUERY:
+	case container.CREATE_TABLE:
+		userIdINT, _ := strconv.Atoi(pp.Parameter[0])
+		userId := int32(userIdINT)
+		schemaString := pp.Parameter[1]
+		ee.CreateTableOperator(userId, schemaString)
+	case container.DROP_TABLE:
+		tableName := pp.Parameter[0]
+		ee.DropTableOperator(tableName)
+	case container.ALTER_TABLE_ADD:
+	case container.ALTER_TABLE_DROP:
+	case container.CREATE_ASSERT:
+	case container.DROP_ASSERT:
+	case container.CREATE_VIEW:
+	case container.DROP_VIEW:
+	case container.CREATE_INDEX:
+	case container.DROP_INDEX:
+	case container.CREATE_TRIGGER:
+	case container.DROP_TRIGGER:
+	case container.CREATE_PSM:
+	case container.DROP_PSM:
+	case container.SHOW_TABLES:
+	case container.SHOW_ASSERTIONS:
+	case container.SHOW_VIEWS:
+	case container.SHOW_INDEXS:
+	case container.SHOW_TRIGGERS:
+	case container.SHOW_FUNCTIONS:
+	case container.SHOW_PROCEDURES:
+	case container.CREATE_USER:
+	case container.LOG_USER:
+	case container.PSM_CALL:
+	}
+
+	return ""
 }
 
 //initialze the whole system, create key tables and insert necessary tuples into these tables

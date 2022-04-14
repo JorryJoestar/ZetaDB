@@ -3,9 +3,11 @@ package main
 import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
+	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
+	"fmt"
 	"sync"
 )
 
@@ -31,32 +33,21 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	//socket := network.GetSocket()
-	//socket.Listen()
-
 	//ktm := execution.GetKeytableManager()
 	ee := execution.GetExecutionEngine()
 	//tm := execution.GetTableManipulator()
+	Parse := parser.GetParser()
+	rewriter := optimizer.GetRewriter()
 
 	transaction := storage.GetTransaction()
-
 	//ktm.InitializeSystem()
 
-	//ee.CreateTableOperator(10, "create table x(id int primary key, longString varchar(100000));")
-
-	/* 	ee.CreateTableOperator(10, "create table m(id int primary key, longString varchar(100000));") */
-
-	/* 	var longS string
-	   	for i := 1; i <= 5000; i++ {
-	   		longS += "b"
-	   	}
-
-	   	newTuple := getNewTuple(2, "ClaireMao")
-	   	tm.InsertTupleIntoTable(17, newTuple) */
-
-	//tm.DeleteTupleFromTable(17, 13)
-
-	ee.DropTableOperator("m")
+	//sql := "create table x(name varchar(20));"
+	sql := "drop table x;"
+	astNode, _ := Parse.ParseSql(sql)
+	pp := rewriter.ASTNodeToPhysicalPlan(1, astNode, sql)
+	result := ee.ExecutePhysicalPlan(pp)
+	fmt.Println(result)
 
 	transaction.PushTransactionIntoDisk()
 
@@ -81,3 +72,19 @@ func getNewTuple(id int32, name string) *container.Tuple {
 	tuple, _ := container.NewTuple(0, 0, schema0, fields)
 	return tuple
 }
+
+//socket := network.GetSocket()
+//socket.Listen()
+//ee.CreateTableOperator(10, "create table x(id int primary key, longString varchar(100000));")
+
+/* 	ee.CreateTableOperator(10, "create table m(id int primary key, longString varchar(100000));") */
+
+/* 	var longS string
+   	for i := 1; i <= 5000; i++ {
+   		longS += "b"
+   	}
+
+   	newTuple := getNewTuple(2, "ClaireMao")
+   	tm.InsertTupleIntoTable(17, newTuple) */
+
+//tm.DeleteTupleFromTable(17, 13)

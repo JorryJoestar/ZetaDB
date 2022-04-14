@@ -5,7 +5,6 @@ package parser
 import "C"
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -390,7 +389,7 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 func (p *calcLex) Error(s string) {
 	p.lastErr = errors.New("yacc: " + s)
 	if err := p.lastErr; err != nil {
-		log.Println(err)
+		//log.Println(err)
 		Parser := GetParser()
 		Parser.err = err
 	}
