@@ -30,7 +30,7 @@ func (socket *Socket) Listen() {
 	listener, _ := net.ListenTCP("tcp", tcp_addr)
 	for {
 		log.Println("[server] listening", tcp_addr.String())
-		// 等待客户端连接
+		// wait for client connection
 		conn, err := listener.Accept()
 		if err != nil {
 			continue
