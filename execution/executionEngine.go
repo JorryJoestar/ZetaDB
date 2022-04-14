@@ -2,7 +2,6 @@ package execution
 
 import (
 	"ZetaDB/container"
-	"ZetaDB/optimizer"
 	"ZetaDB/parser"
 	subOperator "ZetaDB/querySubOperator"
 	"ZetaDB/storage"
@@ -14,7 +13,7 @@ import (
 type ExecutionEngine struct {
 	se       *storage.StorageEngine
 	parser   *parser.Parser
-	rewriter *optimizer.Rewriter
+	rewriter *Rewriter
 	ktm      *KeytableManager
 	tm       *TableManipulator
 }
@@ -29,7 +28,7 @@ func GetExecutionEngine() *ExecutionEngine {
 		eeInstance = &ExecutionEngine{
 			se:       storage.GetStorageEngine(),
 			parser:   parser.GetParser(),
-			rewriter: &optimizer.Rewriter{}}
+			rewriter: &Rewriter{}}
 	})
 	eeInstance.tm = GetTableManipulator()
 	eeInstance.ktm = GetKeytableManager()

@@ -35,19 +35,16 @@ const (
 )
 
 type PhysicalPlan struct {
-	PlanType      PhysicalPlanType
-	Parameter     []string       //used by all operators except query
-	QueryTreeRoot *QueryTreeNode //used by query operator
+	PlanType        PhysicalPlanType
+	Parameter       []string         //used by all operators except query
+	LogicalPlanRoot *LogicalPlanNode //used by query operator
 }
 
 //PhysicalPlan generator
-func NewPhysicalPlan(planType PhysicalPlanType, parameter []string, queryTreeRoot *QueryTreeNode) *PhysicalPlan {
+func NewPhysicalPlan(planType PhysicalPlanType, parameter []string, logicalPlanRoot *LogicalPlanNode) *PhysicalPlan {
 	return &PhysicalPlan{
-		PlanType:      planType,
-		Parameter:     parameter,
-		QueryTreeRoot: queryTreeRoot,
+		PlanType:        planType,
+		Parameter:       parameter,
+		LogicalPlanRoot: logicalPlanRoot,
 	}
-}
-
-type QueryTreeNode struct {
 }

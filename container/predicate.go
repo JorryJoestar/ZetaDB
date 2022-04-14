@@ -44,5 +44,5 @@ type Predicate struct {
 	LeftAttributeIndex  int
 	RightAttributeIndex int
 	AttributeIndexList  []int
-	Relation            LogicalPlan
+	Relation            LogicalPlanNode
 }

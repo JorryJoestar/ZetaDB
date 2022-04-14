@@ -1,80 +1,37 @@
 package container
 
-//default as bag operation
-type LogicalPlan struct {
-	TopNode LogicalPlanNode
-}
+type LogicalPlanNodeEnum uint8
 
-type LogicalPlanNode interface {
-}
+const (
+	BAG_DIFFERENCE         LogicalPlanNodeEnum = 1
+	BAG_INTERSECTION       LogicalPlanNodeEnum = 2
+	BAG_UNION              LogicalPlanNodeEnum = 3
+	DUPLICATE_ELIMINATION  LogicalPlanNodeEnum = 4
+	GROUPING               LogicalPlanNodeEnum = 5
+	INDEX_FILEREADER       LogicalPlanNodeEnum = 6
+	NATURAL_JOIN           LogicalPlanNodeEnum = 7
+	PRODUCT                LogicalPlanNodeEnum = 8
+	PROJECTION             LogicalPlanNodeEnum = 9
+	RENAME                 LogicalPlanNodeEnum = 10
+	SELECTION              LogicalPlanNodeEnum = 11
+	SEQUENTIAL_FILE_READER LogicalPlanNodeEnum = 12
+	SET_DIFFERENCE         LogicalPlanNodeEnum = 13
+	SET_INTERSECTION       LogicalPlanNodeEnum = 14
+	SET_UNION              LogicalPlanNodeEnum = 15
+	THETA_JOIN             LogicalPlanNodeEnum = 16
+)
 
-type UnionNode struct {
-	NodeL LogicalPlanNode
-	NodeR LogicalPlanNode
-}
+//TODO unfinished
+type LogicalPlanNode struct {
+	NodeType LogicalPlanNodeEnum
 
-type IntersectionNode struct {
-	NodeL LogicalPlanNode
-	NodeR LogicalPlanNode
-}
+	LeftNode  *LogicalPlanNode
+	RightNode *LogicalPlanNode
 
-type DifferenceNode struct {
-	NodeL LogicalPlanNode
-	NodeR LogicalPlanNode
-}
+	//SELECTION
+	Condition *Condition
 
-type SelectionNode struct {
-	Node            LogicalPlanNode
-	SelectCondition Condition
-}
-
-type ProjectionNode struct {
-	Node                LogicalPlanNode
-	ProjectionIndexList []int
-}
-
-type ProductNode struct {
-	NodeL LogicalPlanNode
-	NodeR LogicalPlanNode
-}
-
-type NaturalNode struct {
-	NodeL LogicalPlanNode
-	NodeR LogicalPlanNode
-}
-
-type ThetaNode struct {
-	NodeL          LogicalPlanNode
-	NodeR          LogicalPlanNode
-	ThetaCondition Condition
-}
-
-type RenameNode struct {
-	NewTableName         string
-	NewAttributeNameList []string
-}
-
-type GroupingNode struct {
-	Node                    LogicalPlanNode
-	GroupAttributeIndexList []int
-}
-
-type OrderNode struct {
-	Node                    LogicalPlanNode
-	OrderAttributeIndexList []int
-	OrderByAscending        []bool
-}
-
-type LimitNode struct {
-	Node      LogicalPlanNode
-	LimitNum  int
-	OffsetNum int
-}
-
-type DuplicateNode struct {
-	Node LogicalPlanNode
-}
-
-type RelationNode struct {
-	TableId uint32
+	//SEQUENTIAL_FILE_READER
+	TableHeadPageId uint32
+	Schema          *Schema
 }

@@ -1,4 +1,4 @@
-package optimizer
+package execution
 
 import (
 	"ZetaDB/container"
@@ -317,11 +317,13 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 			//insert tableName first
 			var parameter []string
 			parameter = append(parameter, astNode.Dml.Delete.TableName)
-			//find tupleIds of tuples that are about to be deleted
-			//var tuples []uint32
-			//TODO
+			//ktm := GetKeytableManager()
 
-			return container.NewPhysicalPlan(container.DELETE, parameter, nil)
+			logicalPlanRoot := &container.LogicalPlanNode{
+				NodeType: container.SELECTION,
+			}
+
+			return container.NewPhysicalPlan(container.DELETE, parameter, logicalPlanRoot)
 		}
 	case parser.AST_DCL: //DCL
 	case parser.AST_DQL: //DQL
