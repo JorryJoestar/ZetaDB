@@ -3,7 +3,7 @@ package execution
 import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
-	its "ZetaDB/querySubOperator"
+	its "ZetaDB/physicalPlan"
 	"ZetaDB/storage"
 	. "ZetaDB/utility"
 	"errors"

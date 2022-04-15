@@ -260,7 +260,7 @@ func (rw *Rewriter) PredicateNodeToPredicate(predicateNode *parser.PredicateNode
 	return nil, errors.New("rewriter.go    PredicateNodeToPredicate() can not find LeftAttributeIndex")
 }
 
-func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.PhysicalPlan {
+func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.ExecutionPlan {
 	switch astNode.Type {
 	case parser.AST_DDL: //DDL
 		switch astNode.Ddl.Type {
@@ -268,11 +268,11 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 			var parameter []string
 			parameter = append(parameter, strconv.Itoa(int(userId)))
 			parameter = append(parameter, sqlString)
-			return container.NewPhysicalPlan(container.CREATE_TABLE, parameter, nil)
+			return container.NewExecutionPlan(container.EP_CREATE_TABLE, parameter, nil)
 		case parser.DDL_TABLE_DROP:
 			var parameter []string
 			parameter = append(parameter, astNode.Ddl.Table.TableName)
-			return container.NewPhysicalPlan(container.DROP_TABLE, parameter, nil)
+			return container.NewExecutionPlan(container.EP_DROP_TABLE, parameter, nil)
 		case parser.DDL_TABLE_ALTER_ADD:
 		case parser.DDL_TABLE_ALTER_DROP:
 		case parser.DDL_ASSERT_CREATE:
@@ -311,19 +311,32 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 				}
 			}
 
-			return container.NewPhysicalPlan(container.INSERT, parameter, nil)
+			return container.NewExecutionPlan(container.EP_INSERT, parameter, nil)
 		case parser.DML_UPDATE:
 		case parser.DML_DELETE:
-			//insert tableName first
+			//insert tableName into parameter
 			var parameter []string
 			parameter = append(parameter, astNode.Dml.Delete.TableName)
-			//ktm := GetKeytableManager()
 
+			//create logicalPlan
+			ktm := GetKeytableManager()
+			tableId, tableSchema, _ := ktm.Query_k_tableId_schema_FromTableName(astNode.Dml.Delete.TableName)
+			headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
+
+			Condition, _ := rw.ConditionNodeToCondition(astNode.Dml.Delete.Condition, tableSchema)
+
+			leftNodeOfRoot := &container.LogicalPlanNode{
+				NodeType:        container.SEQUENTIAL_FILE_READER,
+				TableHeadPageId: headPageId,
+				Schema:          tableSchema,
+			}
 			logicalPlanRoot := &container.LogicalPlanNode{
-				NodeType: container.SELECTION,
+				NodeType:  container.SELECTION,
+				Condition: Condition,
+				LeftNode:  leftNodeOfRoot,
 			}
 
-			return container.NewPhysicalPlan(container.DELETE, parameter, logicalPlanRoot)
+			return container.NewExecutionPlan(container.EP_DELETE, parameter, logicalPlanRoot)
 		}
 	case parser.AST_DCL: //DCL
 	case parser.AST_DQL: //DQL

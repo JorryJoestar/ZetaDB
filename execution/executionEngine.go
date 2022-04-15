@@ -3,7 +3,7 @@ package execution
 import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
-	subOperator "ZetaDB/querySubOperator"
+	subOperator "ZetaDB/physicalPlan"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
 	"strconv"
@@ -36,46 +36,46 @@ func GetExecutionEngine() *ExecutionEngine {
 	return eeInstance
 }
 
-func (ee *ExecutionEngine) ExecutePhysicalPlan(pp *container.PhysicalPlan) string {
+func (ee *ExecutionEngine) ExecutePhysicalPlan(pp *container.ExecutionPlan) string {
 	switch pp.PlanType {
-	case container.INITIALIZE_SYSTEM:
-	case container.INSERT:
+	case container.EP_INITIALIZE_SYSTEM:
+	case container.EP_INSERT:
 		tableName := pp.Parameter[0]
 		fieldStrings := pp.Parameter[1:]
 		ee.InsertOperator(tableName, fieldStrings)
-	case container.DELETE:
-	case container.UPDATE:
-	case container.QUERY:
-	case container.CREATE_TABLE:
+	case container.EP_DELETE:
+	case container.EP_UPDATE:
+	case container.EP_QUERY:
+	case container.EP_CREATE_TABLE:
 		userIdINT, _ := strconv.Atoi(pp.Parameter[0])
 		userId := int32(userIdINT)
 		schemaString := pp.Parameter[1]
 		ee.CreateTableOperator(userId, schemaString)
-	case container.DROP_TABLE:
+	case container.EP_DROP_TABLE:
 		tableName := pp.Parameter[0]
 		ee.DropTableOperator(tableName)
-	case container.ALTER_TABLE_ADD:
-	case container.ALTER_TABLE_DROP:
-	case container.CREATE_ASSERT:
-	case container.DROP_ASSERT:
-	case container.CREATE_VIEW:
-	case container.DROP_VIEW:
-	case container.CREATE_INDEX:
-	case container.DROP_INDEX:
-	case container.CREATE_TRIGGER:
-	case container.DROP_TRIGGER:
-	case container.CREATE_PSM:
-	case container.DROP_PSM:
-	case container.SHOW_TABLES:
-	case container.SHOW_ASSERTIONS:
-	case container.SHOW_VIEWS:
-	case container.SHOW_INDEXS:
-	case container.SHOW_TRIGGERS:
-	case container.SHOW_FUNCTIONS:
-	case container.SHOW_PROCEDURES:
-	case container.CREATE_USER:
-	case container.LOG_USER:
-	case container.PSM_CALL:
+	case container.EP_ALTER_TABLE_ADD:
+	case container.EP_ALTER_TABLE_DROP:
+	case container.EP_CREATE_ASSERT:
+	case container.EP_DROP_ASSERT:
+	case container.EP_CREATE_VIEW:
+	case container.EP_DROP_VIEW:
+	case container.EP_CREATE_INDEX:
+	case container.EP_DROP_INDEX:
+	case container.EP_CREATE_TRIGGER:
+	case container.EP_DROP_TRIGGER:
+	case container.EP_CREATE_PSM:
+	case container.EP_DROP_PSM:
+	case container.EP_SHOW_TABLES:
+	case container.EP_SHOW_ASSERTIONS:
+	case container.EP_SHOW_VIEWS:
+	case container.EP_SHOW_INDEXS:
+	case container.EP_SHOW_TRIGGERS:
+	case container.EP_SHOW_FUNCTIONS:
+	case container.EP_SHOW_PROCEDURES:
+	case container.EP_CREATE_USER:
+	case container.EP_LOG_USER:
+	case container.EP_PSM_CALL:
 	}
 
 	return ""
@@ -287,7 +287,7 @@ func (ee *ExecutionEngine) InsertOperator(tableName string, fieldStrings []strin
 
 //generate a tree of iterators from physicalPlan and execute it
 //return resultSchema and resultTuples
-func (ee *ExecutionEngine) QueryOperator(pp *container.PhysicalPlan) (*container.Schema, []*container.Tuple) {
+func (ee *ExecutionEngine) QueryOperator(pp *container.ExecutionPlan) (*container.Schema, []*container.Tuple) {
 	return nil, nil
 }
 

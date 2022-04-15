@@ -4,7 +4,7 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
 	"ZetaDB/parser"
-	its "ZetaDB/querySubOperator"
+	its "ZetaDB/physicalPlan"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
 	"fmt"
