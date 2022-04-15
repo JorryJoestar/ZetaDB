@@ -392,6 +392,42 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 		}
 	case parser.AST_DCL: //DCL
 	case parser.AST_DQL: //DQL
+		switch astNode.Dql.Type {
+		case parser.DQL_SINGLE_QUERY:
+
+			var logicalPlanRoot *container.LogicalPlanNode
+
+			ktm := GetKeytableManager()
+			//get tableId, schema, headPageId
+			tableName := astNode.Dql.Query.FromList[0].TableName
+			tableId, schema, _ := ktm.Query_k_tableId_schema_FromTableName(tableName)
+			headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
+
+			logicalPlanFromFile := &container.LogicalPlanNode{
+				NodeType:        container.SEQUENTIAL_FILE_READER,
+				TableHeadPageId: headPageId,
+				Schema:          schema,
+			}
+
+			if astNode.Dql.Query.WhereValid { //where clause valid
+
+				Condition, _ := rw.ConditionNodeToCondition(astNode.Dql.Query.WhereCondition, schema)
+
+				logicalPlanRoot = &container.LogicalPlanNode{
+					NodeType:  container.SELECTION,
+					LeftNode:  logicalPlanFromFile,
+					Condition: Condition,
+				}
+
+			} else {
+				logicalPlanRoot = logicalPlanFromFile
+			}
+
+			return container.NewExecutionPlan(container.EP_QUERY, nil, logicalPlanRoot)
+		case parser.DQL_UNION:
+		case parser.DQL_DIFFERENCE:
+		case parser.DQL_INTERSECTION:
+		}
 
 	}
 	return nil

@@ -1,15 +1,30 @@
-package main
+package execution
 
 import (
 	"ZetaDB/container"
-	"ZetaDB/execution"
 	its "ZetaDB/physicalPlan"
 	. "ZetaDB/utility"
 	"fmt"
 	"strconv"
+	"sync"
 )
 
-func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
+type Displayer struct {
+}
+
+//for singleton pattern
+var displayerInstance *Displayer
+var displayerOnce sync.Once
+
+//to get Predicator, call this function
+func GetDisplayer() *Displayer {
+	displayerOnce.Do(func() {
+		displayerInstance = &Displayer{}
+	})
+	return displayerInstance
+}
+
+func (displayer *Displayer) TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 	tableString := ""
 
 	fieldsNum := schema.GetSchemaDomainNum()
@@ -228,7 +243,7 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 	tableString += frameLine + "\n"
 
 	//loop and insert tupleLine
-	for j, tuple := range tupleStrings {
+	for _, tuple := range tupleStrings {
 		tupleString := "|"
 		for i, field := range tuple {
 			tupleString += " "
@@ -239,10 +254,7 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 			}
 			tupleString += "|"
 		}
-		//tupleId
-		tupleId := tuples[j].TupleGetTupleId()
-		tupleString += " "
-		tupleString += strconv.FormatUint(uint64(tupleId), 10)
+
 		tableString += tupleString + "\n"
 	}
 
@@ -264,9 +276,9 @@ func TableToString(schema *container.Schema, tuples []*container.Tuple) string {
 	return tableString
 }
 
-func PrintTable(tableId uint32) {
+func (displayer *Displayer) PrintTable(tableId uint32) {
 
-	ktm := execution.GetKeytableManager()
+	ktm := GetKeytableManager()
 	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
 
 	headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
@@ -281,12 +293,12 @@ func PrintTable(tableId uint32) {
 		tuples = append(tuples, tuple)
 	}
 
-	result := TableToString(schema, tuples)
+	result := displayer.TableToString(schema, tuples)
 	fmt.Println(result)
 }
 
-func PrintTableByName(tableName string) {
-	ktm := execution.GetKeytableManager()
+func (displayer *Displayer) PrintTableByName(tableName string) {
+	ktm := GetKeytableManager()
 	tableId, _, _ := ktm.Query_k_tableId_schema_FromTableName(tableName)
-	PrintTable(tableId)
+	displayer.PrintTable(tableId)
 }

@@ -1,8 +1,8 @@
 package execution
 
 import (
+	"ZetaDB/assister"
 	"ZetaDB/container"
-	"ZetaDB/predicator"
 	"errors"
 )
 
@@ -33,7 +33,7 @@ func (si *SelectionIterator) Open(iterator1 Iterator, iterator2 Iterator) error 
 	//set iterator1
 	si.iterator1 = iterator1
 
-	predicator := predicator.GetPredicator()
+	predicator := assister.GetPredicator()
 	for si.iterator1.HasNext() {
 		tuple, _ := si.iterator1.GetNext()
 		if predicator.CheckCondition(si.condition, tuple) {
@@ -55,7 +55,7 @@ func (si *SelectionIterator) GetNext() (*container.Tuple, error) {
 	//save currentTuple for return
 	tupleToReturn := si.currentTuple
 
-	predicator := predicator.GetPredicator()
+	predicator := assister.GetPredicator()
 	for si.iterator1.HasNext() {
 		tuple, _ := si.iterator1.GetNext()
 		if predicator.CheckCondition(si.condition, tuple) {

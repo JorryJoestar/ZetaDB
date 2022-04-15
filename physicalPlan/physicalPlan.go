@@ -19,3 +19,7 @@ func (pp *PhysicalPlan) HasNext() bool {
 func (pp *PhysicalPlan) GetNext() (*container.Tuple, error) {
 	return pp.entranceIterator.GetNext()
 }
+
+func (pp *PhysicalPlan) GetSchema() *container.Schema {
+	return pp.entranceIterator.GetSchema()
+}

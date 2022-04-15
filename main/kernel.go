@@ -45,7 +45,7 @@ func main() {
 	//sql := "drop table student;"
 	//sql := "insert into student values (976, 'Alex');"
 	//sql := "delete from student where id = 976;"
-	sql := "update student set name = 'jack' where id = 976;"
+	sql := "select * from student where id >1 and id <10;"
 	astNode, _ := Parse.ParseSql(sql)
 	pp := rewriter.ASTNodeToExecutionPlan(1, astNode, sql)
 	result := ee.Execute(pp)
@@ -57,8 +57,6 @@ func main() {
 	//PrintTable(8)
 	//PrintTable(9)
 	//PrintTable(15)
-
-	PrintTableByName("student")
 }
 
 func getNewTuple(id int32, name string) *container.Tuple {

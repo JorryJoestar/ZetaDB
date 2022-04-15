@@ -1,4 +1,4 @@
-package predicator
+package assister
 
 import (
 	"ZetaDB/container"

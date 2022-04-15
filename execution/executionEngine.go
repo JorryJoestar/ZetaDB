@@ -37,12 +37,14 @@ func GetExecutionEngine() *ExecutionEngine {
 }
 
 func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) string {
+	executeResult := ""
 	switch executionPlan.PlanType {
 	case container.EP_INITIALIZE_SYSTEM:
 	case container.EP_INSERT:
 		tableName := executionPlan.Parameter[0]
 		fieldStrings := executionPlan.Parameter[1:]
 		ee.InsertOperator(tableName, fieldStrings)
+		executeResult = "Execute OK, 1 row inserted"
 	case container.EP_DELETE: //DELETE
 		rw := GetRewriter()
 		ktm := GetExecutionEngine().ktm
@@ -59,6 +61,7 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 		for _, tupleToDelete := range tuplesToDelete {
 			tm.DeleteTupleFromTable(tableId, tupleToDelete.TupleGetTupleId())
 		}
+		executeResult = "Execute OK, " + strconv.Itoa(len(tuplesToDelete)) + " row deleted"
 	case container.EP_UPDATE:
 		rw := GetRewriter()
 
@@ -78,19 +81,31 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 				fieldString := executionPlan.Parameter[i+1]
 				fieldStrings[fieldIndex] = fieldString
 			}
-			ee.DeleteOperator(tableName, tupleToDelete.TupleGetTupleId())
-			ee.InsertOperator(tableName, fieldStrings)
+			ee.UpdateOperator(tableName, tupleToDelete, fieldStrings)
+		}
+		executeResult = "Execute OK, " + strconv.Itoa(len(tuplesToDelete)) + " row affected"
+	case container.EP_QUERY:
+		rw := GetRewriter()
+		physicalPlan := rw.LogicalPLanToPhysicalPlan(executionPlan.LogicalPlanRoot)
+
+		var resultTuples []*container.Tuple
+		for physicalPlan.HasNext() {
+			fetchedTuple, _ := physicalPlan.GetNext()
+			resultTuples = append(resultTuples, fetchedTuple)
 		}
 
-	case container.EP_QUERY:
+		displayer := GetDisplayer()
+		executeResult = displayer.TableToString(physicalPlan.GetSchema(), resultTuples)
 	case container.EP_CREATE_TABLE:
 		userIdINT, _ := strconv.Atoi(executionPlan.Parameter[0])
 		userId := int32(userIdINT)
 		schemaString := executionPlan.Parameter[1]
 		ee.CreateTableOperator(userId, schemaString)
+		executeResult = "Execute OK, new table created"
 	case container.EP_DROP_TABLE:
 		tableName := executionPlan.Parameter[0]
 		ee.DropTableOperator(tableName)
+		executeResult = "Execute OK, table created"
 	case container.EP_ALTER_TABLE_ADD:
 	case container.EP_ALTER_TABLE_DROP:
 	case container.EP_CREATE_ASSERT:
@@ -115,7 +130,7 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 	case container.EP_PSM_CALL:
 	}
 
-	return ""
+	return executeResult
 }
 
 //initialze the whole system, create key tables and insert necessary tuples into these tables
@@ -333,7 +348,10 @@ func (ee *ExecutionEngine) DeleteOperator(tableName string, tupleId uint32) {
 	ee.tm.DeleteTupleFromTable(tableId, tupleId)
 }
 
-func (ee *ExecutionEngine) UpdateOperator() {}
+func (ee *ExecutionEngine) UpdateOperator(tableName string, tupleToDelete *container.Tuple, fieldStrings []string) {
+	ee.DeleteOperator(tableName, tupleToDelete.TupleGetTupleId())
+	ee.InsertOperator(tableName, fieldStrings)
+}
 
 //TODO
 func (ee *ExecutionEngine) AlterTableAddOperator()  {}
