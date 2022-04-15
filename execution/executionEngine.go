@@ -60,9 +60,10 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 			tm.DeleteTupleFromTable(tableId, tupleToDelete.TupleGetTupleId())
 		}
 	case container.EP_UPDATE:
-		//tableName := executionPlan.Parameter[0]
-
 		rw := GetRewriter()
+
+		tableName := executionPlan.Parameter[0]
+
 		physicalPlan := rw.LogicalPLanToPhysicalPlan(executionPlan.LogicalPlanRoot)
 		var tuplesToDelete []*container.Tuple
 		for physicalPlan.HasNext() {
@@ -70,12 +71,16 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 			tuplesToDelete = append(tuplesToDelete, fetchedTuple)
 		}
 
-		/* 		for _, oldTuple := range tuplesToDelete {
-			oldTuple.get
-		} */
-
-		//fieldStrings := executionPlan.Parameter[1:]
-		//ee.InsertOperator(tableName, fieldStrings)
+		for _, tupleToDelete := range tuplesToDelete {
+			fieldStrings := rw.TupleFieldsToStrings(tupleToDelete)
+			for i := 1; i < len(executionPlan.Parameter); i += 2 {
+				fieldIndex, _ := strconv.Atoi(executionPlan.Parameter[i])
+				fieldString := executionPlan.Parameter[i+1]
+				fieldStrings[fieldIndex] = fieldString
+			}
+			ee.DeleteOperator(tableName, tupleToDelete.TupleGetTupleId())
+			ee.InsertOperator(tableName, fieldStrings)
+		}
 
 	case container.EP_QUERY:
 	case container.EP_CREATE_TABLE:

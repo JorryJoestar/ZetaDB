@@ -6,6 +6,7 @@ import (
 	"ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
+	"fmt"
 	"sync"
 )
 
@@ -32,10 +33,10 @@ func GetInstance() *Kernel {
 
 func main() {
 	//ktm := execution.GetKeytableManager()
-	//ee := execution.GetExecutionEngine()
+	ee := execution.GetExecutionEngine()
 	//tm := execution.GetTableManipulator()
-	//Parse := parser.GetParser()
-	//rewriter := execution.GetRewriter()
+	Parse := parser.GetParser()
+	rewriter := execution.GetRewriter()
 
 	transaction := storage.GetTransaction()
 	//ktm.InitializeSystem()
@@ -43,11 +44,12 @@ func main() {
 	//sql := "create table student(id int, name varchar(20));"
 	//sql := "drop table student;"
 	//sql := "insert into student values (976, 'Alex');"
-	//sql := "delete from student where id = 76;"
-	//astNode, _ := Parse.ParseSql(sql)
-	//pp := rewriter.ASTNodeToExecutionPlan(1, astNode, sql)
-	//result := ee.Execute(pp)
-	//fmt.Println(result)
+	//sql := "delete from student where id = 976;"
+	sql := "update student set name = 'jack' where id = 976;"
+	astNode, _ := Parse.ParseSql(sql)
+	pp := rewriter.ASTNodeToExecutionPlan(1, astNode, sql)
+	result := ee.Execute(pp)
+	fmt.Println(result)
 
 	transaction.PushTransactionIntoDisk()
 
