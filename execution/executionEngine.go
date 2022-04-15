@@ -36,23 +36,38 @@ func GetExecutionEngine() *ExecutionEngine {
 	return eeInstance
 }
 
-func (ee *ExecutionEngine) ExecutePhysicalPlan(pp *container.ExecutionPlan) string {
-	switch pp.PlanType {
+func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) string {
+	switch executionPlan.PlanType {
 	case container.EP_INITIALIZE_SYSTEM:
 	case container.EP_INSERT:
-		tableName := pp.Parameter[0]
-		fieldStrings := pp.Parameter[1:]
+		tableName := executionPlan.Parameter[0]
+		fieldStrings := executionPlan.Parameter[1:]
 		ee.InsertOperator(tableName, fieldStrings)
-	case container.EP_DELETE:
+	case container.EP_DELETE: //DELETE
+		rw := GetRewriter()
+		ktm := GetExecutionEngine().ktm
+		tableName := executionPlan.Parameter[0]
+		tableId, _, _ := ktm.Query_k_tableId_schema_FromTableName(tableName)
+		physicalPlan := rw.LogicalPLanToPhysicalPlan(executionPlan.LogicalPlanRoot)
+		var tuplesToDelete []*container.Tuple
+		for physicalPlan.HasNext() {
+			fetchedTuple, _ := physicalPlan.GetNext()
+			tuplesToDelete = append(tuplesToDelete, fetchedTuple)
+		}
+
+		tm := GetTableManipulator()
+		for _, tupleToDelete := range tuplesToDelete {
+			tm.DeleteTupleFromTable(tableId, tupleToDelete.TupleGetTupleId())
+		}
 	case container.EP_UPDATE:
 	case container.EP_QUERY:
 	case container.EP_CREATE_TABLE:
-		userIdINT, _ := strconv.Atoi(pp.Parameter[0])
+		userIdINT, _ := strconv.Atoi(executionPlan.Parameter[0])
 		userId := int32(userIdINT)
-		schemaString := pp.Parameter[1]
+		schemaString := executionPlan.Parameter[1]
 		ee.CreateTableOperator(userId, schemaString)
 	case container.EP_DROP_TABLE:
-		tableName := pp.Parameter[0]
+		tableName := executionPlan.Parameter[0]
 		ee.DropTableOperator(tableName)
 	case container.EP_ALTER_TABLE_ADD:
 	case container.EP_ALTER_TABLE_DROP:
@@ -287,7 +302,7 @@ func (ee *ExecutionEngine) InsertOperator(tableName string, fieldStrings []strin
 
 //generate a tree of iterators from physicalPlan and execute it
 //return resultSchema and resultTuples
-func (ee *ExecutionEngine) QueryOperator(pp *container.ExecutionPlan) (*container.Schema, []*container.Tuple) {
+func (ee *ExecutionEngine) QueryOperator(executionPlan *container.ExecutionPlan) (*container.Schema, []*container.Tuple) {
 	return nil, nil
 }
 

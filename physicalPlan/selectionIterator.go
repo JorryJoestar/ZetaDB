@@ -73,12 +73,11 @@ func (si *SelectionIterator) HasNext() bool {
 	return si.hasNext
 }
 
-func (si *SelectionIterator) Close() error {
+func (si *SelectionIterator) Close() {
 	si.currentTuple = nil
 	si.iterator1 = nil
 	si.condition = nil
 	si.hasNext = true
-	return nil
 }
 
 func (si *SelectionIterator) GetSchema() *container.Schema {

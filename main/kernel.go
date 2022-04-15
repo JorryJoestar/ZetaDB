@@ -4,7 +4,6 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
 	"ZetaDB/parser"
-	its "ZetaDB/physicalPlan"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
 	"fmt"
@@ -33,35 +32,11 @@ func GetInstance() *Kernel {
 }
 
 func main() {
-	ktm := execution.GetKeytableManager()
-	//ee := execution.GetExecutionEngine()
+	//ktm := execution.GetKeytableManager()
+	ee := execution.GetExecutionEngine()
 	//tm := execution.GetTableManipulator()
-	//Parse := parser.GetParser()
-	//rewriter := optimizer.GetRewriter()
-
-	predicate := &container.Predicate{
-		PredicateType:      1,
-		CompareMark:        6,
-		CompareValueType:   1,
-		CompareIntValue:    2,
-		LeftAttributeIndex: 0,
-	}
-	condition := &container.Condition{
-		Predicate:     predicate,
-		ConditionType: container.CONDITION_PREDICATE,
-	}
-
-	tableId, schema, _ := ktm.Query_k_tableId_schema_FromTableName("student")
-	headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
-	sfr := its.NewSequentialFileReaderIterator(headPageId, schema)
-	sfr.Open(nil, nil)
-
-	si := its.NewSelectionIterator(condition)
-	si.Open(sfr, nil)
-	for si.HasNext() {
-		tuple, _ := si.GetNext()
-		fmt.Println("tupleId: ", tuple.TupleGetTupleId())
-	}
+	Parse := parser.GetParser()
+	rewriter := execution.GetRewriter()
 
 	transaction := storage.GetTransaction()
 	//ktm.InitializeSystem()
@@ -69,10 +44,11 @@ func main() {
 	//sql := "create table student(id int, name varchar(20));"
 	//sql := "drop table student;"
 	//sql := "insert into student values (976, 'Alex');"
-	//astNode, _ := Parse.ParseSql(sql)
-	//pp := rewriter.ASTNodeToPhysicalPlan(1, astNode, sql)
-	//result := ee.ExecutePhysicalPlan(pp)
-	//fmt.Println(result)
+	sql := "delete from student where id = 76;"
+	astNode, _ := Parse.ParseSql(sql)
+	pp := rewriter.ASTNodeToExecutionPlan(1, astNode, sql)
+	result := ee.Execute(pp)
+	fmt.Println(result)
 
 	transaction.PushTransactionIntoDisk()
 

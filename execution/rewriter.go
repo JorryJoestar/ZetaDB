@@ -3,6 +3,7 @@ package execution
 import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
+	pp "ZetaDB/physicalPlan"
 	"errors"
 	"strconv"
 	"sync"
@@ -260,7 +261,7 @@ func (rw *Rewriter) PredicateNodeToPredicate(predicateNode *parser.PredicateNode
 	return nil, errors.New("rewriter.go    PredicateNodeToPredicate() can not find LeftAttributeIndex")
 }
 
-func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.ExecutionPlan {
+func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.ExecutionPlan {
 	switch astNode.Type {
 	case parser.AST_DDL: //DDL
 		switch astNode.Ddl.Type {
@@ -343,4 +344,48 @@ func (rw *Rewriter) ASTNodeToPhysicalPlan(userId int32, astNode *parser.ASTNode,
 
 	}
 	return nil
+}
+
+//generate a physicalPlan from a logicalPlan
+func (rw *Rewriter) LogicalPLanToPhysicalPlan(logicalPlanRootNode *container.LogicalPlanNode) *pp.PhysicalPlan {
+	return pp.NewPhysicalPlan(rw.LogicalPlanNodeToIterator(logicalPlanRootNode))
+}
+
+//TODO unifinished
+func (rw *Rewriter) LogicalPlanNodeToIterator(logicalPlanNode *container.LogicalPlanNode) pp.Iterator {
+	//recursive ending
+	if logicalPlanNode == nil {
+		return nil
+	}
+
+	var returnIterator pp.Iterator
+
+	iterator1 := rw.LogicalPlanNodeToIterator(logicalPlanNode.LeftNode)
+	iterator2 := rw.LogicalPlanNodeToIterator(logicalPlanNode.RightNode)
+
+	switch logicalPlanNode.NodeType {
+	case container.BAG_DIFFERENCE:
+	case container.BAG_INTERSECTION:
+	case container.BAG_UNION:
+	case container.DUPLICATE_ELIMINATION:
+	case container.GROUPING:
+	case container.INDEX_FILEREADER:
+	case container.NATURAL_JOIN:
+	case container.PRODUCT:
+	case container.PROJECTION:
+	case container.RENAME:
+	case container.SELECTION:
+		returnIterator = pp.NewSelectionIterator(logicalPlanNode.Condition)
+	case container.SEQUENTIAL_FILE_READER:
+		returnIterator = pp.NewSequentialFileReaderIterator(logicalPlanNode.TableHeadPageId, logicalPlanNode.Schema)
+	case container.SET_DIFFERENCE:
+	case container.SET_INTERSECTION:
+	case container.SET_UNION:
+	case container.THETA_JOIN:
+	}
+
+	//open this iterator, ready for useage
+	returnIterator.Open(iterator1, iterator2)
+
+	return returnIterator
 }
