@@ -4,6 +4,7 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
 	pp "ZetaDB/physicalPlan"
+	. "ZetaDB/utility"
 	"errors"
 	"strconv"
 	"sync"
@@ -289,7 +290,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 		}
 	case parser.AST_DML: //DML
 		switch astNode.Dml.Type {
-		case parser.DML_INSERT: //TODO
+		case parser.DML_INSERT:
 			var parameter []string
 
 			//insert tableName first
@@ -314,6 +315,56 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 			return container.NewExecutionPlan(container.EP_INSERT, parameter, nil)
 		case parser.DML_UPDATE:
+			ktm := GetKeytableManager()
+			tableId, tableSchema, _ := ktm.Query_k_tableId_schema_FromTableName(astNode.Dml.Update.TableName)
+
+			var parameter []string
+			parameter = append(parameter, astNode.Dml.Update.TableName)
+
+			//insert domain index and values to update
+			for _, updataListEntryNode := range astNode.Dml.Update.UpdateList {
+				var domainIndex int
+				for i, domain := range tableSchema.GetSchemaDomains() {
+					if domain.GetDomainName() == updataListEntryNode.AttributeName {
+						domainIndex = i
+						break
+					}
+				}
+				parameter = append(parameter, strconv.Itoa(domainIndex))
+
+				switch updataListEntryNode.ElementaryValue.Type {
+				case parser.ELEMENTARY_VALUE_INT:
+					parameter = append(parameter, strconv.Itoa(updataListEntryNode.ElementaryValue.IntValue))
+				case parser.ELEMENTARY_VALUE_FLOAT:
+					parameter = append(parameter, strconv.FormatFloat(updataListEntryNode.ElementaryValue.FloatValue, 'f', -1, 64))
+				case parser.ELEMENTARY_VALUE_STRING:
+					parameter = append(parameter, updataListEntryNode.ElementaryValue.StringValue)
+				case parser.ELEMENTARY_VALUE_BOOLEAN:
+					if updataListEntryNode.ElementaryValue.BooleanValue {
+						parameter = append(parameter, "TRUE")
+					} else {
+						parameter = append(parameter, "FALSE")
+					}
+				}
+			}
+
+			//create logicalPlan
+			headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
+
+			Condition, _ := rw.ConditionNodeToCondition(astNode.Dml.Update.Condition, tableSchema)
+
+			leftNodeOfRoot := &container.LogicalPlanNode{
+				NodeType:        container.SEQUENTIAL_FILE_READER,
+				TableHeadPageId: headPageId,
+				Schema:          tableSchema,
+			}
+			logicalPlanRoot := &container.LogicalPlanNode{
+				NodeType:  container.SELECTION,
+				Condition: Condition,
+				LeftNode:  leftNodeOfRoot,
+			}
+
+			return container.NewExecutionPlan(container.EP_UPDATE, parameter, logicalPlanRoot)
 		case parser.DML_DELETE:
 			//insert tableName into parameter
 			var parameter []string
@@ -388,4 +439,168 @@ func (rw *Rewriter) LogicalPlanNodeToIterator(logicalPlanNode *container.Logical
 	returnIterator.Open(iterator1, iterator2)
 
 	return returnIterator
+}
+
+func (rw *Rewriter) TupleFieldsToStrings(tuple *container.Tuple) []string {
+	var fieldStrings []string
+
+	tableId := tuple.TupleGetTableId()
+
+	ktm := GetKeytableManager()
+	schema, _ := ktm.Query_k_tableId_schema_FromTableId(tableId)
+	domains := schema.GetSchemaDomains()
+
+	for fieldIndex, field := range tuple.TupleGetFields() {
+		fieldBytes, nullErr := field.FieldToBytes()
+
+		var fieldString string
+
+		switch domains[fieldIndex].GetDomainType() {
+		case container.CHAR:
+
+			if nullErr == nil { //not null
+				fieldString, _ = BytesToCHAR(fieldBytes)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.VARCHAR:
+
+			if nullErr == nil { //not null
+				fieldString, _ = BytesToVARCHAR(fieldBytes)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.BIT:
+
+			if nullErr == nil { //not null
+				fieldString = BytesToHexString(fieldBytes)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.BITVARYING:
+
+			if nullErr == nil { //not null
+				fieldString = BytesToHexString(fieldBytes)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.BOOLEAN:
+
+			if nullErr == nil { //not null
+				boolValue := ByteToBOOLEAN(fieldBytes[0])
+				if boolValue {
+					fieldString = "TRUE"
+				} else {
+					fieldString = "FALSE"
+				}
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.INT:
+
+			if nullErr == nil { //not null
+				intValue, _ := BytesToINT(fieldBytes)
+
+				fieldString = strconv.Itoa(int(intValue))
+
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.INTEGER:
+
+			if nullErr == nil { //not null
+				intValue, _ := BytesToInteger(fieldBytes)
+				fieldString = strconv.Itoa(int(intValue))
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.SHORTINT:
+
+			if nullErr == nil { //not null
+				int16Value, _ := BytesToSHORTINT(fieldBytes)
+				fieldString = strconv.Itoa(int(int16Value))
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.FLOAT:
+
+			if nullErr == nil { //not null
+				floatValue, _ := BytesToFLOAT(fieldBytes)
+				float64Value := float64(floatValue)
+				fieldString = strconv.FormatFloat(float64Value, 'E', -1, 64)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.REAL:
+
+			if nullErr == nil { //not null
+				floatValue, _ := BytesToREAL(fieldBytes)
+				float64Value := float64(floatValue)
+				fieldString = strconv.FormatFloat(float64Value, 'E', -1, 64)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.DOUBLEPRECISION:
+
+			if nullErr == nil { //not null
+				floatValue, _ := BytesToDOUBLEPRECISION(fieldBytes)
+				fieldString = strconv.FormatFloat(floatValue, 'E', -1, 64)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.DECIMAL:
+
+			if nullErr == nil { //not null
+				d, _ := domains[fieldIndex].GetDomainD()
+				n, _ := domains[fieldIndex].GetDomainN()
+				floatValue, _ := BytesToDECIMAL(fieldBytes, int(n), int(d))
+				fieldString = strconv.FormatFloat(floatValue, 'E', -1, 64)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.NUMERIC:
+
+			if nullErr == nil { //not null
+				d, _ := domains[fieldIndex].GetDomainD()
+				n, _ := domains[fieldIndex].GetDomainN()
+				floatValue, _ := BytesToNUMERIC(fieldBytes, int(n), int(d))
+				fieldString = strconv.FormatFloat(floatValue, 'E', -1, 64)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.DATE:
+
+			if nullErr == nil { //not null
+				fieldString, _ = BytesToDATE(fieldBytes)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		case container.TIME:
+
+			if nullErr == nil { //not null
+				fieldString, _ = BytesToTIME(fieldBytes)
+			} else { //null
+				fieldString = "NULL"
+			}
+
+		}
+
+		fieldStrings = append(fieldStrings, fieldString)
+	}
+
+	return fieldStrings
 }
