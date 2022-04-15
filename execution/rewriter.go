@@ -262,7 +262,7 @@ func (rw *Rewriter) PredicateNodeToPredicate(predicateNode *parser.PredicateNode
 	return nil, errors.New("rewriter.go    PredicateNodeToPredicate() can not find LeftAttributeIndex")
 }
 
-func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode, sqlString string) *container.ExecutionPlan {
+func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode, sqlString string) (*container.ExecutionPlan, error) {
 	switch astNode.Type {
 	case parser.AST_DDL: //DDL
 		switch astNode.Ddl.Type {
@@ -270,11 +270,11 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			var parameter []string
 			parameter = append(parameter, strconv.Itoa(int(userId)))
 			parameter = append(parameter, sqlString)
-			return container.NewExecutionPlan(container.EP_CREATE_TABLE, parameter, nil)
+			return container.NewExecutionPlan(container.EP_CREATE_TABLE, parameter, nil), nil
 		case parser.DDL_TABLE_DROP:
 			var parameter []string
 			parameter = append(parameter, astNode.Ddl.Table.TableName)
-			return container.NewExecutionPlan(container.EP_DROP_TABLE, parameter, nil)
+			return container.NewExecutionPlan(container.EP_DROP_TABLE, parameter, nil), nil
 		case parser.DDL_TABLE_ALTER_ADD:
 		case parser.DDL_TABLE_ALTER_DROP:
 		case parser.DDL_ASSERT_CREATE:
@@ -313,7 +313,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				}
 			}
 
-			return container.NewExecutionPlan(container.EP_INSERT, parameter, nil)
+			return container.NewExecutionPlan(container.EP_INSERT, parameter, nil), nil
 		case parser.DML_UPDATE:
 			ktm := GetKeytableManager()
 			tableId, tableSchema, _ := ktm.Query_k_tableId_schema_FromTableName(astNode.Dml.Update.TableName)
@@ -364,7 +364,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				LeftNode:  leftNodeOfRoot,
 			}
 
-			return container.NewExecutionPlan(container.EP_UPDATE, parameter, logicalPlanRoot)
+			return container.NewExecutionPlan(container.EP_UPDATE, parameter, logicalPlanRoot), nil
 		case parser.DML_DELETE:
 			//insert tableName into parameter
 			var parameter []string
@@ -388,7 +388,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				LeftNode:  leftNodeOfRoot,
 			}
 
-			return container.NewExecutionPlan(container.EP_DELETE, parameter, logicalPlanRoot)
+			return container.NewExecutionPlan(container.EP_DELETE, parameter, logicalPlanRoot), nil
 		}
 	case parser.AST_DCL: //DCL
 	case parser.AST_DQL: //DQL
@@ -423,14 +423,14 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				logicalPlanRoot = logicalPlanFromFile
 			}
 
-			return container.NewExecutionPlan(container.EP_QUERY, nil, logicalPlanRoot)
+			return container.NewExecutionPlan(container.EP_QUERY, nil, logicalPlanRoot), nil
 		case parser.DQL_UNION:
 		case parser.DQL_DIFFERENCE:
 		case parser.DQL_INTERSECTION:
 		}
 
 	}
-	return nil
+	return nil, nil
 }
 
 //generate a physicalPlan from a logicalPlan

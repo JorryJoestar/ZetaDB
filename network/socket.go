@@ -1,62 +1,45 @@
 package network
 
 import (
-	"ZetaDB/parser"
+	"ZetaDB/container"
 	"ZetaDB/utility"
-	"fmt"
 	"log"
 	"net"
-	"sync"
 )
 
-type Socket struct {
-}
-
-//for singleton pattern
-var socketInstance *Socket
-var socketOnce sync.Once
-
-//to get kernel, call this function
-func GetSocket() *Socket {
-	socketOnce.Do(func() {
-	})
-	return socketInstance
-}
-
-func (socket *Socket) Listen() {
+func Listen(requestChannel chan container.Request) {
+	//listen from this tcp address
 	tcp_addr, _ := net.ResolveTCPAddr("tcp4", utility.DEFAULT_SERVER_ADDRESS)
 
-	// listen port 40320
 	listener, _ := net.ListenTCP("tcp", tcp_addr)
+
 	for {
 		log.Println("[server] listening", tcp_addr.String())
+
 		// wait for client connection
 		conn, err := listener.Accept()
 		if err != nil {
+			log.Println("[server] listening error", err)
 			continue
 		}
-		go handle(conn)
+
+		//fetch sql
+		buffer := make([]byte, 256)
+		conn.Read(buffer)
+		sqlString := string(buffer)
+
+		//generate a request
+		newRequest := container.Request{
+			Connection: conn,
+			Sql:        sqlString,
+		}
+
+		//push the request into channel
+		requestChannel <- newRequest
 	}
 }
 
-func handle(conn net.Conn) {
-	buffer := make([]byte, 256)
-	conn.Read(buffer)
-
-	Parser := parser.GetParser()
-	astNode, err := Parser.ParseSql(string(buffer))
-
-	fmt.Println(string(buffer))
-	fmt.Println(astNode)
-	fmt.Println(err)
-
-	var astString string
-	if err != nil { //parser failed
-		astString = "syntax error"
-	} else {
-		astString = parser.ASTToString(astNode)
-	}
-
-	conn.Write([]byte(astString))
-	log.Println("[server] response to:", conn.RemoteAddr().String())
+func Reply(connection net.Conn, result string) {
+	connection.Write([]byte(result))
+	log.Println("[server] response to:", connection.RemoteAddr().String())
 }
