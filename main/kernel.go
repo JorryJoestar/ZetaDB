@@ -36,7 +36,7 @@ func main() {
 		//parse this sql and get an AST, if sql syntax invalid, reply immediately
 		sqlAstNode, parseErr := Parser.ParseSql(executeSql)
 		if parseErr != nil {
-			network.Reply(currentRequest.Connection, "error: sql syntax invalid")
+			network.Reply(currentRequest.Connection, "error: sql syntax invalid", -1)
 			continue
 		}
 
@@ -44,13 +44,13 @@ func main() {
 		//generate an executionPlan from current userId, AST and sql string
 		executionPlan, rewriteErr := rewriter.ASTNodeToExecutionPlan(0, sqlAstNode, executeSql)
 		if rewriteErr != nil {
-			network.Reply(currentRequest.Connection, rewriteErr.Error())
+			network.Reply(currentRequest.Connection, rewriteErr.Error(), -1)
 			continue
 		}
 
 		//TODO debug
 		if executionPlan == nil {
-			network.Reply(currentRequest.Connection, "not supported currently")
+			network.Reply(currentRequest.Connection, "not supported currently", -1)
 			continue
 		}
 
@@ -61,7 +61,7 @@ func main() {
 		transaction.PushTransactionIntoDisk()
 
 		//reply
-		network.Reply(currentRequest.Connection, executionResult)
+		network.Reply(currentRequest.Connection, executionResult, 0)
 
 		//halt if required
 		if executionResult == "Execute OK, system halt" {

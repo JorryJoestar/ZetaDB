@@ -23,15 +23,18 @@ func Listen(requestChannel chan container.Session) {
 			continue
 		}
 
-		//fetch sql
+		//fetch request
 		buffer := make([]byte, 256)
 		conn.Read(buffer)
-		sqlString := string(buffer)
+		currentRequest := container.NewRequestFromBytes(buffer)
+		requestUserId := currentRequest.UserId
+		requestSql := currentRequest.Sql
 
 		//generate a session
 		newSession := container.Session{
 			Connection: conn,
-			Sql:        sqlString,
+			Sql:        requestSql,
+			UserId:     requestUserId,
 		}
 
 		//push the request into channel
@@ -39,7 +42,11 @@ func Listen(requestChannel chan container.Session) {
 	}
 }
 
-func Reply(connection net.Conn, result string) {
-	connection.Write([]byte(result))
+func Reply(connection net.Conn, message string, stateCode int32) {
+
+	newResponse := container.NewResponse(stateCode, message)
+	responseBytes := newResponse.ResponseToBytes()
+
+	connection.Write([]byte(responseBytes))
 	log.Println("[server] response to:", connection.RemoteAddr().String())
 }
