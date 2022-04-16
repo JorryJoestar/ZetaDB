@@ -7,7 +7,7 @@ import (
 	"net"
 )
 
-func Listen(requestChannel chan container.Request) {
+func Listen(requestChannel chan container.Session) {
 	//listen from this tcp address
 	tcp_addr, _ := net.ResolveTCPAddr("tcp4", utility.DEFAULT_SERVER_ADDRESS)
 
@@ -28,14 +28,14 @@ func Listen(requestChannel chan container.Request) {
 		conn.Read(buffer)
 		sqlString := string(buffer)
 
-		//generate a request
-		newRequest := container.Request{
+		//generate a session
+		newSession := container.Session{
 			Connection: conn,
 			Sql:        sqlString,
 		}
 
 		//push the request into channel
-		requestChannel <- newRequest
+		requestChannel <- newSession
 	}
 }
 

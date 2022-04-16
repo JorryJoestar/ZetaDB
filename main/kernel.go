@@ -18,7 +18,7 @@ func main() {
 	transaction := storage.GetTransaction()
 
 	//create a channel to buffer all requests received from socket
-	requestChannel := make(chan container.Request, utility.DEFAULT_REQUEST_CHANNEL_CAPACITY)
+	requestChannel := make(chan container.Session, utility.DEFAULT_REQUEST_CHANNEL_CAPACITY)
 
 	//open socket and listen to request
 	//push all request into requestChannel

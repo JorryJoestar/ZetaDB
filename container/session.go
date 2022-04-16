@@ -1,5 +1,9 @@
 package container
 
+import "net"
+
 type Session struct {
-	userId int32
+	Connection net.Conn
+	UserId     int32
+	Sql        string
 }
