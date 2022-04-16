@@ -395,6 +395,7 @@ const (
 	DCL_PSMCALL              DCLEnum = 13
 	DCL_INIT                 DCLEnum = 14
 	DCL_DROP_USER            DCLEnum = 15
+	DCL_HALT                 DCLEnum = 16
 )
 
 //data control language

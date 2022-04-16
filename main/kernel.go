@@ -4,14 +4,15 @@ import (
 	"ZetaDB/container"
 	"ZetaDB/execution"
 	"ZetaDB/network"
-	"ZetaDB/parser"
+	parser "ZetaDB/parser"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
+	"os"
 )
 
 func main() {
-	//get parser, rewriter, executionEngine, transaction
-	parser := parser.GetParser()
+	//get Parser, rewriter, executionEngine, transaction
+	Parser := parser.GetParser()
 	rewriter := execution.GetRewriter()
 	executionEngine := execution.GetExecutionEngine()
 	transaction := storage.GetTransaction()
@@ -33,7 +34,7 @@ func main() {
 		executeSql := currentRequest.Sql
 
 		//parse this sql and get an AST, if sql syntax invalid, reply immediately
-		sqlAstNode, parseErr := parser.ParseSql(executeSql)
+		sqlAstNode, parseErr := Parser.ParseSql(executeSql)
 		if parseErr != nil {
 			network.Reply(currentRequest.Connection, "error: sql syntax invalid")
 			continue
@@ -41,7 +42,11 @@ func main() {
 
 		//TODO unfinished, change userId
 		//generate an executionPlan from current userId, AST and sql string
-		executionPlan, _ := rewriter.ASTNodeToExecutionPlan(1, sqlAstNode, executeSql)
+		executionPlan, rewriteErr := rewriter.ASTNodeToExecutionPlan(0, sqlAstNode, executeSql)
+		if rewriteErr != nil {
+			network.Reply(currentRequest.Connection, rewriteErr.Error())
+			continue
+		}
 
 		//TODO debug
 		if executionPlan == nil {
@@ -58,8 +63,9 @@ func main() {
 		//reply
 		network.Reply(currentRequest.Connection, executionResult)
 
+		//halt if required
+		if executionResult == "Execute OK, system halt" {
+			os.Exit(0)
+		}
 	}
-
-	//ktm := execution.GetKeytableManager()
-
 }

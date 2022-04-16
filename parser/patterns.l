@@ -141,6 +141,7 @@
 [Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]                                {return PASSWORD;}
 [Cc][Oo][Nn][Nn][Ee][Cc][Tt]                                    {return CONNECT;}
 [Ii][Nn][Ii][Tt][Ii][Aa][Ll][Ii][Zz][Ee]                        {return INITIALIZE;}
+[Hh][Aa][Ll][Tt]                                                {return HALT;}
 
 [Aa][Ss][Cc]                                                    {return ASC;}
 [Dd][Ee][Ss][Cc]                                                {return DESC;}

@@ -158,7 +158,7 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 		k1_fieldStrings = append(k1_fieldStrings, password)
 		ee.InsertOperator("k_userId_password", k1_fieldStrings)
 
-		executeResult = "Execute OK, new user " + userName + " created"
+		executeResult = "Execute OK, new user created"
 
 	//LOG IN
 	case container.EP_LOG_USER:
@@ -208,6 +208,78 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 			}
 		}
 	case container.EP_PSM_CALL:
+	case container.EP_INIT:
+		ee.InitializeSystem()
+		executeResult = "Execute OK, system initialized"
+	//TODO unfinished
+	case container.EP_DROP_USER:
+		userNameToDelete := executionPlan.Parameter[0]
+
+		//check if user exists, if so get userId, else return error
+		var userIdToDelete int32 = -1
+		ktm := GetKeytableManager()
+		schema0, _ := ktm.Query_k_tableId_schema_FromTableId(0)
+		seqIt0 := pp.NewSequentialFileReaderIterator(0, schema0)
+		seqIt0.Open(nil, nil)
+		for seqIt0.HasNext() {
+			tuple0, _ := seqIt0.GetNext()
+			tupleUserNameBytes, _ := tuple0.TupleGetFieldValue(1)
+			tupleUserName := string(tupleUserNameBytes)
+			if tupleUserName == userNameToDelete {
+				tupleUserIdBytes, _ := tuple0.TupleGetFieldValue(0)
+				userIdToDelete, _ = utility.BytesToINT(tupleUserIdBytes)
+
+				//delete from k_userId_userName
+				ee.DeleteOperator("k_userId_userName", tuple0.TupleGetTupleId())
+				break
+			}
+		}
+		if userIdToDelete == -1 {
+			return "error: no such user to delete"
+		}
+
+		//userId 0 is not permitted to delete
+		if userIdToDelete == 0 {
+			return "error: delete administor not permitted"
+		}
+
+		//delete from k_userId_password
+		schema1, _ := ktm.Query_k_tableId_schema_FromTableId(1)
+		seqIt1 := pp.NewSequentialFileReaderIterator(1, schema1)
+		seqIt1.Open(nil, nil)
+		for seqIt1.HasNext() {
+			tuple1, _ := seqIt1.GetNext()
+			tupleUserIdBytes, _ := tuple1.TupleGetFieldValue(0)
+			tupleUserId, _ := utility.BytesToINT(tupleUserIdBytes)
+			if tupleUserId == userIdToDelete {
+				ee.DeleteOperator("k_userId_password", tuple1.TupleGetTupleId())
+				break
+			}
+		}
+
+		//delete all tables belongs to this user
+		var tableIdsToDelete []int32
+		schema2, _ := ktm.Query_k_tableId_schema_FromTableId(2)
+		seqIt2 := pp.NewSequentialFileReaderIterator(2, schema2)
+		seqIt2.Open(nil, nil)
+		for seqIt2.HasNext() {
+			tuple2, _ := seqIt2.GetNext()
+			tupleUserIdBytes, _ := tuple2.TupleGetFieldValue(1)
+			tupleUserId, _ := utility.BytesToINT(tupleUserIdBytes)
+			if tupleUserId == userIdToDelete {
+				tupleTableIdBytes, _ := tuple2.TupleGetFieldValue(0)
+				tupleTableId, _ := utility.BytesToINT(tupleTableIdBytes)
+				tableIdsToDelete = append(tableIdsToDelete, tupleTableId)
+			}
+		}
+		for _, tableIdToDelete := range tableIdsToDelete {
+			schema, _ := ktm.Query_k_tableId_schema_FromTableId(uint32(tableIdToDelete))
+			tableNameToDelete := schema.GetSchemaTableName()
+			ee.DropTableOperator(tableNameToDelete)
+		}
+		executeResult = "Execute OK, user " + userNameToDelete + " deleted"
+	case container.EP_HALT:
+		executeResult = "Execute OK, system halt"
 	}
 
 	return executeResult

@@ -390,7 +390,9 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 			return container.NewExecutionPlan(container.EP_DELETE, parameter, logicalPlanRoot), nil
 		}
-	case parser.AST_DCL: //DCL
+
+	//DCL
+	case parser.AST_DCL:
 		switch astNode.Dcl.Type {
 		case parser.DCL_TRANSACTION_BEGIN:
 		case parser.DCL_TRANSACTION_COMMIT:
@@ -425,6 +427,31 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 			return container.NewExecutionPlan(container.EP_LOG_USER, parameter, nil), nil
 		case parser.DCL_PSMCALL:
+		case parser.DCL_INIT:
+			//check if current user is administor
+			if userId != 0 {
+				return nil, errors.New("error: current user is not administor")
+			}
+
+			return container.NewExecutionPlan(container.EP_INIT, nil, nil), nil
+		case parser.DCL_DROP_USER:
+			//check if current user is administor
+			if userId != 0 {
+				return nil, errors.New("error: current user is not administor")
+			}
+
+			//push userName to drop into parameter
+			var parameter []string
+			parameter = append(parameter, astNode.Dcl.UserName)
+
+			return container.NewExecutionPlan(container.EP_DROP_USER, parameter, nil), nil
+		case parser.DCL_HALT:
+			//check if current user is administor
+			if userId != 0 {
+				return nil, errors.New("error: current user is not administor")
+			}
+
+			return container.NewExecutionPlan(container.EP_HALT, nil, nil), nil
 		}
 	case parser.AST_DQL: //DQL
 		switch astNode.Dql.Type {

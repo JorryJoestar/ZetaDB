@@ -32,6 +32,9 @@ const (
 	EP_CREATE_USER       ExecutionPlanType = 27
 	EP_LOG_USER          ExecutionPlanType = 28
 	EP_PSM_CALL          ExecutionPlanType = 29
+	EP_INIT              ExecutionPlanType = 30
+	EP_DROP_USER         ExecutionPlanType = 31
+	EP_HALT              ExecutionPlanType = 32
 )
 
 type ExecutionPlan struct {

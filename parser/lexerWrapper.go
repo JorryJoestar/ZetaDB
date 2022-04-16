@@ -330,6 +330,8 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return CONNECT
 	case C.INITIALIZE:
 		return INITIALIZE
+	case C.HALT:
+		return HALT
 
 	//dql
 	case C.DESC:

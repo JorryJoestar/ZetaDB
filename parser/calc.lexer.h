@@ -470,7 +470,7 @@ extern int yylex (void);
 #undef yyTABLES_NAME
 #endif
 
-#line 177 "parser/patterns.l"
+#line 178 "parser/patterns.l"
 
 
 #line 476 "parser/calc.lexer.h"
