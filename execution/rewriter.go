@@ -264,17 +264,23 @@ func (rw *Rewriter) PredicateNodeToPredicate(predicateNode *parser.PredicateNode
 
 func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode, sqlString string) (*container.ExecutionPlan, error) {
 	switch astNode.Type {
-	case parser.AST_DDL: //DDL
+
+	//DDL
+	case parser.AST_DDL:
 		switch astNode.Ddl.Type {
+
+		//CREATE TABLE
 		case parser.DDL_TABLE_CREATE:
 			var parameter []string
 			parameter = append(parameter, strconv.Itoa(int(userId)))
 			parameter = append(parameter, sqlString)
-			return container.NewExecutionPlan(container.EP_CREATE_TABLE, parameter, nil), nil
+			return container.NewExecutionPlan(container.EP_CREATE_TABLE, userId, parameter, nil), nil
+
+		//DROP TABLE
 		case parser.DDL_TABLE_DROP:
 			var parameter []string
 			parameter = append(parameter, astNode.Ddl.Table.TableName)
-			return container.NewExecutionPlan(container.EP_DROP_TABLE, parameter, nil), nil
+			return container.NewExecutionPlan(container.EP_DROP_TABLE, userId, parameter, nil), nil
 		case parser.DDL_TABLE_ALTER_ADD:
 		case parser.DDL_TABLE_ALTER_DROP:
 		case parser.DDL_ASSERT_CREATE:
@@ -288,8 +294,12 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 		case parser.DDL_PSM_CREATE:
 		case parser.DDL_PSM_DROP:
 		}
-	case parser.AST_DML: //DML
+
+	//DML
+	case parser.AST_DML:
 		switch astNode.Dml.Type {
+
+		//INSERT INTO TABLE
 		case parser.DML_INSERT:
 			var parameter []string
 
@@ -313,7 +323,9 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				}
 			}
 
-			return container.NewExecutionPlan(container.EP_INSERT, parameter, nil), nil
+			return container.NewExecutionPlan(container.EP_INSERT, userId, parameter, nil), nil
+
+		//UPDATE TABLE
 		case parser.DML_UPDATE:
 			ktm := GetKeytableManager()
 			tableId, tableSchema, _ := ktm.Query_k_tableId_schema_FromTableName(astNode.Dml.Update.TableName)
@@ -351,7 +363,11 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			//create logicalPlan
 			headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
 
-			Condition, _ := rw.ConditionNodeToCondition(astNode.Dml.Update.Condition, tableSchema)
+			Condition, conditionErr := rw.ConditionNodeToCondition(astNode.Dml.Update.Condition, tableSchema)
+
+			if conditionErr != nil {
+				return nil, errors.New("error: condition invalid")
+			}
 
 			leftNodeOfRoot := &container.LogicalPlanNode{
 				NodeType:        container.SEQUENTIAL_FILE_READER,
@@ -364,7 +380,9 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				LeftNode:  leftNodeOfRoot,
 			}
 
-			return container.NewExecutionPlan(container.EP_UPDATE, parameter, logicalPlanRoot), nil
+			return container.NewExecutionPlan(container.EP_UPDATE, userId, parameter, logicalPlanRoot), nil
+
+		//DELETE FROM TABLE
 		case parser.DML_DELETE:
 			//insert tableName into parameter
 			var parameter []string
@@ -375,7 +393,11 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			tableId, tableSchema, _ := ktm.Query_k_tableId_schema_FromTableName(astNode.Dml.Delete.TableName)
 			headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
 
-			Condition, _ := rw.ConditionNodeToCondition(astNode.Dml.Delete.Condition, tableSchema)
+			Condition, conditionErr := rw.ConditionNodeToCondition(astNode.Dml.Delete.Condition, tableSchema)
+
+			if conditionErr != nil {
+				return nil, errors.New("error: condition invalid")
+			}
 
 			leftNodeOfRoot := &container.LogicalPlanNode{
 				NodeType:        container.SEQUENTIAL_FILE_READER,
@@ -388,7 +410,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				LeftNode:  leftNodeOfRoot,
 			}
 
-			return container.NewExecutionPlan(container.EP_DELETE, parameter, logicalPlanRoot), nil
+			return container.NewExecutionPlan(container.EP_DELETE, userId, parameter, logicalPlanRoot), nil
 		}
 
 	//DCL
@@ -397,6 +419,8 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 		case parser.DCL_TRANSACTION_BEGIN:
 		case parser.DCL_TRANSACTION_COMMIT:
 		case parser.DCL_TRANSACTION_ROLLBACK:
+
+		//SHOW TABLES
 		case parser.DCL_SHOW_TABLES:
 		case parser.DCL_SHOW_ASSERTIONS:
 		case parser.DCL_SHOW_VIEWS:
@@ -404,6 +428,8 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 		case parser.DCL_SHOW_TRIGGERS:
 		case parser.DCL_SHOW_FUNCTIONS:
 		case parser.DCL_SHOW_PROCEDURES:
+
+		//CREATE USER
 		case parser.DCL_CREATE_USER:
 			//get userName and password
 			userName := astNode.Dcl.UserName
@@ -414,7 +440,9 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			parameter = append(parameter, userName)
 			parameter = append(parameter, password)
 
-			return container.NewExecutionPlan(container.EP_CREATE_USER, parameter, nil), nil
+			return container.NewExecutionPlan(container.EP_CREATE_USER, userId, parameter, nil), nil
+
+		//LOG IN USER
 		case parser.DCL_LOG_USER:
 			//get userName and password
 			userName := astNode.Dcl.UserName
@@ -425,15 +453,19 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			parameter = append(parameter, userName)
 			parameter = append(parameter, password)
 
-			return container.NewExecutionPlan(container.EP_LOG_USER, parameter, nil), nil
+			return container.NewExecutionPlan(container.EP_LOG_USER, userId, parameter, nil), nil
 		case parser.DCL_PSMCALL:
+
+		//INITIALIZE
 		case parser.DCL_INIT:
 			//check if current user is administor
 			if userId != 0 {
 				return nil, errors.New("error: current user is not administor")
 			}
 
-			return container.NewExecutionPlan(container.EP_INIT, nil, nil), nil
+			return container.NewExecutionPlan(container.EP_INIT, userId, nil, nil), nil
+
+		//DROP USER
 		case parser.DCL_DROP_USER:
 			//check if current user is administor
 			if userId != 0 {
@@ -444,17 +476,21 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			var parameter []string
 			parameter = append(parameter, astNode.Dcl.UserName)
 
-			return container.NewExecutionPlan(container.EP_DROP_USER, parameter, nil), nil
+			return container.NewExecutionPlan(container.EP_DROP_USER, userId, parameter, nil), nil
 		case parser.DCL_HALT:
 			//check if current user is administor
 			if userId != 0 {
 				return nil, errors.New("error: current user is not administor")
 			}
 
-			return container.NewExecutionPlan(container.EP_HALT, nil, nil), nil
+			return container.NewExecutionPlan(container.EP_HALT, userId, nil, nil), nil
 		}
-	case parser.AST_DQL: //DQL
+
+	//DQL
+	case parser.AST_DQL:
 		switch astNode.Dql.Type {
+
+		//SINGLE QUERY
 		case parser.DQL_SINGLE_QUERY:
 
 			var logicalPlanRoot *container.LogicalPlanNode
@@ -462,9 +498,31 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			ktm := GetKeytableManager()
 			//get tableId, schema, headPageId
 			tableName := astNode.Dql.Query.FromList[0].TableName
-			tableId, schema, _ := ktm.Query_k_tableId_schema_FromTableName(tableName)
+			tableId, schema, tableExistErr := ktm.Query_k_tableId_schema_FromTableName(tableName)
+			if tableExistErr != nil { //check if tableName exist
+				return nil, errors.New("error: no such table")
+			}
 			headPageId, _, _, _, _ := ktm.Query_k_table(tableId)
 
+			//check if this table belongs to the user
+			//administrator has rights to query all tables
+			if userId != 0 {
+				schema2 := ktm.GetKeyTableSchema(2)
+				seqItCheckOwner := pp.NewSequentialFileReaderIterator(2, schema2)
+				seqItCheckOwner.Open(nil, nil)
+				for seqItCheckOwner.HasNext() {
+					tup, _ := seqItCheckOwner.GetNext()
+					tupTableIdBytes, _ := tup.TupleGetFieldValue(0)
+					tupUserIdBytes, _ := tup.TupleGetFieldValue(1)
+					tupTableId, _ := BytesToINT(tupTableIdBytes)
+					tupUserId, _ := BytesToINT(tupUserIdBytes)
+					if uint32(tupTableId) == tableId && tupUserId != userId {
+						return nil, errors.New("error: lack table ownership")
+					}
+				}
+			}
+
+			//build logicalPlan tree
 			logicalPlanFromFile := &container.LogicalPlanNode{
 				NodeType:        container.SEQUENTIAL_FILE_READER,
 				TableHeadPageId: headPageId,
@@ -473,7 +531,11 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 			if astNode.Dql.Query.WhereValid { //where clause valid
 
-				Condition, _ := rw.ConditionNodeToCondition(astNode.Dql.Query.WhereCondition, schema)
+				Condition, conditionErr := rw.ConditionNodeToCondition(astNode.Dql.Query.WhereCondition, schema)
+
+				if conditionErr != nil {
+					return nil, errors.New("error: condition invalid")
+				}
 
 				logicalPlanRoot = &container.LogicalPlanNode{
 					NodeType:  container.SELECTION,
@@ -485,7 +547,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 				logicalPlanRoot = logicalPlanFromFile
 			}
 
-			return container.NewExecutionPlan(container.EP_QUERY, nil, logicalPlanRoot), nil
+			return container.NewExecutionPlan(container.EP_QUERY, userId, nil, logicalPlanRoot), nil
 		case parser.DQL_UNION:
 		case parser.DQL_DIFFERENCE:
 		case parser.DQL_INTERSECTION:

@@ -50,7 +50,7 @@ func main() {
 
 		//TODO debug
 		if executionPlan == nil {
-			network.Reply(currentRequest.Connection, "not supported currently", -1)
+			network.Reply(currentRequest.Connection, "error: not supported currently", -1)
 			continue
 		}
 

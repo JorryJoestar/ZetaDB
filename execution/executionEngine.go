@@ -40,13 +40,16 @@ func GetExecutionEngine() *ExecutionEngine {
 func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) string {
 	executeResult := ""
 	switch executionPlan.PlanType {
-	case container.EP_INITIALIZE_SYSTEM:
+
+	//INSERT INTO TABLE
 	case container.EP_INSERT:
 		tableName := executionPlan.Parameter[0]
 		fieldStrings := executionPlan.Parameter[1:]
 		ee.InsertOperator(tableName, fieldStrings)
 		executeResult = "Execute OK, 1 row inserted"
-	case container.EP_DELETE: //DELETE
+
+	//DELETE FROM TABLE
+	case container.EP_DELETE:
 		rw := GetRewriter()
 		ktm := GetExecutionEngine().ktm
 		tableName := executionPlan.Parameter[0]
@@ -119,7 +122,10 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 	case container.EP_DROP_TRIGGER:
 	case container.EP_CREATE_PSM:
 	case container.EP_DROP_PSM:
+
+	//SHOW TABLES
 	case container.EP_SHOW_TABLES:
+
 	case container.EP_SHOW_ASSERTIONS:
 	case container.EP_SHOW_VIEWS:
 	case container.EP_SHOW_INDEXS:
@@ -208,6 +214,8 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 			}
 		}
 	case container.EP_PSM_CALL:
+
+	//INITIALIZE
 	case container.EP_INIT:
 		ee.InitializeSystem()
 		executeResult = "Execute OK, system initialized"
