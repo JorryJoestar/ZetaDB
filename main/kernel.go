@@ -42,7 +42,7 @@ func main() {
 
 		//TODO unfinished, change userId
 		//generate an executionPlan from current userId, AST and sql string
-		executionPlan, rewriteErr := rewriter.ASTNodeToExecutionPlan(0, sqlAstNode, executeSql)
+		executionPlan, rewriteErr := rewriter.ASTNodeToExecutionPlan(currentRequest.UserId, sqlAstNode, executeSql)
 		if rewriteErr != nil {
 			network.Reply(currentRequest.Connection, rewriteErr.Error(), -1)
 			continue
@@ -61,7 +61,16 @@ func main() {
 		transaction.PushTransactionIntoDisk()
 
 		//reply
-		network.Reply(currentRequest.Connection, executionResult, 0)
+		if len(executionResult) > 8 && executionResult[0:8] == "userId: " {
+			//return logged userId
+			network.Reply(currentRequest.Connection, executionResult[8:], 1)
+		} else if len(executionResult) > 7 && executionResult[0:7] == "error: " {
+			network.Reply(currentRequest.Connection, executionResult, -1)
+		} else if executionResult == "Execute OK, system halt" {
+			network.Reply(currentRequest.Connection, executionResult, -2)
+		} else {
+			network.Reply(currentRequest.Connection, executionResult, 0)
+		}
 
 		//halt if required
 		if executionResult == "Execute OK, system halt" {

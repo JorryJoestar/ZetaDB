@@ -203,7 +203,7 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 				if tuplePassword != password {
 					return "error: incorrect password"
 				} else {
-					return strconv.Itoa(int(userId))
+					return "userId: " + strconv.Itoa(int(userId)) + " " + userName
 				}
 			}
 		}
