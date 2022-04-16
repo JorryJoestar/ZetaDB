@@ -391,6 +391,41 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			return container.NewExecutionPlan(container.EP_DELETE, parameter, logicalPlanRoot), nil
 		}
 	case parser.AST_DCL: //DCL
+		switch astNode.Dcl.Type {
+		case parser.DCL_TRANSACTION_BEGIN:
+		case parser.DCL_TRANSACTION_COMMIT:
+		case parser.DCL_TRANSACTION_ROLLBACK:
+		case parser.DCL_SHOW_TABLES:
+		case parser.DCL_SHOW_ASSERTIONS:
+		case parser.DCL_SHOW_VIEWS:
+		case parser.DCL_SHOW_INDEXS:
+		case parser.DCL_SHOW_TRIGGERS:
+		case parser.DCL_SHOW_FUNCTIONS:
+		case parser.DCL_SHOW_PROCEDURES:
+		case parser.DCL_CREATE_USER:
+			//get userName and password
+			userName := astNode.Dcl.UserName
+			password := astNode.Dcl.Password
+
+			//insert userName and password into parameter
+			var parameter []string
+			parameter = append(parameter, userName)
+			parameter = append(parameter, password)
+
+			return container.NewExecutionPlan(container.EP_CREATE_USER, parameter, nil), nil
+		case parser.DCL_LOG_USER:
+			//get userName and password
+			userName := astNode.Dcl.UserName
+			password := astNode.Dcl.Password
+
+			//insert userName and password into parameter
+			var parameter []string
+			parameter = append(parameter, userName)
+			parameter = append(parameter, password)
+
+			return container.NewExecutionPlan(container.EP_LOG_USER, parameter, nil), nil
+		case parser.DCL_PSMCALL:
+		}
 	case parser.AST_DQL: //DQL
 		switch astNode.Dql.Type {
 		case parser.DQL_SINGLE_QUERY:

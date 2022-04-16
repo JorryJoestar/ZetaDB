@@ -160,9 +160,9 @@ enum {
     PASSWORD        = 320,
     PASSWORDS       = 321,
     CONNECT         = 322, 
+    INITIALIZE      = 323,
 
 //dql
-    DESC            = 323,
     ASC             = 324,
     JOIN            = 325,
     NATURAL         = 326,
@@ -179,13 +179,14 @@ enum {
     UNION           = 337,
     DIFFERENCE      = 338,
     INTERSECTION    = 339,
+    DESC            = 340,
 
 //public
-    NULLMARK          = 340,  //NULL
     LPAREN            = 341,  //(
     RPAREN            = 342,  //)
     SEMICOLON         = 343,  //;
     COMMA             = 344,  //,
     ID                = 345,  //begin with non-number character
     TABLEDOTATTRIBUTE = 346, //tableName.attributeName
+    NULLMARK          = 347,  //NULL
 };

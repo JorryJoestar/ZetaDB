@@ -140,6 +140,7 @@
 [Uu][Ss][Ee][Rr]                                                {return USER;}
 [Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]                                {return PASSWORD;}
 [Cc][Oo][Nn][Nn][Ee][Cc][Tt]                                    {return CONNECT;}
+[Ii][Nn][Ii][Tt][Ii][Aa][Ll][Ii][Zz][Ee]                        {return INITIALIZE;}
 
 [Aa][Ss][Cc]                                                    {return ASC;}
 [Dd][Ee][Ss][Cc]                                                {return DESC;}

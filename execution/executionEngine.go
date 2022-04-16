@@ -3,6 +3,7 @@ package execution
 import (
 	"ZetaDB/container"
 	"ZetaDB/parser"
+	pp "ZetaDB/physicalPlan"
 	subOperator "ZetaDB/physicalPlan"
 	"ZetaDB/storage"
 	"ZetaDB/utility"
@@ -126,7 +127,86 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 	case container.EP_SHOW_FUNCTIONS:
 	case container.EP_SHOW_PROCEDURES:
 	case container.EP_CREATE_USER:
+		userName := executionPlan.Parameter[0]
+		password := executionPlan.Parameter[1]
+
+		//check if this user is already exist
+		ktm := GetKeytableManager()
+		schema0, _ := ktm.Query_k_tableId_schema_FromTableId(0)
+		seqIt := pp.NewSequentialFileReaderIterator(0, schema0)
+		seqIt.Open(nil, nil)
+		for seqIt.HasNext() {
+			tuple0, _ := seqIt.GetNext()
+			tupleUserNameBytes, _ := tuple0.TupleGetFieldValue(1)
+			tupleUserName := string(tupleUserNameBytes)
+			if tupleUserName == userName {
+				return "error: user already exists"
+			}
+		}
+
+		//insert tuple into key table k_userId_userName
+		_, _, lastTupleId, _, _ := ktm.Query_k_table(0)
+		userId := strconv.FormatUint(uint64(lastTupleId+1), 10)
+		var k0_fieldStrings []string
+		k0_fieldStrings = append(k0_fieldStrings, userId)
+		k0_fieldStrings = append(k0_fieldStrings, userName)
+		ee.InsertOperator("k_userId_userName", k0_fieldStrings)
+
+		//insert tuple into key table k_userId_password
+		var k1_fieldStrings []string
+		k1_fieldStrings = append(k1_fieldStrings, userId)
+		k1_fieldStrings = append(k1_fieldStrings, password)
+		ee.InsertOperator("k_userId_password", k1_fieldStrings)
+
+		executeResult = "Execute OK, new user " + userName + " created"
+
+	//LOG IN
 	case container.EP_LOG_USER:
+		userName := executionPlan.Parameter[0]
+		password := executionPlan.Parameter[1]
+		var userId int32 = -1
+
+		//check if userName is in k_userId_userName
+		//if so, get userId
+		//else return error
+		ktm := GetKeytableManager()
+		schema0, _ := ktm.Query_k_tableId_schema_FromTableId(0)
+		seqIt0 := pp.NewSequentialFileReaderIterator(0, schema0)
+		seqIt0.Open(nil, nil)
+		for seqIt0.HasNext() {
+			tuple0, _ := seqIt0.GetNext()
+			tupleUserNameBytes, _ := tuple0.TupleGetFieldValue(1)
+			tupleUserName := string(tupleUserNameBytes)
+			if tupleUserName == userName {
+				tupleUserIdBytes, _ := tuple0.TupleGetFieldValue(0)
+				userId, _ = utility.BytesToINT(tupleUserIdBytes)
+				break
+			}
+		}
+		if userId == -1 {
+			return "error: no such user"
+		}
+
+		//check if password is correct according k_userId_password
+		//if so, return userId
+		//else return error
+		schema1, _ := ktm.Query_k_tableId_schema_FromTableId(1)
+		seqIt1 := pp.NewSequentialFileReaderIterator(1, schema1)
+		seqIt1.Open(nil, nil)
+		for seqIt1.HasNext() {
+			tuple1, _ := seqIt1.GetNext()
+			tupleUserIdBytes, _ := tuple1.TupleGetFieldValue(0)
+			tupleUserId, _ := utility.BytesToINT(tupleUserIdBytes)
+			if tupleUserId == userId {
+				tuplePasswordBytes, _ := tuple1.TupleGetFieldValue(1)
+				tuplePassword := string(tuplePasswordBytes)
+				if tuplePassword != password {
+					return "error: incorrect password"
+				} else {
+					return strconv.Itoa(int(userId))
+				}
+			}
+		}
 	case container.EP_PSM_CALL:
 	}
 

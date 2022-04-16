@@ -393,6 +393,8 @@ const (
 	DCL_CREATE_USER          DCLEnum = 11
 	DCL_LOG_USER             DCLEnum = 12
 	DCL_PSMCALL              DCLEnum = 13
+	DCL_INIT                 DCLEnum = 14
+	DCL_DROP_USER            DCLEnum = 15
 )
 
 //data control language

@@ -299,7 +299,7 @@ type SelectStmtNode struct {
 %type <NodePt> createUserStmt
 %type <NodePt> logUserStmt
 %token START TRANSACTION COMMIT ROLLBACK SHOW TABLES ASSERTIONS VIEWS
-%token INDEXS TRIGGERS FUNCTIONS PROCEDURES USER PASSWORD CONNECT
+%token INDEXS TRIGGERS FUNCTIONS PROCEDURES USER PASSWORD CONNECT INITIALIZE
 %token <String> PASSWORDS
 
 // dml
@@ -2029,12 +2029,13 @@ orderByListEntry
             createUserStmt                  // DCL_CREATE_USER
             logUserStmt                     // DCL_LOG_USER
             psmCallStmt                     // DCL_PSMCALL
+            INITIALIZE SEMICOLON            // DCL_INIT
+            DROP USER ID SEMICOLON          // DCL_DROP_USER
 
         createUserStmt
             CREATE USER ID PASSWORD PASSWORDS SEMICOLON
             CREATE USER ID PASSWORD ID SEMICOLON
-            CREATE USER ID PASSWORD INTVALUE SEMICOLON
-
+            CREATE USER ID PASSWORD INTVALUE SEMICOLO
         logUserStmt
 			CONNECT AS USER ID PASSWORD PASSWORDS SEMICOLON
 			CONNECT AS USER ID PASSWORD ID SEMICOLON
@@ -2134,6 +2135,21 @@ dcl
         $$.Dcl = &DCLNode{}
         $$.Dcl.Type = DCL_PSMCALL
         $$.Dcl.PsmCall = $1.Psm
+    }
+    |INITIALIZE SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_INIT
+    }
+    |DROP USER ID SEMICOLON {
+        $$ = &Node{}
+        $$.Type = DCL_NODE
+
+        $$.Dcl = &DCLNode{}
+        $$.Dcl.Type = DCL_DROP_USER
+        $$.Dcl.UserName = $3
     }
     ;
 

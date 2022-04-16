@@ -1,0 +1,3 @@
+flex --prefix=yy --header-file=parser/calc.lexer.h -o parser/calc.lexer.c parser/patterns.l
+go tool yacc -o parser/calc.parser.go -p "calc" parser/grammar.y
+CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ go build -o ZetaDbServer

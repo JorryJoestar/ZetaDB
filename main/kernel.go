@@ -28,19 +28,26 @@ func main() {
 		//fetch a request if channel is not empty
 		currentRequest := <-requestChannel
 
-		//get sql string from this request
-		currentSql := currentRequest.Sql
+		//get userSql and executeSql string from this request
+		//userSql := currentRequest.UserSql
+		executeSql := currentRequest.Sql
 
 		//parse this sql and get an AST, if sql syntax invalid, reply immediately
-		astNode, parseErr := parser.ParseSql(currentSql)
+		sqlAstNode, parseErr := parser.ParseSql(executeSql)
 		if parseErr != nil {
-			network.Reply(currentRequest.Connection, "Error: sql syntax invalid")
+			network.Reply(currentRequest.Connection, "error: sql syntax invalid")
 			continue
 		}
 
 		//TODO unfinished, change userId
 		//generate an executionPlan from current userId, AST and sql string
-		executionPlan, _ := rewriter.ASTNodeToExecutionPlan(1, astNode, currentSql)
+		executionPlan, _ := rewriter.ASTNodeToExecutionPlan(1, sqlAstNode, executeSql)
+
+		//TODO debug
+		if executionPlan == nil {
+			network.Reply(currentRequest.Connection, "not supported currently")
+			continue
+		}
 
 		//use executionEngine to execute this executionPlan, get a result string for reply
 		executionResult := executionEngine.Execute(executionPlan)
@@ -56,23 +63,3 @@ func main() {
 	//ktm := execution.GetKeytableManager()
 
 }
-
-//tm := execution.GetTableManipulator()
-//ktm.InitializeSystem()
-
-//sql := "create table student(id int, name varchar(20));"
-//sql := "drop table student;"
-//sql := "insert into student values (976, 'Alex');"
-//sql := "delete from student where id = 976;"
-/* 	sql := "select * from student;"
-   	astNode, _ := Parse.ParseSql(sql)
-   	pp, _ := rewriter.ASTNodeToExecutionPlan(1, astNode, sql)
-   	result := ee.Execute(pp)
-   	fmt.Println(result)
-
-   	transaction.PushTransactionIntoDisk() */
-
-//PrintTable(2)
-//PrintTable(8)
-//PrintTable(9)
-//PrintTable(15)

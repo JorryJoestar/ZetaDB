@@ -328,6 +328,8 @@ func (p *calcLex) Lex(yylval *calcSymType) int {
 		return PASSWORDS
 	case C.CONNECT:
 		return CONNECT
+	case C.INITIALIZE:
+		return INITIALIZE
 
 	//dql
 	case C.DESC:
