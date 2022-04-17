@@ -1,14 +1,18 @@
 # ZetaDB
 
-ZetaDB is a relational database that based on Golang and yacc&lex. 
+ZetaDB is a relational database that based on Golang and lex&yacc.
 
 ## Set Up
 
-ZetaDB is composed by server and client. In order to use and test it, compiled clients for multiple platforms and architectures are provided. Them can be found here:
-[darwin_amd64](https://github.com/JorryJoestar/ZetaDBclient/blob/master/%20executable_file/ZetaClient_darwin_amd64)
-[darwin_m1](https://github.com/JorryJoestar/ZetaDBclient/blob/master/%20executable_file/ZetaClient_darwin_m1)
-[linux_amd64](https://github.com/JorryJoestar/ZetaDBclient/blob/master/%20executable_file/ZetaClient_linux_amd64)
-[windows_amd64](https://github.com/JorryJoestar/ZetaDBclient/blob/master/%20executable_file/ZetaClient_windows_amd64.exe)
+ZetaDB is composed by server and client. In order to use and test it, compiled clients for multiple platforms and architectures are provided.
+
+- darwin_amd64
+- darwin_m1
+- linux_amd64
+- windows_amd64
+
+Them can be found here:
+[executable_clients](https://github.com/JorryJoestar/ZetaDBclient/tree/master/%20executable_file)
 
 ## Supported Sql Currently
 
@@ -33,16 +37,23 @@ HALT;
 ```
 SELECT * FROM [ table_name ] WHERE [ condition ];
 
-INSERT INTO [ table_name ] VALUES ( elementaryValueList );
+INSERT INTO [ table_name ] VALUES ( [ elementary_value_list ] );
 
 UPDATE [ table_name ] SET [ updateList ] WHERE [ condition ];
 
 DELETE FROM [ table_name ] WHERE [ condition ];
 ```
 
+[ condition ] is a nested structure, it can be:
 
+- ``[ attribute_name ] [ compare_mark ] elementary_value``
+- ``[ condition ] AND [ condition ]``
+- ``[ condition ] OR [ condition ]``
 
+[ elementary_value_list ] is a list, it can be:
 
+- ``[ elementary_value ]``
+- ``[ elementary_value_list ] , [ elementary_value ]``
 
 #### Create & Drop Table
 
