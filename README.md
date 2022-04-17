@@ -21,7 +21,7 @@ Quite a few of sql commands are supported according to the design, and all of th
 #### User Sign In, Sign Up, Drop User, Log Out
 
 ```
-CONNECT AS USER [ uer_name ] PASSWORD [ password ];
+CONNECT AS USER [ user_name ] PASSWORD [ password ];
 
 CREATE USER [ user_name ] PASSWORD [ password ];
 
@@ -32,7 +32,7 @@ QUIT;
 HALT;
 ```
 
-``DROP USER [ user_name ];`` and ``HALT;`` can only be executed a specific administrator
+Attention: ``DROP USER [ user_name ];`` and ``HALT;`` can only be executed a specific administrator
   
 #### Modification On Table & Query
 
@@ -46,33 +46,13 @@ UPDATE [ table_name ] SET [ update_list ] WHERE [ condition ];
 DELETE FROM [ table_name ] WHERE [ condition ];
 ```
 
-``[ condition ]`` is a nested structure, it can be:
+Notice:
 
-- ``[ attribute_name ] [ compare_mark ] [ elementary_value ]``
-- ``[ condition ] AND [ condition ]``
-- ``[ condition ] OR [ condition ]``
+``[ condition ]`` can be ``[ attribute_name ] [ compare_mark ] [ elementary_value ]``, ``[ condition ] AND [ condition ]`` or ``[ condition ] OR [ condition ]``
 
-``[ compare_mark ]`` can be:
+``[ compare_mark ]`` can be ``=``, ``<>``, ``<``, ``>``, ``<=``, ``>=``
 
-- ``=``
-- ``<>``
-- ``<``
-- ``>``
-- ``<=``
-- ``>=``
-
-``[ elementary_value_list ]`` is a list, it can be:
-
-- ``[ elementary_value ]``
-- ``[ elementary_value_list ] , [ elementary_value ]``
-
-``[ update_list ]`` is a list, it can be:
-
-- ``[ update_list_entry ]``
-- ``[ update_list ] , [ update_list_entry ]``
-			
-``[ update_list_entry ]`` is ``[ attribute_name ] = [ elementary_value ]``
-
+``[ elementary_value ]`` can be int value, float value or string
 
 #### Create & Drop Table
 
@@ -81,7 +61,24 @@ CREATE TABLE [ table_name ] ( [ attribute_declaration_list ] );
 DROP TABLE [ table_name ];
 ```
 
-``[ attribute_declaration_list ]`` is a list, it can be:
+Notice:
 
-- ``[ attribute_declaration ]``
-- ``[ attribute_declaration_list ] , [ attribute_declaration ]``
+``[ attribute_declaration ]`` is ``[ attribute_name ] [ data_type ]``
+
+#### Supported Data Type
+
+- CHAR
+- VARCHAR
+- BIT
+- BITVARYING
+- BOOLEAN
+- INT
+- INTEGER
+- SHORTINT
+- FLOAT
+- REAL
+- DOUBLEPRECISION
+- DECIMAL
+- NUMERIC
+- DATE
+- TIME 
