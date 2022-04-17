@@ -1,6 +1,6 @@
 # ZetaDB
 
-ZetaDB is a relational database that based on Golang and lex&yacc.
+ZetaDB is a relational database that based on lex&yacc and Golang. It is now deployed on a server so you can connect and test it through a client provided below.
 
 ## Set Up
 
@@ -16,7 +16,7 @@ Them can be found here:
 
 ## Supported Sql Currently
 
-Quite a few of sql commands are supported according to the design, and all of them can be parsed if the syntax is correct. Howerer, only a limited amount of commands are realised and can function well currently. These sql commands are lists below:
+Quite a few of sql commands are supported according to the design, and all of them can be parsed if the syntax is correct. Howerer, only a limited amount of commands are realised and can function correctly at present. These sql commands are lists below:
 
 #### User Sign In, Sign Up, Drop User, Log Out
 
@@ -32,7 +32,7 @@ QUIT;
 HALT;
 ```
 
-Attention: ``DROP USER [ user_name ];`` and ``HALT;`` can only be executed a specific administrator
+Attention: ``DROP USER [ user_name ];`` and ``HALT;`` can only be executed by a specific administrator
   
 #### Modification On Table & Query
 
