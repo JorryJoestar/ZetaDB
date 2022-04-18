@@ -271,6 +271,14 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 		//CREATE TABLE
 		case parser.DDL_TABLE_CREATE:
+			//error: log in first
+			if userId == -1 {
+				return nil, errors.New("error: log in first")
+			}
+
+			//error: table already exist
+			//TODO
+
 			var parameter []string
 			parameter = append(parameter, strconv.Itoa(int(userId)))
 			parameter = append(parameter, sqlString)
@@ -281,6 +289,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 			var parameter []string
 			parameter = append(parameter, astNode.Ddl.Table.TableName)
 			return container.NewExecutionPlan(container.EP_DROP_TABLE, userId, parameter, nil), nil
+
 		case parser.DDL_TABLE_ALTER_ADD:
 		case parser.DDL_TABLE_ALTER_DROP:
 		case parser.DDL_ASSERT_CREATE:
@@ -422,6 +431,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 		//SHOW TABLES
 		case parser.DCL_SHOW_TABLES:
+
 		case parser.DCL_SHOW_ASSERTIONS:
 		case parser.DCL_SHOW_VIEWS:
 		case parser.DCL_SHOW_INDEXS:
@@ -467,7 +477,7 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 		//DROP USER
 		case parser.DCL_DROP_USER:
-			//check if current user is administor
+			//error: current user is not administor
 			if userId != 0 {
 				return nil, errors.New("error: current user is not administor")
 			}
@@ -492,6 +502,11 @@ func (rw *Rewriter) ASTNodeToExecutionPlan(userId int32, astNode *parser.ASTNode
 
 		//SINGLE QUERY
 		case parser.DQL_SINGLE_QUERY:
+
+			//error: log in first
+			if userId == -1 {
+				return nil, errors.New("error: log in first")
+			}
 
 			var logicalPlanRoot *container.LogicalPlanNode
 

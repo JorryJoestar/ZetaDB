@@ -39,6 +39,7 @@ func GetExecutionEngine() *ExecutionEngine {
 
 func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) string {
 	executeResult := ""
+
 	switch executionPlan.PlanType {
 
 	//INSERT INTO TABLE
@@ -109,7 +110,7 @@ func (ee *ExecutionEngine) Execute(executionPlan *container.ExecutionPlan) strin
 	case container.EP_DROP_TABLE:
 		tableName := executionPlan.Parameter[0]
 		ee.DropTableOperator(tableName)
-		executeResult = "Execute OK, table created"
+		executeResult = "Execute OK, table dropped"
 	case container.EP_ALTER_TABLE_ADD:
 	case container.EP_ALTER_TABLE_DROP:
 	case container.EP_CREATE_ASSERT:
